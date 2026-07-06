@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { authApi } from "@/lib/api/shop";
+import { authApi, cartApi } from "@/lib/api/shop";
 import type { TokenPairResponse, UserProfile } from "@/lib/api/types";
 import { clearSession, getCurrentUser, getRefreshToken, setCurrentUser, setTokens } from "@/lib/auth/session";
 
@@ -46,6 +46,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function applyTokens(tokens: TokenPairResponse) {
     setTokens(tokens);
+    // the backend merged the guest cart during login/register (CART-02)
+    cartApi.forgetGuestToken();
     try {
       await reloadUserInternal();
     } catch (error) {
@@ -66,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       isReady,
       isAuthenticated: Boolean(user),
-      isAdmin: user?.roles?.some((role) => role.toUpperCase() === "ADMIN") ?? false,
+      isAdmin: user?.roles?.some((role) => role.toUpperCase() === "ADMIN" || role.toUpperCase() === "MANAGER") ?? false,
       login: async (email: string, password: string) => {
         await applyTokens(await authApi.login(email, password));
       },
@@ -74,6 +76,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await applyTokens(await authApi.register(email, password));
       },
       logout: () => {
+        const refreshToken = getRefreshToken();
+        if (refreshToken) {
+          // best effort: revoke the refresh token server-side (AUTH-05)
+          authApi.logout(refreshToken).catch(() => undefined);
+        }
         clearSession();
         setUser(null);
         router.push("/login");

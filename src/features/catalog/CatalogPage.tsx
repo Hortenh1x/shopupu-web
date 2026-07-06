@@ -8,51 +8,71 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { ProductCard } from "@/features/catalog/ProductCard";
 import { catalogApi } from "@/lib/api/shop";
 
-type CatalogFilters = {
-  query: string;
+type FilterState = {
+  q: string;
   category: string;
+  brand: string;
+  gender: string;
+  size: string;
+  color: string;
   minPrice: string;
   maxPrice: string;
+  inStock: boolean;
   sort: string;
 };
+
+const GENDERS = ["MEN", "WOMEN", "UNISEX", "KIDS"];
 
 export function CatalogPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const categories = useQuery({ queryKey: ["categories"], queryFn: catalogApi.categories });
+  const brands = useQuery({ queryKey: ["brands"], queryFn: catalogApi.brands });
   const searchKey = searchParams.toString();
-  const [filters, setFilters] = useState<CatalogFilters>(() => readFilters(searchParams));
+  const [filters, setFilters] = useState<FilterState>(() => readFilters(searchParams));
 
   useEffect(() => {
     setFilters(readFilters(new URLSearchParams(searchKey)));
   }, [searchKey]);
 
-  const apiParams = new URLSearchParams();
-  apiParams.set("page", String(Math.max(Number(searchParams.get("page") ?? "1") - 1, 0)));
-  apiParams.set("size", searchParams.get("size") ?? "12");
-  apiParams.set("sort", searchParams.get("sort") ?? "createdAt,desc");
-  apiParams.set("enabled", "true");
-  if (searchParams.get("query")) apiParams.set("q", searchParams.get("query")!);
-  if (searchParams.get("category")) apiParams.set("categoryId", searchParams.get("category")!);
-  if (searchParams.get("minPrice")) apiParams.set("minPrice", searchParams.get("minPrice")!);
-  if (searchParams.get("maxPrice")) apiParams.set("maxPrice", searchParams.get("maxPrice")!);
+  const page = Math.max(Number(searchParams.get("page") ?? "1") - 1, 0);
+  const applied = readFilters(searchParams);
 
   const products = useQuery({
-    queryKey: ["catalog", apiParams.toString()],
-    queryFn: () => catalogApi.products(apiParams)
+    queryKey: ["catalog", searchKey],
+    queryFn: () =>
+      catalogApi.search({
+        q: applied.q || undefined,
+        categoryId: applied.category ? Number(applied.category) : undefined,
+        brandId: applied.brand ? Number(applied.brand) : undefined,
+        gender: applied.gender || undefined,
+        size: applied.size || undefined,
+        color: applied.color || undefined,
+        minPrice: applied.minPrice || undefined,
+        maxPrice: applied.maxPrice || undefined,
+        inStock: applied.inStock || undefined,
+        page,
+        pageSize: 12,
+        sort: applied.sort
+      })
   });
 
-  function setFilter(name: keyof CatalogFilters, value: string) {
+  function setFilter<K extends keyof FilterState>(name: K, value: FilterState[K]) {
     setFilters((current) => ({ ...current, [name]: value }));
   }
 
-  function updateFilter(event: FormEvent<HTMLFormElement>) {
+  function applyFilters(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const next = new URLSearchParams();
-    if (filters.query.trim()) next.set("query", filters.query.trim());
+    if (filters.q.trim()) next.set("q", filters.q.trim());
     if (filters.category) next.set("category", filters.category);
+    if (filters.brand) next.set("brand", filters.brand);
+    if (filters.gender) next.set("gender", filters.gender);
+    if (filters.size.trim()) next.set("size", filters.size.trim());
+    if (filters.color.trim()) next.set("color", filters.color.trim());
     if (filters.minPrice.trim()) next.set("minPrice", filters.minPrice.trim());
     if (filters.maxPrice.trim()) next.set("maxPrice", filters.maxPrice.trim());
+    if (filters.inStock) next.set("inStock", "true");
     if (filters.sort) next.set("sort", filters.sort);
     next.set("page", "1");
     router.push(`/catalog?${next.toString()}`);
@@ -62,14 +82,14 @@ export function CatalogPage() {
     <main className="page">
       <section className="stack">
         <h1 className="title">Catalog</h1>
-        <form onSubmit={updateFilter} className="card toolbar">
+        <form onSubmit={applyFilters} className="card toolbar" style={{ flexWrap: "wrap" }}>
           <label className="label">
             Search
-            <input className="input" name="query" value={filters.query} onChange={(event) => setFilter("query", event.target.value)} />
+            <input className="input" value={filters.q} onChange={(e) => setFilter("q", e.target.value)} />
           </label>
           <label className="label">
             Category
-            <select className="select" name="category" value={filters.category} onChange={(event) => setFilter("category", event.target.value)}>
+            <select className="select" value={filters.category} onChange={(e) => setFilter("category", e.target.value)}>
               <option value="">All</option>
               {categories.data?.map((category) => (
                 <option key={category.id} value={category.id}>
@@ -79,16 +99,55 @@ export function CatalogPage() {
             </select>
           </label>
           <label className="label">
+            Brand
+            <select className="select" value={filters.brand} onChange={(e) => setFilter("brand", e.target.value)}>
+              <option value="">All</option>
+              {brands.data?.map((brand) => (
+                <option key={brand.id} value={brand.id}>
+                  {brand.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="label">
+            Gender
+            <select className="select" value={filters.gender} onChange={(e) => setFilter("gender", e.target.value)}>
+              <option value="">All</option>
+              {GENDERS.map((gender) => (
+                <option key={gender} value={gender}>
+                  {gender.toLowerCase()}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="label">
+            Size
+            <input className="input" placeholder="M" value={filters.size} onChange={(e) => setFilter("size", e.target.value)} style={{ width: 80 }} />
+          </label>
+          <label className="label">
+            Color
+            <input className="input" placeholder="black" value={filters.color} onChange={(e) => setFilter("color", e.target.value)} style={{ width: 110 }} />
+          </label>
+          <label className="label">
             Min price
-            <input className="input" name="minPrice" value={filters.minPrice} onChange={(event) => setFilter("minPrice", event.target.value)} inputMode="decimal" />
+            <input className="input" value={filters.minPrice} onChange={(e) => setFilter("minPrice", e.target.value)} inputMode="decimal" style={{ width: 90 }} />
           </label>
           <label className="label">
             Max price
-            <input className="input" name="maxPrice" value={filters.maxPrice} onChange={(event) => setFilter("maxPrice", event.target.value)} inputMode="decimal" />
+            <input className="input" value={filters.maxPrice} onChange={(e) => setFilter("maxPrice", e.target.value)} inputMode="decimal" style={{ width: 90 }} />
+          </label>
+          <label className="label">
+            In stock
+            <input
+              type="checkbox"
+              checked={filters.inStock}
+              onChange={(e) => setFilter("inStock", e.target.checked)}
+              style={{ width: 22, height: 22 }}
+            />
           </label>
           <label className="label">
             Sort
-            <select className="select" name="sort" value={filters.sort} onChange={(event) => setFilter("sort", event.target.value)}>
+            <select className="select" value={filters.sort} onChange={(e) => setFilter("sort", e.target.value)}>
               <option value="createdAt,desc">Newest</option>
               <option value="title,asc">Name A-Z</option>
               <option value="price,asc">Price low</option>
@@ -106,11 +165,14 @@ export function CatalogPage() {
               <Skeleton key={index} />
             ))}
           </div>
+        ) : products.error ? (
+          <p className="muted">{(products.error as Error).message}</p>
         ) : (
           <>
             <div className="grid">
               {products.data?.content?.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
+            {!products.data?.content?.length ? <p className="muted">Nothing matches these filters.</p> : null}
             <Pagination page={products.data?.number ?? 0} totalPages={products.data?.totalPages ?? 0} />
           </>
         )}
@@ -119,12 +181,17 @@ export function CatalogPage() {
   );
 }
 
-function readFilters(searchParams: { get: (name: string) => string | null }): CatalogFilters {
+function readFilters(searchParams: { get: (name: string) => string | null }): FilterState {
   return {
-    query: searchParams.get("query") ?? "",
+    q: searchParams.get("q") ?? "",
     category: searchParams.get("category") ?? "",
+    brand: searchParams.get("brand") ?? "",
+    gender: searchParams.get("gender") ?? "",
+    size: searchParams.get("size") ?? "",
+    color: searchParams.get("color") ?? "",
     minPrice: searchParams.get("minPrice") ?? "",
     maxPrice: searchParams.get("maxPrice") ?? "",
+    inStock: searchParams.get("inStock") === "true",
     sort: searchParams.get("sort") ?? "createdAt,desc"
   };
 }

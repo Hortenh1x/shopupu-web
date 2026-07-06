@@ -8,10 +8,17 @@ export type Page<T> = {
   last: boolean;
 };
 
+// === Auth / identity ========================================================
+
 export type UserProfile = {
   id: number;
   email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phone?: string | null;
+  preferredSize?: string | null;
   enabled: boolean;
+  emailVerified: boolean;
   roles: string[];
 };
 
@@ -19,6 +26,59 @@ export type TokenPairResponse = {
   accessToken: string;
   refreshToken: string;
 };
+
+export type UserAddress = {
+  id: number;
+  fullName: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  state?: string | null;
+  postalCode: string;
+  country: string;
+  defaultAddress: boolean;
+};
+
+export type AddressInput = {
+  fullName: string;
+  line1: string;
+  line2?: string | null;
+  city: string;
+  state?: string | null;
+  postalCode: string;
+  country: string;
+  defaultAddress?: boolean;
+};
+
+export type WishlistEntry = {
+  productId: number;
+  title: string;
+  slug: string;
+  price: number;
+  oldPrice?: number | null;
+  brandName?: string | null;
+  available?: boolean | null;
+  addedAt?: string;
+};
+
+export type ConsentType = "MARKETING_EMAIL" | "COOKIES_ANALYTICS" | "DATA_PROCESSING";
+
+export type Consent = {
+  consentType: ConsentType;
+  granted: boolean;
+  policyVersion: string;
+  createdAt?: string;
+};
+
+export type UserDataExport = {
+  profile: UserProfile;
+  addresses: UserAddress[];
+  orders: Array<{ orderNumber: string; status: string; paymentAmount: number; createdAt?: string }>;
+  reviews: Array<{ productId: number; rating: number; title: string; body: string; status: string; createdAt?: string }>;
+  exportedAt: string;
+};
+
+// === Catalog ================================================================
 
 export type Category = {
   id: number;
@@ -28,33 +88,64 @@ export type Category = {
   parentId?: number | null;
 };
 
+export type Brand = {
+  id: number;
+  name: string;
+  slug: string;
+};
+
+export type Gender = "MEN" | "WOMEN" | "UNISEX" | "KIDS";
+
 export type ProductImage = {
   id: number;
   url: string;
   altText?: string | null;
   position?: number | null;
-  sortOrder?: number | null;
+};
+
+export type Variant = {
+  id: number;
+  sku: string;
+  size: string;
+  color?: string | null;
+  price: number;
+  oldPrice?: number | null;
+  enabled: boolean;
+  available?: number | null;
 };
 
 export type Product = {
   id: number;
   title: string;
+  slug: string;
   description?: string | null;
   price: number;
-  sku: string;
-  stock: number;
+  oldPrice?: number | null;
   enabled: boolean;
+  gender: Gender;
+  season?: string | null;
+  material?: string | null;
+  careInstructions?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  brandId?: number | null;
+  brandName?: string | null;
   createdAt?: string;
   categoryId?: number | null;
   categoryName?: string | null;
   categorySlug?: string | null;
-  images?: ProductImage[];
+  images: ProductImage[];
+  variants: Variant[];
 };
 
 export type ProductListItem = {
   id: number;
   title: string;
+  slug: string;
   price: number;
+  oldPrice?: number | null;
+  brandName?: string | null;
+  gender?: Gender | null;
   enabled: boolean;
   createdAt?: string;
   categoryId?: number | null;
@@ -63,51 +154,141 @@ export type ProductListItem = {
   imageAltText?: string | null;
 };
 
+export type ProductInput = {
+  categoryId: number;
+  title: string;
+  slug?: string | null;
+  description?: string | null;
+  price: number | string;
+  oldPrice?: number | string | null;
+  brandName?: string | null;
+  gender?: Gender | null;
+  season?: string | null;
+  material?: string | null;
+  careInstructions?: string | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  enabled?: boolean | null;
+};
+
+export type VariantInput = {
+  sku: string;
+  size: string;
+  color?: string | null;
+  price?: number | string | null;
+  oldPrice?: number | string | null;
+  stock?: number | null;
+  enabled?: boolean | null;
+};
+
+// === Cart ===================================================================
+
 export type CartItem = {
+  variantId: number;
   productId: number;
   title: string;
-  unitPrice: number;
+  sku: string;
+  size: string;
+  color?: string | null;
+  price: number;
   quantity: number;
   lineTotal: number;
 };
 
 export type Cart = {
-  id: number;
   items: CartItem[];
+  totalItems: number;
   subtotal: number;
+  guestToken?: string | null;
 };
 
+// === Orders =================================================================
+
+export type OrderStatus =
+  | "CREATED"
+  | "PENDING_PAYMENT"
+  | "PAID"
+  | "PROCESSING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "COMPLETED"
+  | "CANCELLED"
+  | "REFUNDED";
+
 export type OrderItem = {
+  id: number;
   productId: number;
+  variantId?: number | null;
   title: string;
-  unitPrice: number;
+  sku?: string | null;
+  size?: string | null;
+  color?: string | null;
+  brand?: string | null;
+  price: number;
   quantity: number;
   lineTotal: number;
 };
 
 export type Order = {
   id: number;
-  status: string;
+  orderNumber: string;
   subtotalAmount: number;
   shippingAmount: number;
+  discountAmount: number;
+  promoCode?: string | null;
   paymentAmount: number;
+  status: OrderStatus;
   createdAt?: string;
   updatedAt?: string;
   items: OrderItem[];
 };
 
-export type Shipment = {
-  orderId: number;
-  method: string;
-  shippingStatus: string;
-  orderStatus: string;
-  trackingNumber?: string | null;
-  shippingCost: number;
-  currency: string;
-  address?: ShippingAddress | null;
-  createdAt?: string;
-  updatedAt?: string;
+export type OrderStatusHistoryEntry = {
+  fromStatus?: OrderStatus | null;
+  toStatus: OrderStatus;
+  changedBy: string;
+  createdAt: string;
 };
+
+// === Promo ==================================================================
+
+export type PromoType = "PERCENT" | "FIXED" | "FREE_SHIPPING";
+
+export type PromoValidation = {
+  code: string;
+  promoType: PromoType;
+  discount: number;
+};
+
+export type PromoCode = {
+  id: number;
+  code: string;
+  promoType: PromoType;
+  value: number;
+  minOrderAmount?: number | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  maxRedemptions?: number | null;
+  perUserLimit: number;
+  redemptionCount: number;
+  enabled: boolean;
+};
+
+export type PromoCodeInput = {
+  code: string;
+  promoType: PromoType;
+  value?: number | string | null;
+  minOrderAmount?: number | string | null;
+  startsAt?: string | null;
+  endsAt?: string | null;
+  maxRedemptions?: number | null;
+  perUserLimit?: number | null;
+  enabled?: boolean | null;
+};
+
+// === Shipping ===============================================================
+
+export type ShippingMethod = "DHL" | "STANDARD_POST" | "LOCAL_PICKUP";
 
 export type ShippingAddress = {
   fullName?: string | null;
@@ -119,12 +300,36 @@ export type ShippingAddress = {
   postalCode?: string | null;
 };
 
+export type Shipment = {
+  orderId: number;
+  method?: ShippingMethod | null;
+  shippingStatus?: string | null;
+  orderStatus: string;
+  trackingNumber?: string | null;
+  shippingCost?: number | null;
+  currency?: string | null;
+  address?: ShippingAddress | null;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+// === Payments ===============================================================
+
+export type PaymentStatus =
+  | "CREATED"
+  | "PENDING"
+  | "SUCCEEDED"
+  | "FAILED"
+  | "CANCELED"
+  | "EXPIRED"
+  | "REFUNDED";
+
 export type Payment = {
   id: number;
   orderId: number;
   amount: number;
   currency: string;
-  status: string;
+  status: PaymentStatus;
   provider?: string | null;
   externalPaymentId?: string | null;
   paymentUrl?: string | null;
@@ -132,6 +337,10 @@ export type Payment = {
   createdAt?: string;
   updatedAt?: string;
 };
+
+// === Reviews ================================================================
+
+export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
 
 export type Review = {
   id: number;
@@ -141,14 +350,23 @@ export type Review = {
   rating: number;
   title: string;
   body: string;
-  status: string;
+  status: ReviewStatus;
   createdAt?: string;
   updatedAt?: string;
 };
 
-export type AdminReview = Review & {
-  productTitle?: string;
-  userEmail?: string;
+export type AdminReview = {
+  id: number;
+  productId: number;
+  productTitle?: string | null;
+  userId: number;
+  userEmail?: string | null;
+  rating: number;
+  title: string;
+  body: string;
+  status: ReviewStatus;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type RatingSummary = {
@@ -157,11 +375,14 @@ export type RatingSummary = {
   reviewCount: number;
 };
 
+// === Errors =================================================================
+
 export type ApiProblem = {
   status?: number;
   title?: string;
   detail?: string;
   code?: string;
   message?: string;
+  requestId?: string;
   errors?: Array<{ field: string; message: string }>;
 };

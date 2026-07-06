@@ -6,7 +6,9 @@ export default async function CategoryRedirect({ params }: { params: Promise<{ s
   const { slug } = await params;
   let category: Category | null = null;
   try {
-    const response = await fetch(`${apiBaseUrl}/api/catalog/categories/${encodeURIComponent(slug)}`, { cache: "no-store" });
+    const response = await fetch(`${apiBaseUrl}/api/v1/catalog/categories/${encodeURIComponent(slug)}`, {
+      cache: "no-store"
+    });
     if (response.ok) {
       category = (await response.json()) as Category;
     }
@@ -16,5 +18,5 @@ export default async function CategoryRedirect({ params }: { params: Promise<{ s
   if (category) {
     redirect(`/catalog?category=${category.id}`);
   }
-  redirect(`/catalog?query=${encodeURIComponent(slug)}`);
+  redirect(`/catalog?q=${encodeURIComponent(slug)}`);
 }

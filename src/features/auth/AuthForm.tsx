@@ -1,7 +1,9 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ApiError } from "@/lib/api/client";
@@ -17,6 +19,7 @@ type FormValues = z.infer<typeof schema>;
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const auth = useAuth();
   const router = useRouter();
+  const [registered, setRegistered] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: { email: "", password: "" }
@@ -26,10 +29,11 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     try {
       if (mode === "login") {
         await auth.login(values.email, values.password);
+        router.push("/catalog");
       } else {
         await auth.register(values.email, values.password);
+        setRegistered(true);
       }
-      router.push("/catalog");
     } catch (error) {
       form.reset(values, {
         keepDirty: true,
@@ -40,6 +44,29 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
         message: error instanceof ApiError || error instanceof Error ? error.message : "Authentication failed"
       });
     }
+  }
+
+  if (registered) {
+    return (
+      <main className="page">
+        <section className="brutal stack" style={{ maxWidth: 520, margin: "40px auto", padding: 28 }}>
+          <h1 className="title">Account created</h1>
+          <p className="subhead">Check your email to verify the address.</p>
+          <p className="muted">
+            You are already logged in and can start shopping. Once the verification email arrives, follow the link or
+            paste the token on the verification page.
+          </p>
+          <div className="toolbar">
+            <Link className="button buttonDark" href="/catalog">
+              Go to catalog
+            </Link>
+            <Link className="button" href="/verify-email">
+              Verify email
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -62,6 +89,11 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             {mode === "login" ? "Login" : "Create account"}
           </button>
         </form>
+        {mode === "login" ? (
+          <p className="muted">
+            <Link href="/forgot-password">Forgot password?</Link>
+          </p>
+        ) : null}
       </section>
     </main>
   );

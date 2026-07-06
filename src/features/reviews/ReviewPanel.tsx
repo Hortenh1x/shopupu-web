@@ -5,8 +5,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { RatingStars } from "@/components/ui/RatingStars";
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { ApiError } from "@/lib/api/client";
 import { catalogApi, reviewApi } from "@/lib/api/shop";
+import { useAuth } from "@/lib/auth/AuthProvider";
 
 const reviewSchema = z.object({
   rating: z.coerce.number().min(1).max(5),
@@ -31,6 +32,12 @@ export function ReviewPanel({ productId }: { productId: number }) {
     onSuccess: async () => {
       form.reset({ rating: 5, title: "", body: "" });
       await queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
+    }
+  });
+  const deleteReview = useMutation({
+    mutationFn: (reviewId: number) => reviewApi.remove(reviewId),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
       await queryClient.invalidateQueries({ queryKey: ["rating", productId] });
     }
   });
@@ -44,7 +51,7 @@ export function ReviewPanel({ productId }: { productId: number }) {
         <div className="card">
           <RatingStars value={rating} />
           <p className="muted">
-            {rating.toFixed(2)} average / {summary.data?.reviewCount ?? 0} reviews
+            {rating.toFixed(2)} average / {summary.data?.reviewCount ?? 0} approved reviews
           </p>
         </div>
         {reviews.data?.content?.length ? (
@@ -54,17 +61,28 @@ export function ReviewPanel({ productId }: { productId: number }) {
               <strong>{review.title}</strong>
               <p>{review.body}</p>
               <span className="muted">by {review.username}</span>
+              {auth.user && review.userId === auth.user.id ? (
+                <button
+                  className="button buttonRed"
+                  disabled={deleteReview.isPending}
+                  onClick={() => deleteReview.mutate(review.id)}
+                >
+                  Delete my review
+                </button>
+              ) : null}
             </article>
           ))
         ) : (
-          <p className="muted">No reviews yet.</p>
+          <p className="muted">No approved reviews yet.</p>
         )}
       </div>
 
       <aside className="card stack">
         <h3 style={{ margin: 0 }}>Write review</h3>
         {!auth.isAuthenticated ? (
-          <p className="muted">Login to review this product.</p>
+          <p className="muted">Login to review this product. Reviews are open to verified buyers.</p>
+        ) : createReview.isSuccess ? (
+          <p className="status">Thanks! Your review was sent for moderation and will appear once approved.</p>
         ) : (
           <form className="stack" onSubmit={form.handleSubmit((values) => createReview.mutate(values))}>
             <label className="label">
@@ -85,9 +103,15 @@ export function ReviewPanel({ productId }: { productId: number }) {
               Body
               <textarea className="textarea" {...form.register("body")} />
             </label>
-            {createReview.error ? <p className="muted">{createReview.error.message}</p> : null}
+            {createReview.error ? (
+              <p className="muted">
+                {createReview.error instanceof ApiError && createReview.error.status === 422
+                  ? "Only verified buyers can review: you need a paid order containing this product."
+                  : (createReview.error as Error).message}
+              </p>
+            ) : null}
             <button className="button buttonDark" disabled={createReview.isPending}>
-              Publish
+              Send for moderation
             </button>
           </form>
         )}

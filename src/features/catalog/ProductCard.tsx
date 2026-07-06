@@ -21,9 +21,17 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
           aria-label={preview.altText ?? product.title}
         />
         <div className="stack" style={{ gap: 6 }}>
+          {product.brandName ? <span className="status">{product.brandName}</span> : null}
           <h2 style={{ margin: 0, fontSize: "1.25rem", letterSpacing: "-0.015em" }}>{product.title}</h2>
-          <strong>{Number(product.price).toFixed(2)} EUR</strong>
-          <span className="muted">{product.enabled ? "available" : "disabled"}</span>
+          <span>
+            <strong>{Number(product.price).toFixed(2)} EUR</strong>{" "}
+            {product.oldPrice ? (
+              <span className="muted" style={{ textDecoration: "line-through" }}>
+                {Number(product.oldPrice).toFixed(2)} EUR
+              </span>
+            ) : null}
+          </span>
+          {"gender" in product && product.gender ? <span className="muted">{product.gender.toLowerCase()}</span> : null}
         </div>
       </Link>
     </article>
