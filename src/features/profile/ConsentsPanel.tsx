@@ -25,11 +25,11 @@ export function ConsentsPanel() {
 
   return (
     <div className="stack" style={{ maxWidth: 640 }}>
-      <h2 className="subhead" style={{ margin: 0 }}>
+      <h2 className="subtitle" style={{ margin: 0 }}>
         Consents
       </h2>
       <p className="muted">Every change is recorded with a timestamp and the policy version ({POLICY_VERSION}).</p>
-      {consents.error ? <p className="muted">{(consents.error as Error).message}</p> : null}
+      {consents.error ? <p className="errorText">{(consents.error as Error).message}</p> : null}
       {CONSENTS.map(({ type, label, hint }) => {
         const state = current.get(type);
         return (
@@ -56,7 +56,7 @@ export function ConsentsPanel() {
           </label>
         );
       })}
-      {update.error ? <p className="muted">{(update.error as Error).message}</p> : null}
+      {update.error ? <p className="errorText">{(update.error as Error).message}</p> : null}
     </div>
   );
 }

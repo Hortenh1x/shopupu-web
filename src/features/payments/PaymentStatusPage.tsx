@@ -5,10 +5,18 @@ import { useQuery } from "@tanstack/react-query";
 import { Protected } from "@/components/layout/Protected";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { formatPrice } from "@/features/catalog/ProductCard";
 import { paymentApi } from "@/lib/api/shop";
 import type { PaymentStatus } from "@/lib/api/types";
 
 const failedStatuses: PaymentStatus[] = ["FAILED", "CANCELED", "EXPIRED"];
+
+function statusClass(status: PaymentStatus) {
+  if (status === "SUCCEEDED") return "status statusOk";
+  if (failedStatuses.includes(status)) return "status statusDanger";
+  if (status === "REFUNDED") return "status statusBrand";
+  return "status statusWarn";
+}
 
 export function PaymentStatusPage({ paymentId }: { paymentId: number }) {
   const payment = useQuery({
@@ -33,34 +41,46 @@ export function PaymentStatusPage({ paymentId }: { paymentId: number }) {
             </Link>
           </EmptyState>
         ) : (
-          <section className="brutal stack" style={{ padding: 28 }}>
+          <section className="brutal stack" style={{ padding: "40px 32px", justifyItems: "start", gap: 14 }}>
             {payment.data.status === "SUCCEEDED" ? (
               <>
-                <h1 className="title">Payment succeeded</h1>
-                <p className="subhead muted">The order is paid and moves on to processing.</p>
+                <h1 className="title">
+                  Payment <span className="mark">succeeded</span>.
+                </h1>
+                <p className="subhead" style={{ margin: 0 }}>
+                  The order is paid and moves on to processing.
+                </p>
               </>
             ) : failedStatuses.includes(payment.data.status) ? (
               <>
-                <h1 className="title">Payment {payment.data.status.toLowerCase()}</h1>
-                <p className="subhead muted">The payment did not go through. You can retry from the order.</p>
+                <h1 className="title">Payment {payment.data.status.toLowerCase()}.</h1>
+                <p className="subhead" style={{ margin: 0 }}>
+                  The payment did not go through. You can retry from the order.
+                </p>
               </>
             ) : payment.data.status === "REFUNDED" ? (
               <>
-                <h1 className="title">Payment refunded</h1>
-                <p className="subhead muted">The amount was returned to the original payment method.</p>
+                <h1 className="title">Payment refunded.</h1>
+                <p className="subhead" style={{ margin: 0 }}>
+                  The amount was returned to the original payment method.
+                </p>
               </>
             ) : (
               <>
-                <h1 className="title">Waiting for confirmation</h1>
-                <p className="subhead muted">The payment status refreshes every 3 seconds.</p>
+                <h1 className="title">Waiting for confirmation.</h1>
+                <p className="subhead" style={{ margin: 0 }}>
+                  The payment status refreshes every 3 seconds.
+                </p>
               </>
             )}
-            <span className="status">{payment.data.status}</span>
-            <p>
-              Amount: {payment.data.amount.toFixed(2)} {payment.data.currency}
+            <span className={statusClass(payment.data.status)}>{payment.data.status.toLowerCase()}</span>
+            <p className="mono" style={{ margin: 0 }}>
+              {formatPrice(payment.data.amount)} {payment.data.currency}
             </p>
             {payment.data.externalPaymentId ? (
-              <p className="muted">External payment id: {payment.data.externalPaymentId}</p>
+              <p className="mono muted" style={{ margin: 0, fontSize: "0.82rem" }}>
+                External payment id: {payment.data.externalPaymentId}
+              </p>
             ) : null}
             <div className="toolbar">
               {payment.data.status === "SUCCEEDED" ? (

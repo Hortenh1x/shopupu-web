@@ -64,10 +64,10 @@ export function AddressBook() {
   return (
     <div className="split">
       <div className="stack">
-        <h2 className="subhead" style={{ margin: 0 }}>
+        <h2 className="subtitle" style={{ margin: 0 }}>
           Saved addresses
         </h2>
-        {addresses.error ? <p className="muted">{(addresses.error as Error).message}</p> : null}
+        {addresses.error ? <p className="errorText">{(addresses.error as Error).message}</p> : null}
         {!addresses.data?.length ? <p className="muted">No saved addresses yet.</p> : null}
         {addresses.data?.map((address) => (
           <article key={address.id} className="card stack">
@@ -103,7 +103,7 @@ export function AddressBook() {
           save.mutate();
         }}
       >
-        <h2 className="subhead" style={{ margin: 0 }}>
+        <h2 className="subtitle" style={{ margin: 0 }}>
           {editingId ? "Edit address" : "Add address"}
         </h2>
         {field("fullName", "Full name")}
@@ -113,7 +113,7 @@ export function AddressBook() {
         {field("state", "State / region")}
         {field("postalCode", "Postal code")}
         {field("country", "Country")}
-        {save.error ? <p className="muted">{(save.error as Error).message}</p> : null}
+        {save.error ? <p className="errorText">{(save.error as Error).message}</p> : null}
         <div className="toolbar">
           <button className="button buttonDark" disabled={save.isPending}>
             {editingId ? "Save changes" : "Add address"}

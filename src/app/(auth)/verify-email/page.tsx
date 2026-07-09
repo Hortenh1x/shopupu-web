@@ -33,8 +33,8 @@ function VerifyEmailForm() {
   if (verify.isSuccess) {
     return (
       <main className="page">
-        <section className="brutal stack" style={{ maxWidth: 520, margin: "40px auto", padding: 28 }}>
-          <h1 className="title">Email verified</h1>
+        <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 14 }}>
+          <h1 className="title">Email <span className="mark">verified</span>.</h1>
           <p className="subhead">Your email address is confirmed. Thank you!</p>
           <Link className="button buttonDark" href="/">
             Back to shop
@@ -46,15 +46,15 @@ function VerifyEmailForm() {
 
   return (
     <main className="page">
-      <section className="brutal stack" style={{ maxWidth: 520, margin: "40px auto", padding: 28 }}>
-        <h1 className="title">Verify email</h1>
+      <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 14 }}>
+        <h1 className="title">Verify email.</h1>
         <p className="muted">Paste the verification token from the email we sent you.</p>
         <form className="stack" onSubmit={submit}>
           <label className="label">
             Verification token
             <input className="input" required value={token} onChange={(event) => setToken(event.target.value)} />
           </label>
-          {verify.error ? <p className="muted">{(verify.error as Error).message}</p> : null}
+          {verify.error ? <p className="errorText" style={{ margin: 0 }}>{(verify.error as Error).message}</p> : null}
           <button className="button buttonDark" disabled={verify.isPending}>
             Verify
           </button>
@@ -66,9 +66,9 @@ function VerifyEmailForm() {
               <button className="button" disabled={resend.isPending} onClick={() => resend.mutate()}>
                 Resend verification email
               </button>
-              {resend.isSuccess ? <span className="status">Sent</span> : null}
+              {resend.isSuccess ? <span className="status statusOk">sent</span> : null}
             </div>
-            {resend.error ? <p className="muted">{(resend.error as Error).message}</p> : null}
+            {resend.error ? <p className="errorText" style={{ margin: 0 }}>{(resend.error as Error).message}</p> : null}
           </div>
         ) : null}
       </section>

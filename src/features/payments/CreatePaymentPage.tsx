@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { Protected } from "@/components/layout/Protected";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { formatPrice } from "@/features/catalog/ProductCard";
 import { newIdempotencyKey } from "@/lib/api/client";
 import { orderApi, paymentApi } from "@/lib/api/shop";
 
@@ -34,11 +35,13 @@ export function CreatePaymentPage() {
 
   if (!Number.isFinite(orderId) || orderId <= 0) {
     return (
-      <EmptyState title="Missing order" body="Open payment from an order so the order id is present.">
-        <Link className="button buttonDark" href="/orders">
-          Orders
-        </Link>
-      </EmptyState>
+      <main className="page">
+        <EmptyState title="Missing order" body="Open payment from an order so the order id is present.">
+          <Link className="button buttonDark" href="/orders">
+            Orders
+          </Link>
+        </EmptyState>
+      </main>
     );
   }
 
@@ -47,50 +50,76 @@ export function CreatePaymentPage() {
   return (
     <Protected>
       <main className="page">
-        <section className="brutal stack" style={{ padding: 28 }}>
-          <h1 className="title">Payment</h1>
-          {order.isLoading ? (
-            <Skeleton lines={4} />
-          ) : order.data ? (
-            <div className="card stack">
-              <h2 className="headline">Order {order.data.orderNumber}</h2>
-              <p>Subtotal: {order.data.subtotalAmount.toFixed(2)} EUR</p>
-              <p>Shipping: {order.data.shippingAmount.toFixed(2)} EUR</p>
-              {order.data.discountAmount > 0 ? (
-                <p>
-                  Discount{order.data.promoCode ? ` (${order.data.promoCode})` : ""}: -
-                  {order.data.discountAmount.toFixed(2)} EUR
-                </p>
-              ) : null}
-              <strong style={{ fontSize: "1.5rem" }}>Total: {order.data.paymentAmount.toFixed(2)} EUR</strong>
-            </div>
-          ) : null}
-          {order.error ? <p className="muted">{(order.error as Error).message}</p> : null}
-          <button
-            className="button buttonDark"
-            disabled={createPayment.isPending || Boolean(payment)}
-            onClick={() => createPayment.mutate()}
-          >
-            Pay now
-          </button>
-          {createPayment.error ? <p className="muted">{(createPayment.error as Error).message}</p> : null}
+        <div className="stack" style={{ gap: 6, marginBottom: 24 }}>
+          <span className="kicker">Checkout · step 3 of 3</span>
+          <h1 className="title">Pay for your order.</h1>
+        </div>
+        <section className="split">
+          <div className="card stack" style={{ padding: 24 }}>
+            {order.isLoading ? (
+              <Skeleton lines={4} />
+            ) : order.data ? (
+              <div className="stack" style={{ gap: 8 }}>
+                <span className="mono muted" style={{ fontSize: "0.85rem" }}>
+                  Order {order.data.orderNumber}
+                </span>
+                <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                  <span className="muted">Subtotal</span>
+                  <span className="price">{formatPrice(order.data.subtotalAmount)}</span>
+                </div>
+                <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                  <span className="muted">Shipping</span>
+                  <span className="price">{formatPrice(order.data.shippingAmount)}</span>
+                </div>
+                {order.data.discountAmount > 0 ? (
+                  <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                    <span className="muted">Discount{order.data.promoCode ? ` (${order.data.promoCode})` : ""}</span>
+                    <span className="price">&minus;{formatPrice(order.data.discountAmount)}</span>
+                  </div>
+                ) : null}
+                <hr className="divider" />
+                <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                  <span style={{ fontWeight: 600 }}>Total</span>
+                  <span className="price" style={{ fontSize: "1.6rem" }}>
+                    {formatPrice(order.data.paymentAmount)}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+            {order.error ? <p className="errorText" style={{ margin: 0 }}>{(order.error as Error).message}</p> : null}
+            <button
+              className="button buttonAccent"
+              disabled={createPayment.isPending || Boolean(payment)}
+              onClick={() => createPayment.mutate()}
+            >
+              {createPayment.isPending ? "Creating payment..." : "Pay now"}
+            </button>
+            {createPayment.error ? (
+              <p className="errorText" style={{ margin: 0 }}>
+                {(createPayment.error as Error).message}
+              </p>
+            ) : null}
+            {payment && isAbsoluteHttpUrl(payment.paymentUrl) ? (
+              <p className="muted" style={{ margin: 0 }}>
+                Redirecting to the payment provider...
+              </p>
+            ) : null}
+            <Link className="button" style={{ justifySelf: "start" }} href={`/orders/${orderId}`}>
+              Back to order
+            </Link>
+          </div>
+
           {payment && !isAbsoluteHttpUrl(payment.paymentUrl) ? (
-            <div className="card stack">
-              <span className="status">{payment.status}</span>
-              <p>
-                Payment #{payment.id}: {payment.amount.toFixed(2)} {payment.currency}
+            <aside className="card stack" style={{ padding: 24 }}>
+              <span className="status statusWarn">{payment.status.toLowerCase()}</span>
+              <p className="mono" style={{ margin: 0 }}>
+                Payment #{payment.id} · {formatPrice(payment.amount)} {payment.currency}
               </p>
               <Link className="button buttonDark" href={`/payment/${payment.id}`}>
                 Track payment status
               </Link>
-            </div>
+            </aside>
           ) : null}
-          {payment && isAbsoluteHttpUrl(payment.paymentUrl) ? (
-            <p className="muted">Redirecting to the payment provider...</p>
-          ) : null}
-          <Link className="button" href={`/orders/${orderId}`}>
-            Back to order
-          </Link>
         </section>
       </main>
     </Protected>

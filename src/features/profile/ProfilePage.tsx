@@ -24,14 +24,12 @@ export function ProfilePage() {
   return (
     <Protected>
       <main className="page">
-        <h1 className="title">My account</h1>
-        <div className="toolbar" style={{ flexWrap: "wrap" }}>
+        <h1 className="title" style={{ marginBottom: 20 }}>
+          My account.
+        </h1>
+        <div className="chipRow">
           {TABS.map((item) => (
-            <button
-              key={item.id}
-              className={item.id === tab ? "button buttonDark" : "button"}
-              onClick={() => setTab(item.id)}
-            >
+            <button key={item.id} className="chip" data-selected={item.id === tab} onClick={() => setTab(item.id)}>
               {item.label}
             </button>
           ))}

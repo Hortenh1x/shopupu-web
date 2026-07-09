@@ -17,6 +17,7 @@ Production build: `npm run build && npm run start`. Type check: `npm run typeche
 ## Environment
 
 - `NEXT_PUBLIC_API_BASE_URL` — backend URL (default `http://localhost:8080`).
+  The backend allows this origin via CORS for the `dev` profile.
 
 ## What's inside
 
@@ -39,7 +40,14 @@ Production build: `npm run build && npm run start`. Type check: `npm run typeche
 - **Admin** (`/admin`, ADMIN/MANAGER): products with clothing attributes,
   **variant editor** (SKU/size/color/price/stock) and image uploads; categories;
   paged orders with valid status transitions, status history, shipping updates
-  and payment refunds; review moderation (approve/reject); promo codes; users.
+  and payment refunds; review moderation (approve/reject); promo codes; users;
+  **AI maintenance** (embeddings backfill, recommendations recompute, review
+  summaries refresh - async 202 triggers).
+- **AI catalog features** (degrade gracefully when `AI_ENABLED` is off on the
+  backend): **smart search** toggle on the catalog (`nl-search` parses plain
+  words into filters), "You may also like" (`/similar`) and "Often bought
+  together" (`/bought-together`) rails plus an AI review summary
+  (`/review-summary`, hidden until generated) on the product page.
 
 ## Structure
 
@@ -50,5 +58,7 @@ Production build: `npm run build && npm run start`. Type check: `npm run typeche
   shipping, reviews, profile, admin)
 - `src/app` — App Router pages (thin wrappers around features)
 
-Design is intentionally minimal (global CSS classes only) — a full redesign is
-planned separately.
+Design: warm editorial "tangerine" system (cream surfaces, tangerine panels,
+golden highlight marks; Bricolage Grotesque + Inter + JetBrains Mono via
+`next/font`), implemented as plain global CSS classes in `src/app/globals.css`.
+Tokens and rules: [DESIGN.md](DESIGN.md), strategy: [PRODUCT.md](PRODUCT.md).

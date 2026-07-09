@@ -48,8 +48,8 @@ export default function Page() {
         <button className="button buttonDark" disabled={update.isPending}>
           Update shipment
         </button>
-        {update.data ? <span className="status">Updated</span> : null}
-        {update.error ? <p className="muted">{(update.error as Error).message}</p> : null}
+        {update.data ? <span className="status statusOk">updated</span> : null}
+        {update.error ? <p className="errorText">{(update.error as Error).message}</p> : null}
       </form>
     </AdminShell>
   );

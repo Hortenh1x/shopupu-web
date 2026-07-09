@@ -18,10 +18,10 @@ export function WishlistPanel() {
 
   return (
     <div className="stack">
-      <h2 className="subhead" style={{ margin: 0 }}>
+      <h2 className="subtitle" style={{ margin: 0 }}>
         Wishlist
       </h2>
-      {wishlist.error ? <p className="muted">{(wishlist.error as Error).message}</p> : null}
+      {wishlist.error ? <p className="errorText">{(wishlist.error as Error).message}</p> : null}
       {!data?.content?.length ? <p className="muted">Nothing saved yet - add products from their pages.</p> : null}
       {data?.content?.map((entry) => (
         <article key={entry.productId} className="card toolbar" style={{ justifyContent: "space-between" }}>
@@ -46,9 +46,7 @@ export function WishlistPanel() {
           <button className="button" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
             Previous
           </button>
-          <span className="status">
-            {page + 1} / {data.totalPages}
-          </span>
+          <span className="mono muted" style={{ fontSize: "0.88rem" }}>{page + 1} / {data.totalPages}</span>
           <button className="button" disabled={page >= data.totalPages - 1} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>

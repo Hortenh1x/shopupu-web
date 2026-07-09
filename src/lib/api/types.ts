@@ -375,6 +375,18 @@ export type RatingSummary = {
   reviewCount: number;
 };
 
+// === AI (semantic search, recommendations, review summaries) ===============
+
+export type ReviewSummary = {
+  productId: number;
+  tldr?: string | null;
+  pros?: string[] | null;
+  cons?: string[] | null;
+  sentiment?: string | null;
+  basedOnReviews: number;
+  generatedAt?: string | null;
+};
+
 // === Errors =================================================================
 
 export type ApiProblem = {

@@ -30,8 +30,8 @@ function ResetPasswordForm() {
   if (reset.isSuccess) {
     return (
       <main className="page">
-        <section className="brutal stack" style={{ maxWidth: 520, margin: "40px auto", padding: 28 }}>
-          <h1 className="title">Password updated</h1>
+        <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 14 }}>
+          <h1 className="title">Password <span className="mark">updated</span>.</h1>
           <p className="subhead">Your password has been reset. Login with the new password.</p>
           <Link className="button buttonDark" href="/login">
             Go to login
@@ -43,8 +43,8 @@ function ResetPasswordForm() {
 
   return (
     <main className="page">
-      <section className="brutal stack" style={{ maxWidth: 520, margin: "40px auto", padding: 28 }}>
-        <h1 className="title">Reset password</h1>
+      <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 14 }}>
+        <h1 className="title">Reset password.</h1>
         <form className="stack" onSubmit={submit}>
           <label className="label">
             Reset code
@@ -72,8 +72,8 @@ function ResetPasswordForm() {
               onChange={(event) => setConfirm(event.target.value)}
             />
           </label>
-          {mismatch ? <p className="muted">Passwords do not match.</p> : null}
-          {reset.error ? <p className="muted">{(reset.error as Error).message}</p> : null}
+          {mismatch ? <p className="errorText" style={{ margin: 0 }}>Passwords do not match.</p> : null}
+          {reset.error ? <p className="errorText" style={{ margin: 0 }}>{(reset.error as Error).message}</p> : null}
           <button className="button buttonDark" disabled={reset.isPending}>
             Set new password
           </button>

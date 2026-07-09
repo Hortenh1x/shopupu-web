@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { AdminShell } from "@/features/admin/AdminShell";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { adminApi } from "@/lib/api/shop";
 
 export default function Page() {
@@ -34,7 +35,7 @@ export default function Page() {
           </select>
         </label>
       </div>
-      {reviews.error ? <p className="muted">{(reviews.error as Error).message}</p> : null}
+      {reviews.error ? <p className="errorText">{(reviews.error as Error).message}</p> : null}
       <table className="table">
         <thead>
           <tr>
@@ -61,13 +62,13 @@ export default function Page() {
                 </p>
               </td>
               <td>
-                <span className="status">{review.status}</span>
+                <StatusBadge value={review.status} />
               </td>
               <td>
                 <div className="toolbar">
                   {review.status !== "APPROVED" ? (
                     <button
-                      className="button buttonGreen"
+                      className="button buttonGreen buttonSmall"
                       disabled={updateStatus.isPending}
                       onClick={() => updateStatus.mutate({ id: review.id, nextStatus: "APPROVED" })}
                     >
@@ -76,14 +77,14 @@ export default function Page() {
                   ) : null}
                   {review.status !== "REJECTED" ? (
                     <button
-                      className="button"
+                      className="button buttonSmall"
                       disabled={updateStatus.isPending}
                       onClick={() => updateStatus.mutate({ id: review.id, nextStatus: "REJECTED" })}
                     >
                       Reject
                     </button>
                   ) : null}
-                  <button className="button buttonRed" disabled={remove.isPending} onClick={() => remove.mutate(review.id)}>
+                  <button className="button buttonRed buttonSmall" disabled={remove.isPending} onClick={() => remove.mutate(review.id)}>
                     Delete
                   </button>
                 </div>

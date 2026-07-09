@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { AdminShell } from "@/features/admin/AdminShell";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { formatPrice } from "@/features/catalog/ProductCard";
 import { adminApi } from "@/lib/api/shop";
 
 const STATUSES = [
@@ -50,7 +52,7 @@ export default function Page() {
           </select>
         </label>
       </div>
-      {orders.error ? <p className="muted">{(orders.error as Error).message}</p> : null}
+      {orders.error ? <p className="errorText">{(orders.error as Error).message}</p> : null}
       <table className="table">
         <thead>
           <tr>
@@ -65,15 +67,15 @@ export default function Page() {
         <tbody>
           {data?.content?.map((order) => (
             <tr key={order.id}>
-              <td>{order.orderNumber}</td>
+              <td className="mono" style={{ fontWeight: 600 }}>{order.orderNumber}</td>
               <td>
-                <span className="status">{order.status}</span>
+                <StatusBadge value={order.status} />
               </td>
-              <td>{Number(order.paymentAmount).toFixed(2)} EUR</td>
-              <td>{order.discountAmount > 0 ? `-${Number(order.discountAmount).toFixed(2)}` : "-"}</td>
+              <td className="price">{formatPrice(order.paymentAmount)}</td>
+              <td className="mono muted">{order.discountAmount > 0 ? `-${formatPrice(order.discountAmount)}` : "-"}</td>
               <td>{order.createdAt ? new Date(order.createdAt).toLocaleString() : "-"}</td>
               <td>
-                <Link className="button" href={`/admin/orders/${order.id}`}>
+                <Link className="button buttonSmall" href={`/admin/orders/${order.id}`}>
                   Open
                 </Link>
               </td>
@@ -86,7 +88,7 @@ export default function Page() {
           <button className="button" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
             Previous
           </button>
-          <span className="status">
+          <span className="mono muted" style={{ fontSize: "0.88rem" }}>
             {page + 1} / {data.totalPages}
           </span>
           <button className="button" disabled={page >= data.totalPages - 1} onClick={() => setPage((p) => p + 1)}>

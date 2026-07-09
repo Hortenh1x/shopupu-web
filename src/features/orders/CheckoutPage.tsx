@@ -7,6 +7,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Protected } from "@/components/layout/Protected";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { formatPrice } from "@/features/catalog/ProductCard";
 import { newIdempotencyKey } from "@/lib/api/client";
 import { cartApi, orderApi, promoApi } from "@/lib/api/shop";
 import { useAuth } from "@/lib/auth/AuthProvider";
@@ -39,57 +40,68 @@ export function CheckoutPage() {
   return (
     <Protected>
       <main className="page">
-        <h1 className="title">Checkout</h1>
+        <div className="stack" style={{ gap: 6, marginBottom: 24 }}>
+          <span className="kicker">Checkout · step 1 of 3</span>
+          <h1 className="title">Review your order.</h1>
+        </div>
         {cart.isLoading ? (
           <Skeleton lines={4} />
         ) : !cart.data?.items?.length ? (
-          <EmptyState title="Empty cart" body="Add products before checking out.">
+          <EmptyState title="Your cart is empty." body="Add products before checking out.">
             <Link className="button buttonDark" href="/catalog">
-              Browse catalog
+              Browse the catalog
             </Link>
           </EmptyState>
         ) : (
           <section className="split">
             <div className="stack">
-              <h2 className="headline">Review items</h2>
               <div style={{ overflowX: "auto" }}>
                 <table className="table">
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>SKU</th>
-                      <th>Size</th>
-                      <th>Color</th>
+                      <th>Item</th>
                       <th>Qty</th>
+                      <th>Unit</th>
                       <th>Total</th>
                     </tr>
                   </thead>
                   <tbody>
                     {cart.data.items.map((item) => (
                       <tr key={item.variantId}>
-                        <td>{item.title}</td>
-                        <td className="muted">{item.sku}</td>
-                        <td>{item.size}</td>
-                        <td>{item.color ?? "-"}</td>
                         <td>
-                          {item.quantity} x {item.price.toFixed(2)} EUR
+                          <div className="stack" style={{ gap: 3 }}>
+                            <span style={{ fontWeight: 600 }}>{item.title}</span>
+                            <span className="mono muted" style={{ fontSize: "0.78rem" }}>
+                              {[item.size, item.color, item.sku].filter(Boolean).join(" · ")}
+                            </span>
+                          </div>
                         </td>
-                        <td>{item.lineTotal.toFixed(2)} EUR</td>
+                        <td className="mono">{item.quantity}</td>
+                        <td className="price">{formatPrice(item.price)}</td>
+                        <td className="price">{formatPrice(item.lineTotal)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-              <Link className="button" href="/cart">
+              <Link className="button" style={{ justifySelf: "start" }} href="/cart">
                 Edit cart
               </Link>
             </div>
-            <aside className="card stack">
-              <h2 className="headline">Summary</h2>
-              <p>Subtotal: {cart.data.subtotal.toFixed(2)} EUR</p>
+
+            <aside className="card stack" style={{ padding: 24 }}>
+              <h2 className="subtitle" style={{ margin: 0 }}>
+                Summary.
+              </h2>
+              <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                <span className="muted">Subtotal</span>
+                <span className="price" style={{ fontSize: "1.4rem" }}>
+                  {formatPrice(cart.data.subtotal)}
+                </span>
+              </div>
               <label className="label">
                 Promo code
-                <div className="toolbar">
+                <div className="toolbar" style={{ flexWrap: "nowrap" }}>
                   <input
                     className="input"
                     value={code}
@@ -107,19 +119,23 @@ export function CheckoutPage() {
                 </div>
               </label>
               {promo.data ? (
-                <p className="status">
-                  {promo.data.code} ({promo.data.promoType}): -{promo.data.discount.toFixed(2)} EUR
-                  <button className="button" type="button" style={{ marginLeft: 8 }} onClick={() => promo.reset()}>
+                <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                  <span className="status statusOk">
+                    {promo.data.code} &minus;{formatPrice(promo.data.discount)}
+                  </span>
+                  <button className="button buttonSmall" type="button" onClick={() => promo.reset()}>
                     Remove
                   </button>
-                </p>
+                </div>
               ) : null}
-              {promo.error ? <p className="muted">{(promo.error as Error).message}</p> : null}
+              {promo.error ? <p className="errorText" style={{ margin: 0 }}>{(promo.error as Error).message}</p> : null}
               <button className="button buttonDark" disabled={checkout.isPending} onClick={() => checkout.mutate()}>
-                Place order
+                {checkout.isPending ? "Placing order..." : "Place order"}
               </button>
-              {checkout.error ? <p className="muted">{(checkout.error as Error).message}</p> : null}
-              <p className="muted">Shipping is chosen on the next step and added to the total.</p>
+              {checkout.error ? <p className="errorText" style={{ margin: 0 }}>{(checkout.error as Error).message}</p> : null}
+              <p className="muted" style={{ margin: 0, fontSize: "0.85rem" }}>
+                Shipping is chosen on the next step and added to the total.
+              </p>
             </aside>
           </section>
         )}

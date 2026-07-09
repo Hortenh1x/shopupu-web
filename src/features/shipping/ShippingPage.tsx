@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Protected } from "@/components/layout/Protected";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { formatPrice } from "@/features/catalog/ProductCard";
 import { orderApi, shippingApi, userApi } from "@/lib/api/shop";
 import type { ShippingMethod } from "@/lib/api/types";
 
@@ -25,7 +26,7 @@ const schema = z.object({
 type ShippingForm = z.infer<typeof schema>;
 
 const methodLabels: Record<ShippingMethod, string> = {
-  DHL: "DHL",
+  DHL: "DHL courier",
   STANDARD_POST: "Standard post",
   LOCAL_PICKUP: "Local pickup"
 };
@@ -55,6 +56,7 @@ export function ShippingPage() {
       method: "STANDARD_POST"
     }
   });
+  const chosenMethod = form.watch("method");
 
   const submitShipping = useMutation({
     mutationFn: async (values: ShippingForm) => {
@@ -85,30 +87,35 @@ export function ShippingPage() {
 
   function fieldError(name: keyof ShippingForm) {
     const message = form.formState.errors[name]?.message;
-    return message ? <span className="muted">{message}</span> : null;
+    return message ? <span className="errorText">{message}</span> : null;
   }
 
   if (!Number.isFinite(orderId) || orderId <= 0) {
     return (
-      <EmptyState title="Missing order" body="Open shipping from checkout so the order id is present.">
-        <Link className="button buttonDark" href="/checkout">
-          Back to checkout
-        </Link>
-      </EmptyState>
+      <main className="page">
+        <EmptyState title="Missing order" body="Open shipping from checkout so the order id is present.">
+          <Link className="button buttonDark" href="/checkout">
+            Back to checkout
+          </Link>
+        </EmptyState>
+      </main>
     );
   }
 
   return (
     <Protected>
       <main className="page">
+        <div className="stack" style={{ gap: 6, marginBottom: 24 }}>
+          <span className="kicker">Checkout · step 2 of 3</span>
+          <h1 className="title">Where should it go?</h1>
+          {order.data ? (
+            <p className="mono muted" style={{ margin: 0, fontSize: "0.85rem" }}>
+              Order {order.data.orderNumber}
+            </p>
+          ) : null}
+        </div>
         <section className="split">
-          <div className="brutal stack" style={{ padding: 28 }}>
-            <h1 className="title">Shipping</h1>
-            {order.data ? (
-              <p className="subhead muted">
-                Order {order.data.orderNumber} - {order.data.subtotalAmount.toFixed(2)} EUR items
-              </p>
-            ) : null}
+          <div className="card stack" style={{ padding: 24 }}>
             {addresses.data?.length ? (
               <label className="label">
                 Use saved address
@@ -126,86 +133,112 @@ export function ShippingPage() {
             <form className="stack" onSubmit={form.handleSubmit((values) => submitShipping.mutate(values))}>
               <label className="label">
                 Full name
-                <input className="input" {...form.register("fullName")} />
+                <input className="input" autoComplete="name" {...form.register("fullName")} />
                 {fieldError("fullName")}
               </label>
               <label className="label">
-                Line 1
-                <input className="input" {...form.register("line1")} />
+                Address line 1
+                <input className="input" autoComplete="address-line1" {...form.register("line1")} />
                 {fieldError("line1")}
               </label>
               <label className="label">
-                Line 2
-                <input className="input" {...form.register("line2")} />
+                Address line 2
+                <input className="input" autoComplete="address-line2" {...form.register("line2")} />
                 {fieldError("line2")}
               </label>
-              <div className="toolbar">
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
                 <label className="label">
                   City
-                  <input className="input" {...form.register("city")} />
+                  <input className="input" autoComplete="address-level2" {...form.register("city")} />
                   {fieldError("city")}
                 </label>
                 <label className="label">
                   State
-                  <input className="input" {...form.register("state")} />
+                  <input className="input" autoComplete="address-level1" {...form.register("state")} />
                   {fieldError("state")}
                 </label>
                 <label className="label">
                   Postal code
-                  <input className="input" {...form.register("postalCode")} />
+                  <input className="input" autoComplete="postal-code" {...form.register("postalCode")} />
                   {fieldError("postalCode")}
                 </label>
                 <label className="label">
                   Country
-                  <input className="input" {...form.register("country")} />
+                  <input className="input" autoComplete="country-name" {...form.register("country")} />
                   {fieldError("country")}
                 </label>
               </div>
-              <div className="stack">
-                <span className="label">Shipping method</span>
-                {(Object.keys(methodLabels) as ShippingMethod[]).map((method) => (
-                  <label key={method} className="label" style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <input type="radio" value={method} {...form.register("method")} />
-                    {methodLabels[method]}
-                  </label>
-                ))}
+              <div className="stack" style={{ gap: 8 }}>
+                <span className="kicker">Shipping method</span>
+                <div className="chipRow">
+                  {(Object.keys(methodLabels) as ShippingMethod[]).map((method) => (
+                    <label key={method} className="chip" data-selected={chosenMethod === method}>
+                      <input
+                        type="radio"
+                        value={method}
+                        {...form.register("method")}
+                        style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
+                      />
+                      {methodLabels[method]}
+                    </label>
+                  ))}
+                </div>
                 {fieldError("method")}
               </div>
-              {submitShipping.error ? <p className="muted">{(submitShipping.error as Error).message}</p> : null}
+              {submitShipping.error ? (
+                <p className="errorText" style={{ margin: 0 }}>
+                  {(submitShipping.error as Error).message}
+                </p>
+              ) : null}
               <button className="button buttonDark" disabled={submitShipping.isPending}>
-                Save shipping
+                {submitShipping.isPending ? "Saving..." : "Save shipping"}
               </button>
             </form>
           </div>
-          <aside className="card stack">
-            <h2 className="headline">Order total</h2>
-            {submitShipping.data ? (
-              <>
-                <p>Method: {submitShipping.data.method ? methodLabels[submitShipping.data.method] : "-"}</p>
-                <p>Shipping cost: {Number(submitShipping.data.shippingCost ?? 0).toFixed(2)} EUR</p>
-              </>
-            ) : (
-              <p className="muted">Save the address and method to see the shipping cost.</p>
-            )}
+
+          <aside className="panelInk stack" style={{ position: "sticky", top: 84, padding: 28, gap: 12 }}>
+            <h2 className="subtitle" style={{ margin: 0 }}>
+              Order total.
+            </h2>
             {order.data ? (
-              <>
-                <p>Subtotal: {order.data.subtotalAmount.toFixed(2)} EUR</p>
-                <p>Shipping: {order.data.shippingAmount.toFixed(2)} EUR</p>
+              <div className="stack" style={{ gap: 8 }}>
+                <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                  <span className="muted">Subtotal</span>
+                  <span className="price">{formatPrice(order.data.subtotalAmount)}</span>
+                </div>
+                <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                  <span className="muted">Shipping</span>
+                  <span className="price">{formatPrice(order.data.shippingAmount)}</span>
+                </div>
                 {order.data.discountAmount > 0 ? (
-                  <p>
-                    Discount{order.data.promoCode ? ` (${order.data.promoCode})` : ""}: -
-                    {order.data.discountAmount.toFixed(2)} EUR
-                  </p>
+                  <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                    <span className="muted">Discount{order.data.promoCode ? ` (${order.data.promoCode})` : ""}</span>
+                    <span className="price">&minus;{formatPrice(order.data.discountAmount)}</span>
+                  </div>
                 ) : null}
-                <strong style={{ fontSize: "1.5rem" }}>Total: {order.data.paymentAmount.toFixed(2)} EUR</strong>
-              </>
-            ) : null}
-            {order.error ? <p className="muted">{(order.error as Error).message}</p> : null}
+                <hr className="divider" style={{ borderColor: "color-mix(in oklab, var(--cream-on-dark) 18%, transparent)" }} />
+                <div className="toolbar" style={{ justifyContent: "space-between" }}>
+                  <span>Total</span>
+                  <span className="price" style={{ fontSize: "1.6rem" }}>
+                    {formatPrice(order.data.paymentAmount)}
+                  </span>
+                </div>
+              </div>
+            ) : (
+              <p className="muted" style={{ margin: 0 }}>
+                Save the address and method to see the shipping cost.
+              </p>
+            )}
+            {order.error ? <p className="errorText" style={{ margin: 0 }}>{(order.error as Error).message}</p> : null}
             {submitShipping.isSuccess ? (
-              <Link className="button buttonDark" href={`/checkout/payment?orderId=${orderId}`}>
+              <Link className="button buttonAccent" href={`/checkout/payment?orderId=${orderId}`}>
                 Continue to payment
               </Link>
-            ) : null}
+            ) : (
+              <p className="muted" style={{ margin: 0, fontSize: "0.85rem" }}>
+                Payment follows once shipping is saved.
+              </p>
+            )}
           </aside>
         </section>
       </main>

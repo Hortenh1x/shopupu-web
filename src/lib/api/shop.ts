@@ -21,6 +21,7 @@ import type {
   PromoValidation,
   RatingSummary,
   Review,
+  ReviewSummary,
   Shipment,
   ShippingMethod,
   TokenPairResponse,
@@ -76,7 +77,8 @@ function searchParams(filters: CatalogFilters) {
   if (filters.categoryId != null) params.set("categoryId", String(filters.categoryId));
   if (filters.brandId != null) params.set("brandId", String(filters.brandId));
   if (filters.gender) params.set("gender", filters.gender);
-  if (filters.size) params.set("size", filters.size);
+  // clothing size rides on `variantSize`; plain `size` is Spring's page-size param (set below)
+  if (filters.size) params.set("variantSize", filters.size);
   if (filters.color) params.set("color", filters.color);
   if (filters.minPrice != null && filters.minPrice !== "") params.set("minPrice", String(filters.minPrice));
   if (filters.maxPrice != null && filters.maxPrice !== "") params.set("maxPrice", String(filters.maxPrice));
@@ -105,6 +107,28 @@ export const catalogApi = {
   reviews: (productId: number, page = 0, size = 6) =>
     apiFetch<Page<Review>>(`${v1}/catalog/products/${productId}/reviews?page=${page}&size=${size}`, { auth: false }),
   rating: (productId: number) => apiFetch<RatingSummary>(`${v1}/catalog/products/${productId}/rating`, { auth: false })
+};
+
+// === AI-assisted catalog (degrades to keyword/non-AI behaviour server-side) =
+
+export const aiApi = {
+  semanticSearch: (q: string, limit = 20) =>
+    apiFetch<ProductListItem[]>(
+      `${v1}/catalog/products/semantic-search?q=${encodeURIComponent(q)}&limit=${limit}`,
+      { auth: false }
+    ),
+  nlSearch: (q: string, page = 0, size = 20) =>
+    apiFetch<Page<ProductListItem>>(
+      `${v1}/catalog/products/nl-search?q=${encodeURIComponent(q)}&page=${page}&size=${size}`,
+      { auth: false }
+    ),
+  similar: (productId: number, limit = 8) =>
+    apiFetch<ProductListItem[]>(`${v1}/catalog/products/${productId}/similar?limit=${limit}`, { auth: false }),
+  boughtTogether: (productId: number, limit = 8) =>
+    apiFetch<ProductListItem[]>(`${v1}/catalog/products/${productId}/bought-together?limit=${limit}`, { auth: false }),
+  /** 404 while a summary has not been generated yet — treat it as "nothing to show" */
+  reviewSummary: (productId: number) =>
+    apiFetch<ReviewSummary>(`${v1}/catalog/products/${productId}/review-summary`, { auth: false })
 };
 
 // === Reviews ================================================================
@@ -277,5 +301,10 @@ export const adminApi = {
   promos: (page = 0, size = 20) => apiFetch<Page<PromoCode>>(`${v1}/admin/promo?page=${page}&size=${size}`),
   createPromo: (body: PromoCodeInput) => apiJson<PromoCode>(`${v1}/admin/promo`, body),
   setPromoEnabled: (id: number, enabled: boolean) =>
-    apiFetch<PromoCode>(`${v1}/admin/promo/${id}/enabled?enabled=${enabled}`, { method: "PATCH" })
+    apiFetch<PromoCode>(`${v1}/admin/promo/${id}/enabled?enabled=${enabled}`, { method: "PATCH" }),
+
+  // AI maintenance triggers — async jobs, the backend answers 202 immediately
+  backfillEmbeddings: () => apiFetch<void>(`${v1}/admin/ai/embeddings/backfill`, { method: "POST" }),
+  recomputeRecommendations: () => apiFetch<void>(`${v1}/admin/ai/recommendations/recompute`, { method: "POST" }),
+  refreshReviewSummaries: () => apiFetch<void>(`${v1}/admin/ai/review-summaries/refresh`, { method: "POST" })
 };

@@ -61,7 +61,7 @@ export default function Page() {
           Create
         </button>
       </form>
-      {create.error ? <p className="muted">{(create.error as Error).message}</p> : null}
+      {create.error ? <p className="errorText">{(create.error as Error).message}</p> : null}
       <table className="table">
         <thead>
           <tr>
@@ -88,7 +88,7 @@ export default function Page() {
           ))}
         </tbody>
       </table>
-      {remove.error ? <p className="muted">{(remove.error as Error).message}</p> : null}
+      {remove.error ? <p className="errorText">{(remove.error as Error).message}</p> : null}
     </AdminShell>
   );
 }

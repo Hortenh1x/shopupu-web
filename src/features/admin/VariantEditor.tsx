@@ -66,10 +66,10 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
 
   return (
     <section className="card stack">
-      <h2 className="subhead" style={{ margin: 0 }}>
+      <h2 className="subtitle" style={{ margin: 0 }}>
         Variants (size / color / SKU)
       </h2>
-      {variants.error ? <p className="muted">{(variants.error as Error).message}</p> : null}
+      {variants.error ? <p className="errorText">{(variants.error as Error).message}</p> : null}
       <table className="table">
         <thead>
           <tr>
@@ -212,7 +212,7 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
           </button>
         ) : null}
       </form>
-      {save.error ? <p className="muted">{(save.error as Error).message}</p> : null}
+      {save.error ? <p className="errorText">{(save.error as Error).message}</p> : null}
       <p className="muted">Note: stock updates the inventory level; it cannot go below the currently reserved quantity.</p>
     </section>
   );

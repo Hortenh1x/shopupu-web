@@ -161,8 +161,8 @@ export function PromoAdmin() {
           Create promo
         </button>
       </form>
-      {create.error ? <p className="muted">{(create.error as Error).message}</p> : null}
-      {promos.error ? <p className="muted">{(promos.error as Error).message}</p> : null}
+      {create.error ? <p className="errorText">{(create.error as Error).message}</p> : null}
+      {promos.error ? <p className="errorText">{(promos.error as Error).message}</p> : null}
 
       <table className="table">
         <thead>
@@ -222,9 +222,7 @@ export function PromoAdmin() {
           <button className="button" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
             Previous
           </button>
-          <span className="status">
-            {page + 1} / {data.totalPages}
-          </span>
+          <span className="mono muted" style={{ fontSize: "0.88rem" }}>{page + 1} / {data.totalPages}</span>
           <button className="button" disabled={page >= data.totalPages - 1} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>

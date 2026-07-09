@@ -40,7 +40,7 @@ export function SecurityPanel() {
           changePassword.mutate();
         }}
       >
-        <h2 className="subhead" style={{ margin: 0 }}>
+        <h2 className="subtitle" style={{ margin: 0 }}>
           Change password
         </h2>
         <label className="label">
@@ -65,10 +65,10 @@ export function SecurityPanel() {
             onChange={(e) => setNewPassword(e.target.value)}
           />
         </label>
-        {changePassword.error ? <p className="muted">{(changePassword.error as Error).message}</p> : null}
+        {changePassword.error ? <p className="errorText">{(changePassword.error as Error).message}</p> : null}
         {changePassword.isSuccess ? (
           <div className="stack">
-            <p className="status">Password changed. All sessions were logged out.</p>
+            <p className="status statusOk">Password changed. All sessions were logged out.</p>
             <button type="button" className="button buttonDark" onClick={auth.logout}>
               Login again
             </button>
@@ -81,18 +81,18 @@ export function SecurityPanel() {
       </form>
 
       <div className="card stack">
-        <h2 className="subhead" style={{ margin: 0 }}>
+        <h2 className="subtitle" style={{ margin: 0 }}>
           My data (GDPR)
         </h2>
         <p className="muted">Download everything we store about you as JSON.</p>
         <button className="button" disabled={exportData.isPending} onClick={() => exportData.mutate()}>
           Download my data
         </button>
-        {exportData.error ? <p className="muted">{(exportData.error as Error).message}</p> : null}
+        {exportData.error ? <p className="errorText">{(exportData.error as Error).message}</p> : null}
 
         <hr style={{ width: "100%", border: "none", borderTop: "1px solid var(--color-border-soft)" }} />
 
-        <h2 className="subhead" style={{ margin: 0 }}>
+        <h2 className="subtitle" style={{ margin: 0 }}>
           Delete account
         </h2>
         <p className="muted">
@@ -113,7 +113,7 @@ export function SecurityPanel() {
             </button>
           </div>
         )}
-        {deleteAccount.error ? <p className="muted">{(deleteAccount.error as Error).message}</p> : null}
+        {deleteAccount.error ? <p className="errorText">{(deleteAccount.error as Error).message}</p> : null}
       </div>
     </div>
   );

@@ -35,7 +35,7 @@ export function ProfileForm() {
           save.mutate();
         }}
       >
-        <h2 className="subhead" style={{ margin: 0 }}>
+        <h2 className="subtitle" style={{ margin: 0 }}>
           Personal data
         </h2>
         <label className="label">
@@ -60,21 +60,21 @@ export function ProfileForm() {
             ))}
           </select>
         </label>
-        {save.error ? <p className="muted">{(save.error as Error).message}</p> : null}
-        {save.isSuccess ? <p className="status">Saved</p> : null}
+        {save.error ? <p className="errorText">{(save.error as Error).message}</p> : null}
+        {save.isSuccess ? <p className="status statusOk">saved</p> : null}
         <button className="button buttonDark" disabled={save.isPending}>
           Save profile
         </button>
       </form>
 
       <aside className="card stack">
-        <h2 className="subhead" style={{ margin: 0 }}>
+        <h2 className="subtitle" style={{ margin: 0 }}>
           Account
         </h2>
         <p>
           Email: {auth.user?.email}{" "}
           {auth.user?.emailVerified ? (
-            <span className="status">verified</span>
+            <span className="status statusOk">verified</span>
           ) : (
             <span className="muted">not verified</span>
           )}
@@ -85,7 +85,7 @@ export function ProfileForm() {
             <button className="button" disabled={resend.isPending} onClick={() => resend.mutate()}>
               Resend verification email
             </button>
-            {resend.isSuccess ? <p className="status">Verification email sent - check your inbox.</p> : null}
+            {resend.isSuccess ? <p className="status statusOk">sent - check your inbox</p> : null}
           </>
         ) : null}
       </aside>

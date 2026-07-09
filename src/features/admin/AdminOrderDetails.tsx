@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { AdminShell } from "@/features/admin/AdminShell";
+import { StatusBadge } from "@/components/ui/StatusBadge";
 import { adminApi, shippingApi } from "@/lib/api/shop";
 import type { OrderStatus } from "@/lib/api/types";
 
@@ -58,12 +59,12 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
 
   return (
     <AdminShell title={data ? `Order ${data.orderNumber}` : `Order #${orderId}`}>
-      {order.error ? <p className="muted">{(order.error as Error).message}</p> : null}
+      {order.error ? <p className="errorText">{(order.error as Error).message}</p> : null}
       {data ? (
         <div className="stack">
           <div className="card stack">
             <div className="toolbar">
-              <span className="status">{data.status}</span>
+              <StatusBadge value={data.status} />
               <span className="muted">{data.createdAt ? new Date(data.createdAt).toLocaleString() : ""}</span>
             </div>
             <p>
@@ -88,11 +89,11 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
             ) : (
               <p className="muted">Terminal status - no transitions available.</p>
             )}
-            {updateStatus.error ? <p className="muted">{(updateStatus.error as Error).message}</p> : null}
+            {updateStatus.error ? <p className="errorText">{(updateStatus.error as Error).message}</p> : null}
           </div>
 
           <div className="card stack">
-            <h2 className="subhead" style={{ margin: 0 }}>
+            <h2 className="subtitle" style={{ margin: 0 }}>
               Items
             </h2>
             <table className="table">
@@ -127,7 +128,7 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
 
           <div className="split">
             <div className="card stack">
-              <h2 className="subhead" style={{ margin: 0 }}>
+              <h2 className="subtitle" style={{ margin: 0 }}>
                 Shipping
               </h2>
               {shipment.data?.method ? (
@@ -162,11 +163,11 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
                   Update shipping
                 </button>
               </div>
-              {updateShipping.error ? <p className="muted">{(updateShipping.error as Error).message}</p> : null}
+              {updateShipping.error ? <p className="errorText">{(updateShipping.error as Error).message}</p> : null}
             </div>
 
             <div className="card stack">
-              <h2 className="subhead" style={{ margin: 0 }}>
+              <h2 className="subtitle" style={{ margin: 0 }}>
                 Refund
               </h2>
               <p className="muted">
@@ -192,13 +193,13 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
                   Refund payment
                 </button>
               </div>
-              {refund.isSuccess ? <p className="status">Refund executed.</p> : null}
-              {refund.error ? <p className="muted">{(refund.error as Error).message}</p> : null}
+              {refund.isSuccess ? <p className="status statusOk">refund executed</p> : null}
+              {refund.error ? <p className="errorText">{(refund.error as Error).message}</p> : null}
             </div>
           </div>
 
           <div className="card stack">
-            <h2 className="subhead" style={{ margin: 0 }}>
+            <h2 className="subtitle" style={{ margin: 0 }}>
               Status history
             </h2>
             {!history.data?.length ? <p className="muted">No history entries.</p> : null}

@@ -203,7 +203,7 @@ export function ProductForm({ productId }: { productId?: number }) {
           <p className="muted">{Object.values(form.formState.errors)[0]?.message as string}</p>
         ) : null}
         {mutationError ? <p className="muted">{(mutationError as Error).message}</p> : null}
-        {update.isSuccess ? <p className="status">Saved</p> : null}
+        {update.isSuccess ? <p className="status statusOk">saved</p> : null}
         <button className="button buttonDark" disabled={create.isPending || update.isPending}>
           {productId ? "Save product" : "Create product"}
         </button>
@@ -213,7 +213,7 @@ export function ProductForm({ productId }: { productId?: number }) {
       {productId ? (
         <>
           <section className="card stack">
-            <h2 className="subhead" style={{ margin: 0 }}>
+            <h2 className="subtitle" style={{ margin: 0 }}>
               Images
             </h2>
             <div className="toolbar" style={{ flexWrap: "wrap" }}>
@@ -252,7 +252,7 @@ export function ProductForm({ productId }: { productId?: number }) {
                 }}
               />
             </label>
-            {uploadImage.error ? <p className="muted">{(uploadImage.error as Error).message}</p> : null}
+            {uploadImage.error ? <p className="errorText">{(uploadImage.error as Error).message}</p> : null}
           </section>
 
           <VariantEditor productId={productId} basePrice={product.data?.price ?? 0} />

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { formatPrice } from "@/features/catalog/ProductCard";
 import { cartApi } from "@/lib/api/shop";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
@@ -27,10 +28,12 @@ export function CartPage() {
     onSuccess: (data) => queryClient.setQueryData(["cart", auth.user?.id ?? "guest"], data)
   });
 
-  if (cart.isLoading) {
+  if (cart.isLoading || !auth.isReady) {
     return (
       <main className="page">
-        <h1 className="title">Cart</h1>
+        <h1 className="title" style={{ marginBottom: 24 }}>
+          Cart
+        </h1>
         <Skeleton lines={4} />
       </main>
     );
@@ -38,12 +41,14 @@ export function CartPage() {
 
   return (
     <main className="page">
-      <h1 className="title">Cart</h1>
-      {cart.error ? <p className="muted">{(cart.error as Error).message}</p> : null}
+      <h1 className="title" style={{ marginBottom: 24 }}>
+        Cart
+      </h1>
+      {cart.error ? <p className="errorText">{(cart.error as Error).message}</p> : null}
       {!cart.data?.items?.length ? (
-        <EmptyState title="Empty cart" body="Add products from catalog.">
+        <EmptyState title="Your cart is empty." body="Everything you add is kept, even before you sign in.">
           <Link className="button buttonDark" href="/catalog">
-            Browse catalog
+            Browse the catalog
           </Link>
         </EmptyState>
       ) : (
@@ -52,38 +57,39 @@ export function CartPage() {
             <table className="table">
               <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>SKU</th>
-                  <th>Size</th>
-                  <th>Color</th>
+                  <th>Item</th>
                   <th>Unit</th>
                   <th>Qty</th>
                   <th>Total</th>
-                  <th />
+                  <th aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
                 {cart.data.items.map((item) => (
                   <tr key={item.variantId}>
                     <td>
-                      <Link href={`/products/${item.productId}`}>{item.title}</Link>
+                      <div className="stack" style={{ gap: 3 }}>
+                        <Link href={`/products/${item.productId}`} style={{ fontWeight: 600 }}>
+                          {item.title}
+                        </Link>
+                        <span className="mono muted" style={{ fontSize: "0.78rem" }}>
+                          {[item.size, item.color, item.sku].filter(Boolean).join(" · ")}
+                        </span>
+                      </div>
                     </td>
-                    <td className="muted">{item.sku}</td>
-                    <td>{item.size}</td>
-                    <td>{item.color ?? "-"}</td>
-                    <td>{item.price.toFixed(2)} EUR</td>
+                    <td className="price">{formatPrice(item.price)}</td>
                     <td>
-                      <div className="toolbar">
+                      <div className="qty">
                         <button
-                          className="button"
+                          aria-label="Decrease quantity"
                           disabled={update.isPending}
                           onClick={() => update.mutate({ variantId: item.variantId, quantity: item.quantity - 1 })}
                         >
-                          -
+                          &minus;
                         </button>
-                        <span className="status">{item.quantity}</span>
+                        <span>{item.quantity}</span>
                         <button
-                          className="button"
+                          aria-label="Increase quantity"
                           disabled={update.isPending}
                           onClick={() => update.mutate({ variantId: item.variantId, quantity: item.quantity + 1 })}
                         >
@@ -91,10 +97,10 @@ export function CartPage() {
                         </button>
                       </div>
                     </td>
-                    <td>{item.lineTotal.toFixed(2)} EUR</td>
+                    <td className="price">{formatPrice(item.lineTotal)}</td>
                     <td>
                       <button
-                        className="button buttonRed"
+                        className="button buttonRed buttonSmall"
                         disabled={remove.isPending}
                         onClick={() => remove.mutate(item.variantId)}
                       >
@@ -105,23 +111,37 @@ export function CartPage() {
                 ))}
               </tbody>
             </table>
-            {update.error ? <p className="muted">{(update.error as Error).message}</p> : null}
-            {remove.error ? <p className="muted">{(remove.error as Error).message}</p> : null}
+            {update.error ? <p className="errorText">{(update.error as Error).message}</p> : null}
+            {remove.error ? <p className="errorText">{(remove.error as Error).message}</p> : null}
           </div>
-          <aside className="card stack" style={{ position: "sticky", top: 92 }}>
-            <h2 className="title">Summary</h2>
-            <p className="muted">{cart.data.totalItems} item(s)</p>
-            <strong style={{ fontSize: "2rem" }}>{cart.data.subtotal.toFixed(2)} EUR</strong>
+
+          <aside className="panelInk stack" style={{ position: "sticky", top: 84, padding: 28, gap: 14 }}>
+            <h2 className="subtitle" style={{ margin: 0 }}>
+              Order summary.
+            </h2>
+            <div className="toolbar" style={{ justifyContent: "space-between" }}>
+              <span className="muted">
+                {cart.data.totalItems} item{cart.data.totalItems === 1 ? "" : "s"}
+              </span>
+              <span className="price" style={{ fontSize: "1.7rem" }}>
+                {formatPrice(cart.data.subtotal)}
+              </span>
+            </div>
+            <p className="muted" style={{ margin: 0, fontSize: "0.85rem" }}>
+              Shipping and promo codes are applied at checkout.
+            </p>
             {!auth.isReady ? null : auth.isAuthenticated ? (
-              <Link className="button buttonDark" href="/checkout">
+              <Link className="button buttonAccent" href="/checkout">
                 Proceed to checkout
               </Link>
             ) : (
               <>
-                <Link className="button buttonDark" href="/login">
-                  Login to checkout
+                <Link className="button buttonAccent" href="/login">
+                  Sign in to checkout
                 </Link>
-                <p className="muted">Your cart is kept and will be merged into your account after login.</p>
+                <p className="muted" style={{ margin: 0, fontSize: "0.85rem" }}>
+                  Your cart is kept and merges into your account after you sign in.
+                </p>
               </>
             )}
           </aside>

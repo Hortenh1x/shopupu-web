@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Protected } from "@/components/layout/Protected";
 
 const NAV = [
@@ -9,27 +10,34 @@ const NAV = [
   { href: "/admin/orders", label: "Orders" },
   { href: "/admin/reviews", label: "Reviews" },
   { href: "/admin/promos", label: "Promos" },
-  { href: "/admin/users", label: "Users" }
+  { href: "/admin/users", label: "Users" },
+  { href: "/admin/ai", label: "AI" }
 ];
 
 export function AdminShell({ title, children }: { title: string; children: React.ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <Protected adminOnly>
       <main className="page">
-        <section className="split" style={{ gridTemplateColumns: "220px minmax(0, 1fr)" }}>
-          <aside className="card stack" style={{ position: "sticky", top: 92, alignSelf: "start" }}>
-            <strong className="status">admin</strong>
-            {NAV.map((item) => (
-              <Link key={item.href} href={item.href}>
-                {item.label}
+        <div className="stack" style={{ gap: 20 }}>
+          <div className="stack" style={{ gap: 12 }}>
+            <div className="stack" style={{ gap: 4 }}>
+              <Link className="kicker" href="/admin">
+                shopupu back office
               </Link>
-            ))}
-          </aside>
-          <section className="stack">
-            <h1 className="title">{title}</h1>
-            {children}
-          </section>
-        </section>
+              <h1 className="title">{title}</h1>
+            </div>
+            <nav className="adminTabs" aria-label="Admin sections">
+              {NAV.map((item) => (
+                <Link key={item.href} href={item.href} data-active={pathname.startsWith(item.href)}>
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+          <section className="stack">{children}</section>
+        </div>
       </main>
     </Protected>
   );

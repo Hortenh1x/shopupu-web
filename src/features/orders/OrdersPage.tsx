@@ -7,6 +7,9 @@ import { useState } from "react";
 import { Protected } from "@/components/layout/Protected";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Pagination } from "@/components/ui/Pagination";
+import { Skeleton } from "@/components/ui/Skeleton";
+import { StatusBadge } from "@/components/ui/StatusBadge";
+import { formatPrice } from "@/features/catalog/ProductCard";
 import { orderApi } from "@/lib/api/shop";
 
 const STATUSES = [
@@ -33,9 +36,9 @@ export function OrdersPage() {
   return (
     <Protected>
       <main className="page">
-        <div className="toolbar">
+        <div className="toolbar" style={{ marginBottom: 24 }}>
           <h1 className="title" style={{ marginRight: "auto" }}>
-            Orders
+            Orders.
           </h1>
           <label className="label">
             Status
@@ -43,15 +46,21 @@ export function OrdersPage() {
               <option value="">All</option>
               {STATUSES.map((value) => (
                 <option key={value} value={value}>
-                  {value}
+                  {value.toLowerCase().replaceAll("_", " ")}
                 </option>
               ))}
             </select>
           </label>
         </div>
-        {orders.error ? <p className="muted">{(orders.error as Error).message}</p> : null}
-        {!orders.data?.content?.length ? (
-          <EmptyState title="No orders" body="Checkout from cart to create your first order." />
+        {orders.error ? <p className="errorText">{(orders.error as Error).message}</p> : null}
+        {orders.isLoading ? (
+          <Skeleton lines={5} />
+        ) : !orders.data?.content?.length ? (
+          <EmptyState title="No orders yet." body="Check out from the cart to place your first order.">
+            <Link className="button buttonDark" href="/catalog">
+              Browse the catalog
+            </Link>
+          </EmptyState>
         ) : (
           <>
             <table className="table">
@@ -62,25 +71,27 @@ export function OrdersPage() {
                   <th>Total</th>
                   <th>Discount</th>
                   <th>Created</th>
-                  <th />
+                  <th aria-label="Actions" />
                 </tr>
               </thead>
               <tbody>
                 {orders.data.content.map((order) => (
                   <tr key={order.id}>
-                    <td>{order.orderNumber}</td>
-                    <td>
-                      <span className="status">{order.status}</span>
+                    <td className="mono" style={{ fontWeight: 600 }}>
+                      {order.orderNumber}
                     </td>
-                    <td>{Number(order.paymentAmount).toFixed(2)} EUR</td>
                     <td>
+                      <StatusBadge value={order.status} />
+                    </td>
+                    <td className="price">{formatPrice(order.paymentAmount)}</td>
+                    <td className="mono muted">
                       {order.discountAmount > 0
-                        ? `-${Number(order.discountAmount).toFixed(2)}${order.promoCode ? ` (${order.promoCode})` : ""}`
-                        : "-"}
+                        ? `-${formatPrice(order.discountAmount)}${order.promoCode ? ` (${order.promoCode})` : ""}`
+                        : "–"}
                     </td>
-                    <td>{order.createdAt ? new Date(order.createdAt).toLocaleString() : "-"}</td>
+                    <td className="muted">{order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "–"}</td>
                     <td>
-                      <Link className="button" href={`/orders/${order.id}`}>
+                      <Link className="button buttonSmall" href={`/orders/${order.id}`}>
                         Open
                       </Link>
                     </td>

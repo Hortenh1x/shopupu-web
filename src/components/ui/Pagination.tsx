@@ -15,16 +15,16 @@ export function Pagination({ page, totalPages }: { page: number; totalPages: num
   if (totalPages <= 1) return null;
 
   return (
-    <div className="toolbar" style={{ justifyContent: "center", marginTop: 24 }}>
-      <button className="button" disabled={page <= 0} onClick={() => go(page - 1)}>
+    <nav className="toolbar" style={{ justifyContent: "center", marginTop: 28 }} aria-label="Pagination">
+      <button className="button buttonSmall" disabled={page <= 0} onClick={() => go(page - 1)}>
         Previous
       </button>
-      <span className="status">
+      <span className="mono muted" style={{ fontSize: "0.88rem", padding: "0 6px" }}>
         {page + 1} / {totalPages}
       </span>
-      <button className="button" disabled={page >= totalPages - 1} onClick={() => go(page + 1)}>
+      <button className="button buttonSmall" disabled={page >= totalPages - 1} onClick={() => go(page + 1)}>
         Next
       </button>
-    </div>
+    </nav>
   );
 }

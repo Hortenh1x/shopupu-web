@@ -22,7 +22,7 @@ export default function Page() {
       <Link className="button buttonDark" href="/admin/products/new" style={{ alignSelf: "flex-start" }}>
         New product
       </Link>
-      {products.error ? <p className="muted">{(products.error as Error).message}</p> : null}
+      {products.error ? <p className="errorText">{(products.error as Error).message}</p> : null}
       <table className="table">
         <thead>
           <tr>
@@ -65,9 +65,7 @@ export default function Page() {
           <button className="button" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
             Previous
           </button>
-          <span className="status">
-            {page + 1} / {data.totalPages}
-          </span>
+          <span className="mono muted" style={{ fontSize: "0.88rem" }}>{page + 1} / {data.totalPages}</span>
           <button className="button" disabled={page >= data.totalPages - 1} onClick={() => setPage((p) => p + 1)}>
             Next
           </button>
