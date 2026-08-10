@@ -12,7 +12,7 @@ import { formatPrice } from "@/features/catalog/ProductCard";
 import { orderApi, shippingApi, userApi } from "@/lib/api/shop";
 import type { ShippingMethod } from "@/lib/api/types";
 
-const schema = z.object({
+export const shippingSchema = z.object({
   fullName: z.string().min(2).max(128),
   line1: z.string().min(2).max(128),
   line2: z.string().max(128).optional(),
@@ -23,7 +23,7 @@ const schema = z.object({
   method: z.enum(["DHL", "STANDARD_POST", "LOCAL_PICKUP"])
 });
 
-type ShippingForm = z.infer<typeof schema>;
+type ShippingForm = z.infer<typeof shippingSchema>;
 
 const methodLabels: Record<ShippingMethod, string> = {
   DHL: "DHL courier",
@@ -44,7 +44,7 @@ export function ShippingPage() {
   const addresses = useQuery({ queryKey: ["addresses"], queryFn: userApi.addresses });
 
   const form = useForm<ShippingForm>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(shippingSchema),
     defaultValues: {
       fullName: "",
       line1: "",
