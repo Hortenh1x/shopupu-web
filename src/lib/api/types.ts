@@ -10,6 +10,9 @@ export type Page<T> = {
 
 // === Auth / identity ========================================================
 
+// A user's self-selected gender (distinct from the product catalog Gender).
+export type UserGender = "MALE" | "FEMALE" | "OTHER";
+
 export type UserProfile = {
   id: number;
   email: string;
@@ -17,6 +20,7 @@ export type UserProfile = {
   lastName?: string | null;
   phone?: string | null;
   preferredSize?: string | null;
+  gender?: UserGender | null;
   enabled: boolean;
   emailVerified: boolean;
   roles: string[];
@@ -74,7 +78,7 @@ export type UserDataExport = {
   profile: UserProfile;
   addresses: UserAddress[];
   orders: Array<{ orderNumber: string; status: string; paymentAmount: number; createdAt?: string }>;
-  reviews: Array<{ productId: number; rating: number; title: string; body: string; status: string; createdAt?: string }>;
+  reviews: Array<{ productId: number; rating: number; body: string; status: string; createdAt?: string }>;
   exportedAt: string;
 };
 
@@ -101,6 +105,15 @@ export type ProductImage = {
   url: string;
   altText?: string | null;
   position?: number | null;
+};
+
+// The admin image-upload endpoint answers with `sortOrder`, not `position`
+// (ProductImageResponse vs the ProductResponse.images element in the OpenAPI schema).
+export type ProductImageUpload = {
+  id: number;
+  url: string;
+  altText?: string | null;
+  sortOrder?: number | null;
 };
 
 export type Variant = {
@@ -290,6 +303,15 @@ export type PromoCodeInput = {
 
 export type ShippingMethod = "DHL" | "STANDARD_POST" | "LOCAL_PICKUP";
 
+export type ShipmentStatus =
+  | "PENDING"
+  | "PREPARING"
+  | "SHIPPED"
+  | "DELIVERED"
+  | "READY_FOR_PICKUP"
+  | "PICKED_UP"
+  | "CANCELED";
+
 export type ShippingAddress = {
   fullName?: string | null;
   line1?: string | null;
@@ -303,8 +325,8 @@ export type ShippingAddress = {
 export type Shipment = {
   orderId: number;
   method?: ShippingMethod | null;
-  shippingStatus?: string | null;
-  orderStatus: string;
+  shippingStatus?: ShipmentStatus | null;
+  orderStatus: OrderStatus;
   trackingNumber?: string | null;
   shippingCost?: number | null;
   currency?: string | null;
@@ -348,7 +370,6 @@ export type Review = {
   userId: number;
   username: string;
   rating: number;
-  title: string;
   body: string;
   status: ReviewStatus;
   createdAt?: string;
@@ -362,7 +383,6 @@ export type AdminReview = {
   userId: number;
   userEmail?: string | null;
   rating: number;
-  title: string;
   body: string;
   status: ReviewStatus;
   createdAt?: string;
@@ -385,6 +405,24 @@ export type ReviewSummary = {
   sentiment?: string | null;
   basedOnReviews: number;
   generatedAt?: string | null;
+};
+
+export type StylistHistoryMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export type StylistSlot = {
+  slot: string;
+  products: ProductListItem[];
+};
+
+export type StylistChatResponse = {
+  reply: string;
+  slots: StylistSlot[];
+  /** requested garments the shop honestly does not carry */
+  unavailable: string[];
+  degraded: boolean;
 };
 
 // === Errors =================================================================

@@ -13,7 +13,7 @@ import type {
   Page,
   Payment,
   Product,
-  ProductImage,
+  ProductImageUpload,
   ProductInput,
   ProductListItem,
   PromoCode,
@@ -24,9 +24,12 @@ import type {
   ReviewSummary,
   Shipment,
   ShippingMethod,
+  StylistChatResponse,
+  StylistHistoryMessage,
   TokenPairResponse,
   UserAddress,
   UserDataExport,
+  UserGender,
   UserProfile,
   Variant,
   VariantInput,
@@ -41,8 +44,15 @@ export const authApi = {
   // the guest cart token rides along so the backend merges the cart (CART-02)
   login: (email: string, password: string) =>
     apiJson<TokenPairResponse>(`${v1}/auth/login`, { email, password }, { auth: false, cartToken: true }),
-  register: (email: string, password: string) =>
-    apiJson<TokenPairResponse>(`${v1}/auth/register`, { email, password }, { auth: false, cartToken: true }),
+  register: (email: string, password: string, passwordConfirm: string) =>
+    apiJson<TokenPairResponse>(
+      `${v1}/auth/register`,
+      { email, password, passwordConfirm },
+      { auth: false, cartToken: true }
+    ),
+  // exchanges a Google ID token (from Google Identity Services) for our session tokens
+  googleLogin: (idToken: string) =>
+    apiJson<TokenPairResponse>(`${v1}/auth/google`, { idToken }, { auth: false, cartToken: true }),
   logout: (refreshToken: string) => apiJson<void>(`${v1}/auth/logout`, { refreshToken }),
   changePassword: (currentPassword: string, newPassword: string) =>
     apiJson<void>(`${v1}/auth/change-password`, { currentPassword, newPassword }),
@@ -128,15 +138,17 @@ export const aiApi = {
     apiFetch<ProductListItem[]>(`${v1}/catalog/products/${productId}/bought-together?limit=${limit}`, { auth: false }),
   /** 404 while a summary has not been generated yet — treat it as "nothing to show" */
   reviewSummary: (productId: number) =>
-    apiFetch<ReviewSummary>(`${v1}/catalog/products/${productId}/review-summary`, { auth: false })
+    apiFetch<ReviewSummary>(`${v1}/catalog/products/${productId}/review-summary`, { auth: false }),
+  stylistChat: (message: string, history: StylistHistoryMessage[]) =>
+    apiJson<StylistChatResponse>(`${v1}/catalog/stylist/chat`, { message, history }, { auth: false })
 };
 
 // === Reviews ================================================================
 
 export const reviewApi = {
-  create: (productId: number, body: { rating: number; title: string; body: string; orderId?: number | null }) =>
+  create: (productId: number, body: { rating: number; body: string; orderId?: number | null }) =>
     apiJson<Review>(`${v1}/products/${productId}/reviews`, body),
-  update: (reviewId: number, body: { rating: number; title: string; body: string }) =>
+  update: (reviewId: number, body: { rating: number; body: string }) =>
     apiJson<Review>(`${v1}/reviews/${reviewId}`, body, { method: "PUT" }),
   remove: (reviewId: number) => apiFetch<void>(`${v1}/reviews/${reviewId}`, { method: "DELETE" })
 };
@@ -217,6 +229,7 @@ export const userApi = {
     lastName?: string | null;
     phone?: string | null;
     preferredSize?: string | null;
+    gender?: UserGender | null;
   }) => apiJson<UserProfile>(`${v1}/users/me/profile`, body, { method: "PUT" }),
 
   addresses: () => apiFetch<UserAddress[]>(`${v1}/users/me/addresses`),
@@ -270,7 +283,7 @@ export const adminApi = {
     form.set("file", file);
     if (altText) form.set("altText", altText);
     if (sortOrder != null) form.set("sortOrder", String(sortOrder));
-    return apiForm<ProductImage>(`${v1}/admin/catalog/products/${productId}/images`, form);
+    return apiForm<ProductImageUpload>(`${v1}/admin/catalog/products/${productId}/images`, form);
   },
   deleteProductImage: (productId: number, imageId: number) =>
     apiFetch<void>(`${v1}/admin/catalog/products/${productId}/images/${imageId}`, { method: "DELETE" }),
