@@ -10,19 +10,19 @@
     "api:generate": "openapi-typescript http://localhost:8080/v3/api-docs -o src/generated/api.d.ts"
   },
   "dependencies": {
-    "@hookform/resolvers": "latest",
-    "@tanstack/react-query": "latest",
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-hook-form": "latest",
-    "zod": "latest"
+    "@hookform/resolvers": "^5.2.2",
+    "@tanstack/react-query": "^5.100.9",
+    "next": "^16.2.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-hook-form": "^7.75.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@types/node": "latest",
-    "@types/react": "latest",
-    "@types/react-dom": "latest",
-    "openapi-typescript": "latest",
-    "typescript": "latest"
+    "@types/node": "^25.6.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "openapi-typescript": "^7.13.0",
+    "typescript": "^5.9.3"
   }
 }
