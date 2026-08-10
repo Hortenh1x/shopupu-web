@@ -18,6 +18,79 @@ Production build: `npm run build && npm run start`. Type check: `npm run typeche
 
 - `NEXT_PUBLIC_API_BASE_URL` — backend URL (default `http://localhost:8080`).
   The backend allows this origin via CORS for the `dev` profile.
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` — Google OAuth Web Client ID; empty hides the
+  Google button. Must match the backend's `GOOGLE_CLIENT_ID`.
+- `NEXT_PUBLIC_BANK_APP_PROTOCOL` — deep-link scheme for handing a payment to a
+  bank app (optional).
+
+All three are **inlined at build time** (`NEXT_PUBLIC_*`), so a production build
+must be made with production values — see Deployment.
+
+## Testing
+
+```bash
+npm run typecheck   # tsc; src/lib/api/types.compat.ts fails it when the
+                    # hand-written API types drift from the generated OpenAPI schema
+npm test            # Vitest + Testing Library (22 tests): JWT auto-refresh
+                    # single-flight, guest-cart token + login merge, Idempotency-Key,
+                    # shipping Zod schema, CheckoutPage promo flow
+npm run e2e         # Playwright smoke: catalog -> product -> guest cart ->
+                    # register (cart merge) -> checkout -> shipping -> stub payment
+```
+
+The e2e run needs a dev-profile backend and a build pointed at it:
+
+```bash
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8080 npm run build
+npm run e2e
+```
+
+The stub payment stays `PENDING` unless the backend runs with
+`--payments.callback-secret=...` and the same value is passed as
+`E2E_PAYMENT_CALLBACK_SECRET` — then the test signs the provider callback
+itself and asserts the UI flips to "Payment succeeded"
+(`E2E_CALLBACK_API_BASE_URL` may point at a second backend instance that
+shares the database).
+
+After backend contract changes: `npm run api:generate` against the running
+backend, then fix `src/lib/api/types.ts` until `npm run typecheck` is green.
+
+## Deployment (shopupu.net)
+
+The frontend is served from the **same machine as the backend** behind one
+Cloudflare Tunnel with path routing — same-origin API, so no CORS in prod:
+
+```
+https://shopupu.net/api/*, /uploads/*  ->  localhost:8080 (Spring, docker `app` service)
+https://shopupu.net/*                  ->  localhost:3000 (this app)
+```
+
+Full runbook: [`../shopupu/docs/deploy-cloudflare.md`](../shopupu/docs/deploy-cloudflare.md)
+(tunnel hostnames table, `deploy/shopupu-web.service` systemd unit for
+`next start`). `.env.production` pins `NEXT_PUBLIC_API_BASE_URL=https://shopupu.net`,
+so a plain `npm run build` on this machine produces the production bundle.
+
+Alternative packaging — the multi-stage `Dockerfile` (standalone Next.js,
+listens on :3000):
+
+```bash
+docker build -t shopupu-web \
+  --build-arg NEXT_PUBLIC_API_BASE_URL=https://shopupu.net \
+  --build-arg NEXT_PUBLIC_GOOGLE_CLIENT_ID=<prod client id> \
+  --build-arg NEXT_PUBLIC_BANK_APP_PROTOCOL=<scheme://> .
+docker run -d --name shopupu-web --network host shopupu-web
+```
+
+(or add it as a `frontend` service next to `app` in `../shopupu/docker-compose.yml`).
+
+Still needed for a complete prod setup (values only the operator has):
+
+- [ ] real `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (Google Cloud Console; backend
+      `GOOGLE_CLIENT_ID` must match) — Google sign-in stays hidden until set
+- [ ] real `NEXT_PUBLIC_BANK_APP_PROTOCOL` if the bank hand-off is wanted
+- [ ] post-deploy smoke: open https://shopupu.net — catalog renders, product
+      page, add to cart, login, checkout to the payment step; watch the browser
+      console for CSP/CORS errors
 
 ## What's inside
 
