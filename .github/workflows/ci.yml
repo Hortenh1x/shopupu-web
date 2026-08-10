@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # includes src/lib/api/types.compat.ts — fails when the hand-written API
+      # types drift from the committed OpenAPI-generated schema
+      - run: npm run typecheck
+
+      - run: npm test
+
+      - run: npm run build
+        env:
+          # keep the CI artifact pointed at a local backend; the deploy image
+          # bakes its real base URL via Docker build args instead
+          NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+
+  # The Playwright smoke needs the Java backend + seeded Postgres, so it stays
+  # a local/manual job: `npm run build && npm run e2e` with the backend up.
