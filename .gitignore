@@ -10,6 +10,10 @@ yarn-error.log*
 pnpm-debug.log*
 tsconfig.tsbuildinfo
 
+# Playwright artifacts
+test-results/
+playwright-report/
+
 # Local tooling / IDE / agent session data
 .claude/
 .idea/
