@@ -4,6 +4,7 @@ import "./globals.css";
 import { AppProviders } from "@/components/layout/AppProviders";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { StylistWidget } from "@/features/stylist/StylistWidget";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <SiteHeader />
           {children}
           <SiteFooter />
+          <StylistWidget />
         </AppProviders>
       </body>
     </html>

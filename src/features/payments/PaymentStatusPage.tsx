@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { formatPrice } from "@/features/catalog/ProductCard";
 import { paymentApi } from "@/lib/api/shop";
 import type { PaymentStatus } from "@/lib/api/types";
+import { isSafeHttpUrl } from "@/lib/url";
 
 const failedStatuses: PaymentStatus[] = ["FAILED", "CANCELED", "EXPIRED"];
 
@@ -93,8 +94,9 @@ export function PaymentStatusPage({ paymentId }: { paymentId: number }) {
                   Retry payment
                 </Link>
               ) : null}
-              {(payment.data.status === "CREATED" || payment.data.status === "PENDING") && payment.data.paymentUrl ? (
-                <a className="button buttonDark" href={payment.data.paymentUrl}>
+              {(payment.data.status === "CREATED" || payment.data.status === "PENDING") &&
+              isSafeHttpUrl(payment.data.paymentUrl) ? (
+                <a className="button buttonDark" href={payment.data.paymentUrl} rel="noopener noreferrer">
                   Open bank app
                 </a>
               ) : null}

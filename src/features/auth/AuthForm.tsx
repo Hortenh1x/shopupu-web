@@ -8,10 +8,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ApiError } from "@/lib/api/client";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { GoogleSignInButton } from "@/features/auth/GoogleSignInButton";
 
 const schema = z.object({
   email: z.string().email(),
-  password: z.string().min(8)
+  password: z.string().min(8),
+  passwordConfirm: z.string().optional()
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -22,16 +24,26 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [registered, setRegistered] = useState(false);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { email: "", password: "" }
+    defaultValues: { email: "", password: "", passwordConfirm: "" }
   });
 
   async function submit(values: FormValues) {
+    if (mode === "register") {
+      if (!values.passwordConfirm || values.passwordConfirm.length < 8) {
+        form.setError("passwordConfirm", { message: "Confirm your password" });
+        return;
+      }
+      if (values.password !== values.passwordConfirm) {
+        form.setError("passwordConfirm", { message: "Passwords do not match" });
+        return;
+      }
+    }
     try {
       if (mode === "login") {
         await auth.login(values.email, values.password);
         router.push("/catalog");
       } else {
-        await auth.register(values.email, values.password);
+        await auth.register(values.email, values.password, values.passwordConfirm ?? "");
         setRegistered(true);
       }
     } catch (error) {
@@ -100,6 +112,20 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
               <span className="errorText">{form.formState.errors.password.message}</span>
             ) : null}
           </label>
+          {mode === "register" ? (
+            <label className="label">
+              Confirm password
+              <input
+                className="input"
+                type="password"
+                autoComplete="new-password"
+                {...form.register("passwordConfirm")}
+              />
+              {form.formState.errors.passwordConfirm ? (
+                <span className="errorText">{form.formState.errors.passwordConfirm.message}</span>
+              ) : null}
+            </label>
+          ) : null}
           {form.formState.errors.root ? (
             <p className="errorText" style={{ margin: 0 }}>
               {form.formState.errors.root.message}
@@ -109,6 +135,18 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
             {form.formState.isSubmitting ? "One moment..." : mode === "login" ? "Sign in" : "Create account"}
           </button>
         </form>
+        <GoogleSignInButton
+          onCredential={async (idToken) => {
+            try {
+              await auth.loginWithGoogle(idToken);
+              router.push("/catalog");
+            } catch (error) {
+              form.setError("root", {
+                message: error instanceof ApiError || error instanceof Error ? error.message : "Google sign-in failed"
+              });
+            }
+          }}
+        />
         <div className="toolbar" style={{ justifyContent: "space-between", fontSize: "0.9rem" }}>
           {mode === "login" ? (
             <>

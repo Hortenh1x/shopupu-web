@@ -9,10 +9,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { formatPrice } from "@/features/catalog/ProductCard";
 import { newIdempotencyKey } from "@/lib/api/client";
 import { orderApi, paymentApi } from "@/lib/api/shop";
-
-function isAbsoluteHttpUrl(url: string | null | undefined): url is string {
-  return Boolean(url && /^https?:\/\//i.test(url));
-}
+import { isSafeHttpUrl } from "@/lib/url";
 
 export function CreatePaymentPage() {
   const params = useSearchParams();
@@ -27,7 +24,7 @@ export function CreatePaymentPage() {
   const createPayment = useMutation({
     mutationFn: () => paymentApi.create(orderId, newIdempotencyKey()),
     onSuccess: (payment) => {
-      if (isAbsoluteHttpUrl(payment.paymentUrl)) {
+      if (isSafeHttpUrl(payment.paymentUrl)) {
         window.location.href = payment.paymentUrl;
       }
     }
@@ -99,7 +96,7 @@ export function CreatePaymentPage() {
                 {(createPayment.error as Error).message}
               </p>
             ) : null}
-            {payment && isAbsoluteHttpUrl(payment.paymentUrl) ? (
+            {payment && isSafeHttpUrl(payment.paymentUrl) ? (
               <p className="muted" style={{ margin: 0 }}>
                 Redirecting to the payment provider...
               </p>
@@ -109,7 +106,7 @@ export function CreatePaymentPage() {
             </Link>
           </div>
 
-          {payment && !isAbsoluteHttpUrl(payment.paymentUrl) ? (
+          {payment && !isSafeHttpUrl(payment.paymentUrl) ? (
             <aside className="card stack" style={{ padding: 24 }}>
               <span className="status statusWarn">{payment.status.toLowerCase()}</span>
               <p className="mono" style={{ margin: 0 }}>

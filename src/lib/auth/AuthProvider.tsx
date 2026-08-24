@@ -12,7 +12,8 @@ type AuthContextValue = {
   isAuthenticated: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, passwordConfirm: string) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
   logout: () => void;
   reloadUser: () => Promise<void>;
 };
@@ -72,8 +73,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       login: async (email: string, password: string) => {
         await applyTokens(await authApi.login(email, password));
       },
-      register: async (email: string, password: string) => {
-        await applyTokens(await authApi.register(email, password));
+      register: async (email: string, password: string, passwordConfirm: string) => {
+        await applyTokens(await authApi.register(email, password, passwordConfirm));
+      },
+      loginWithGoogle: async (idToken: string) => {
+        await applyTokens(await authApi.googleLogin(idToken));
       },
       logout: () => {
         const refreshToken = getRefreshToken();

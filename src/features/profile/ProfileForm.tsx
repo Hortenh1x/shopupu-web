@@ -4,8 +4,15 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { authApi, userApi } from "@/lib/api/shop";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import type { UserGender } from "@/lib/api/types";
 
 const SIZES = ["", "XS", "S", "M", "L", "XL", "XXL"];
+const GENDERS: { value: UserGender | ""; label: string }[] = [
+  { value: "", label: "not set" },
+  { value: "MALE", label: "Male" },
+  { value: "FEMALE", label: "Female" },
+  { value: "OTHER", label: "Other" }
+];
 
 export function ProfileForm() {
   const auth = useAuth();
@@ -13,6 +20,7 @@ export function ProfileForm() {
   const [lastName, setLastName] = useState(auth.user?.lastName ?? "");
   const [phone, setPhone] = useState(auth.user?.phone ?? "");
   const [preferredSize, setPreferredSize] = useState(auth.user?.preferredSize ?? "");
+  const [gender, setGender] = useState<UserGender | "">(auth.user?.gender ?? "");
 
   const save = useMutation({
     mutationFn: () =>
@@ -20,7 +28,8 @@ export function ProfileForm() {
         firstName: firstName || null,
         lastName: lastName || null,
         phone: phone || null,
-        preferredSize: preferredSize || null
+        preferredSize: preferredSize || null,
+        gender: gender || null
       }),
     onSuccess: () => auth.reloadUser()
   });
@@ -56,6 +65,16 @@ export function ProfileForm() {
             {SIZES.map((size) => (
               <option key={size} value={size}>
                 {size || "not set"}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="label">
+          Gender
+          <select className="select" value={gender} onChange={(e) => setGender(e.target.value as UserGender | "")}>
+            {GENDERS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>

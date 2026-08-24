@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { RatingStars } from "@/components/ui/RatingStars";
@@ -9,9 +10,10 @@ import { ApiError } from "@/lib/api/client";
 import { aiApi, catalogApi, reviewApi } from "@/lib/api/shop";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
+const REVIEWS_PAGE_SIZE = 6;
+
 const reviewSchema = z.object({
   rating: z.coerce.number().min(1).max(5),
-  title: z.string().min(2).max(160),
   body: z.string().min(5).max(5000)
 });
 
@@ -68,15 +70,37 @@ export function ReviewPanel({ productId }: { productId: number }) {
   const auth = useAuth();
   const queryClient = useQueryClient();
   const summary = useQuery({ queryKey: ["rating", productId], queryFn: () => catalogApi.rating(productId) });
-  const reviews = useQuery({ queryKey: ["reviews", productId], queryFn: () => catalogApi.reviews(productId) });
+  // reviews load lazily: first page up front, the next page only when the
+  // sentinel below the list scrolls into view
+  const reviews = useInfiniteQuery({
+    queryKey: ["reviews", productId],
+    queryFn: ({ pageParam }) => catalogApi.reviews(productId, pageParam, REVIEWS_PAGE_SIZE),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => (lastPage.last ? undefined : lastPage.number + 1)
+  });
+  const { hasNextPage, isFetchingNextPage, fetchNextPage } = reviews;
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || !hasNextPage) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) void fetchNextPage();
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const loadedReviews = reviews.data?.pages.flatMap((page) => page.content) ?? [];
   const form = useForm<ReviewFormInput, unknown, ReviewForm>({
     resolver: zodResolver(reviewSchema),
-    defaultValues: { rating: 5, title: "", body: "" }
+    defaultValues: { rating: 5, body: "" }
   });
   const createReview = useMutation({
     mutationFn: (values: ReviewForm) => reviewApi.create(productId, values),
     onSuccess: async () => {
-      form.reset({ rating: 5, title: "", body: "" });
+      form.reset({ rating: 5, body: "" });
       await queryClient.invalidateQueries({ queryKey: ["reviews", productId] });
     }
   });
@@ -109,17 +133,14 @@ export function ReviewPanel({ productId }: { productId: number }) {
 
         <ReviewSummaryCard productId={productId} />
 
-        {reviews.data?.content?.length ? (
-          reviews.data.content.map((review) => (
+        {loadedReviews.length ? (
+          loadedReviews.map((review) => (
             <article key={review.id} className="card stack" style={{ gap: 10 }}>
-              <span className="toolbar" style={{ gap: 10 }}>
+              <div className="stack" style={{ gap: 4 }}>
+                <strong style={{ fontFamily: "var(--font-head)" }}>{review.username}</strong>
                 <RatingStars value={review.rating} />
-                <strong style={{ fontFamily: "var(--font-head)" }}>{review.title}</strong>
-              </span>
+              </div>
               <p style={{ margin: 0 }}>{review.body}</p>
-              <span className="mono muted" style={{ fontSize: "0.8rem" }}>
-                {review.username}
-              </span>
               {auth.user && review.userId === auth.user.id ? (
                 <button
                   className="button buttonRed buttonSmall"
@@ -137,6 +158,14 @@ export function ReviewPanel({ productId }: { productId: number }) {
             No approved reviews yet. Bought this? Yours could be the first.
           </p>
         )}
+        {hasNextPage ? (
+          <div ref={sentinelRef} aria-hidden style={{ height: 1 }} />
+        ) : null}
+        {isFetchingNextPage ? (
+          <p className="muted" style={{ margin: 0, textAlign: "center" }}>
+            Loading more reviews...
+          </p>
+        ) : null}
       </div>
 
       <aside className="card stack" style={{ padding: 24 }}>
@@ -160,10 +189,6 @@ export function ReviewPanel({ productId }: { productId: number }) {
                 onChange={(value) => form.setValue("rating", value, { shouldValidate: true })}
               />
             </div>
-            <label className="label">
-              Title
-              <input className="input" {...form.register("title")} />
-            </label>
             <label className="label">
               Review
               <textarea className="textarea" {...form.register("body")} />

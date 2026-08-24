@@ -39,7 +39,7 @@ export function RatingStars({ value, onChange }: { value: number; onChange?: (va
   const percent = Math.max(0, Math.min(100, (value / 5) * 100));
   return (
     <span
-      style={{ position: "relative", display: "inline-flex", gap: 2 }}
+      style={{ position: "relative", display: "inline-flex", gap: 2, width: "fit-content", justifySelf: "start" }}
       aria-label={`${value.toFixed(1)} out of 5`}
       role="img"
     >

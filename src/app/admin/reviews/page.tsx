@@ -56,7 +56,6 @@ export default function Page() {
               <td className="muted">{review.userEmail ?? review.userId}</td>
               <td>{review.rating}</td>
               <td>
-                <strong>{review.title}</strong>
                 <p className="muted" style={{ margin: 0 }}>
                   {review.body.length > 140 ? `${review.body.slice(0, 140)}...` : review.body}
                 </p>
