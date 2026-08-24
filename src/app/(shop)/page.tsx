@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ProductCard } from "@/features/catalog/ProductCard";
 import { catalogApi } from "@/lib/api/shop";
@@ -17,63 +16,9 @@ const MARQUEE_ITEMS = [
 
 export default function HomePage() {
   const products = useQuery({ queryKey: ["home-products"], queryFn: () => catalogApi.products(0, 8) });
-  const categories = useQuery({ queryKey: ["categories"], queryFn: catalogApi.categories });
-  const brands = useQuery({ queryKey: ["brands"], queryFn: catalogApi.brands });
-
-  const styleCount = products.data?.totalElements;
-  const brandCount = brands.data?.length;
-  const categoryCount = categories.data?.length;
 
   return (
     <main className="page">
-      <section className="panelTangerine" style={{ padding: "clamp(32px, 6vw, 72px)" }}>
-        <div className="stack" style={{ gap: 22, justifyItems: "start", maxWidth: 760 }}>
-          <span className="kicker onDark">Portfolio demo &middot; a real store, end to end</span>
-          <h1 className="headline">
-            A working store, <span className="mark">front to back</span>.
-          </h1>
-          <p className="subhead" style={{ color: "color-mix(in oklab, var(--cream-on-dark) 88%, transparent)" }}>
-            Shopupu is a full-stack e-commerce demo: a Spring Boot API with live inventory, guest carts,
-            payments and moderated reviews — plus semantic search and an AI stylist. Everything on this
-            site actually works.
-          </p>
-          <div className="toolbar">
-            <Link className="button buttonDark" href="/catalog">
-              Browse the catalog
-            </Link>
-            <a className="button" href="https://github.com/Hortenh1x/shopupu" target="_blank" rel="noreferrer">
-              View the code
-            </a>
-          </div>
-        </div>
-        {styleCount || brandCount || categoryCount ? (
-          <div
-            className="toolbar"
-            style={{
-              marginTop: "clamp(28px, 4vw, 48px)",
-              paddingTop: 22,
-              borderTop: "1px solid color-mix(in oklab, var(--cream-on-dark) 30%, transparent)",
-              gap: "clamp(24px, 6vw, 72px)"
-            }}
-          >
-            {[
-              { value: styleCount, label: "styles in stock" },
-              { value: brandCount, label: "brands" },
-              { value: categoryCount, label: "categories" }
-            ]
-              .filter((stat) => stat.value)
-              .map((stat) => (
-                <div key={stat.label} className="stack" style={{ gap: 2 }}>
-                  <span className="price" style={{ fontSize: "1.6rem" }}>
-                    {stat.value}
-                  </span>
-                  <span className="kicker onDark">{stat.label}</span>
-                </div>
-              ))}
-          </div>
-        ) : null}
-      </section>
-
       <div className="marquee" aria-hidden="true">
         <div className="marqueeTrack">
           {[...MARQUEE_ITEMS, ...MARQUEE_ITEMS].map((item, index) => (
