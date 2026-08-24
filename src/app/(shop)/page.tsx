@@ -87,29 +87,9 @@ export default function HomePage() {
         </div>
       </div>
 
-      {categories.data?.length ? (
-        <section className="section">
-          <div className="railHeader">
-            <h2 className="title">
-              Shop by <span className="mark">category</span>.
-            </h2>
-          </div>
-          <div className="chipRow">
-            {categories.data.map((category) => (
-              <Link key={category.id} className="chip" href={`/catalog?category=${category.id}`}>
-                {category.name}
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       <section className="section">
         <div className="railHeader">
           <h2 className="title">New this week.</h2>
-          <p className="muted" style={{ margin: 0 }}>
-            Straight from the catalog API — stock per size and color is live from the inventory service.
-          </p>
         </div>
         {products.isLoading ? (
           <div className="grid">

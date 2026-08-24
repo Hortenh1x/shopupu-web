@@ -37,7 +37,13 @@ export function SiteFooter() {
             <a href="https://github.com/Hortenh1x/shopupu-web" target="_blank" rel="noreferrer">
               Frontend on GitHub
             </a>
-            <a href="mailto:dmytro.bolibok@gmail.com">Hire me</a>
+            <a
+              href="https://www.upwork.com/freelancers/~0109d61646060009e4?mp_source=share"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Hire me
+            </a>
           </nav>
         </div>
         <div className="footerBase">
