@@ -12,8 +12,9 @@ export function SiteFooter() {
               shopupu
             </span>
             <p className="muted" style={{ margin: 0, maxWidth: "38ch" }}>
-              A clothing shop set on cream paper: honest sizes, live stock and reviews from people who
-              actually bought the thing.
+              A portfolio project: production-grade Spring Boot commerce API behind a Next.js storefront,
+              with AI where it earns its keep — semantic search, an outfit stylist, review summaries.
+              Need something like this built? Get in touch.
             </p>
           </div>
           <nav aria-label="Shop">
@@ -27,6 +28,16 @@ export function SiteFooter() {
             <Link href="/profile">Profile</Link>
             <Link href="/login">Sign in</Link>
             <Link href="/register">Create account</Link>
+          </nav>
+          <nav aria-label="Project">
+            <span className="kicker onDark">Project</span>
+            <a href="https://github.com/Hortenh1x/shopupu" target="_blank" rel="noreferrer">
+              Backend on GitHub
+            </a>
+            <a href="https://github.com/Hortenh1x/shopupu-web" target="_blank" rel="noreferrer">
+              Frontend on GitHub
+            </a>
+            <a href="mailto:dmytro.bolibok@gmail.com">Hire me</a>
           </nav>
         </div>
         <div className="footerBase">

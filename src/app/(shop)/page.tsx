@@ -7,10 +7,12 @@ import { catalogApi } from "@/lib/api/shop";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 const MARQUEE_ITEMS = [
-  "Size and color variants with live stock",
-  "Reviews from verified buyers only",
-  "Guest cart, merged when you sign in",
-  "Promo codes at checkout"
+  "Semantic search on pgvector",
+  "AI stylist backed by a real LLM",
+  "Guest cart merges on sign-in",
+  "Idempotent checkout, 9-status order flow",
+  "HMAC-verified payment webhooks",
+  "Google sign-in, JWT with rotation"
 ];
 
 export default function HomePage() {
@@ -26,21 +28,22 @@ export default function HomePage() {
     <main className="page">
       <section className="panelTangerine" style={{ padding: "clamp(32px, 6vw, 72px)" }}>
         <div className="stack" style={{ gap: 22, justifyItems: "start", maxWidth: 760 }}>
-          <span className="kicker onDark">Season 04 &middot; the shopupu catalog</span>
+          <span className="kicker onDark">Portfolio demo &middot; a real store, end to end</span>
           <h1 className="headline">
-            Clothes you keep <span className="mark">for years</span>, not weeks.
+            A working store, <span className="mark">front to back</span>.
           </h1>
           <p className="subhead" style={{ color: "color-mix(in oklab, var(--cream-on-dark) 88%, transparent)" }}>
-            Size-true pieces with live stock and honest reviews from people who bought them. Your cart
-            waits for you, even before you have an account.
+            Shopupu is a full-stack e-commerce demo: a Spring Boot API with live inventory, guest carts,
+            payments and moderated reviews — plus semantic search and an AI stylist. Everything on this
+            site actually works.
           </p>
           <div className="toolbar">
             <Link className="button buttonDark" href="/catalog">
               Browse the catalog
             </Link>
-            <Link className="button" href="/register">
-              Create account
-            </Link>
+            <a className="button" href="https://github.com/Hortenh1x/shopupu" target="_blank" rel="noreferrer">
+              View the code
+            </a>
           </div>
         </div>
         {styleCount || brandCount || categoryCount ? (
@@ -105,8 +108,7 @@ export default function HomePage() {
         <div className="railHeader">
           <h2 className="title">New this week.</h2>
           <p className="muted" style={{ margin: 0 }}>
-            The latest arrivals, straight from the print queue. Every piece lists its real stock per size
-            and color.
+            Straight from the catalog API — stock per size and color is live from the inventory service.
           </p>
         </div>
         {products.isLoading ? (
