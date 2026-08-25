@@ -24,12 +24,20 @@ const QUICK_PROMPTS = [
 const GREETING =
   "Hi! Tell me where you're headed — a business meeting, a date, a hike in the rain — and I'll put an outfit together from the catalog.";
 
+const MIN_PANEL_WIDTH = 320;
+const MIN_PANEL_HEIGHT = 380;
+
+type PanelSize = { width: number; height: number };
+
 export function StylistWidget() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatEntry[]>([]);
+  const [size, setSize] = useState<PanelSize | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const panelRef = useRef<HTMLElement | null>(null);
+  const resizeOrigin = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
   const chat = useMutation({
     mutationFn: ({ message, history }: { message: string; history: StylistHistoryMessage[] }) =>
@@ -67,10 +75,39 @@ export function StylistWidget() {
     chat.mutate({ message, history });
   };
 
+  const beginResize = (event: React.PointerEvent<HTMLDivElement>) => {
+    const rect = panelRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    event.preventDefault();
+    resizeOrigin.current = { x: event.clientX, y: event.clientY, width: rect.width, height: rect.height };
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // synthetic pointer events carry ids capture can reject; drag still works
+    }
+  };
+
+  const resizeMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const origin = resizeOrigin.current;
+    if (!origin) return;
+    // panel is anchored bottom-right, so dragging the top-left corner away enlarges it
+    const width = origin.width + (origin.x - event.clientX);
+    const height = origin.height + (origin.y - event.clientY);
+    setSize({
+      width: Math.min(Math.max(width, MIN_PANEL_WIDTH), window.innerWidth - 36),
+      height: Math.min(Math.max(height, MIN_PANEL_HEIGHT), window.innerHeight - 110)
+    });
+  };
+
+  const endResize = () => {
+    resizeOrigin.current = null;
+  };
+
   return (
     <>
       {open ? (
         <section
+          ref={panelRef}
           aria-label="AI stylist chat"
           className="card"
           style={{
@@ -78,15 +115,44 @@ export function StylistWidget() {
             right: 20,
             bottom: 86,
             zIndex: 60,
-            width: "min(390px, calc(100vw - 32px))",
+            width: size ? `min(${size.width}px, calc(100vw - 32px))` : "min(390px, calc(100vw - 32px))",
             display: "grid",
             gridTemplateRows: "auto 1fr auto",
-            maxHeight: "min(560px, calc(100vh - 120px))",
+            ...(size
+              ? { height: `min(${size.height}px, calc(100vh - 120px))` }
+              : { maxHeight: "min(560px, calc(100vh - 120px))" }),
             padding: 0,
             overflow: "hidden",
             boxShadow: "var(--shadow-lift)"
           }}
         >
+          <div
+            aria-hidden
+            title="Drag to resize"
+            onPointerDown={beginResize}
+            onPointerMove={resizeMove}
+            onPointerUp={endResize}
+            onPointerCancel={endResize}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: 22,
+              height: 22,
+              cursor: "nwse-resize",
+              touchAction: "none",
+              zIndex: 1
+            }}
+          >
+            <svg
+              width="10"
+              height="10"
+              viewBox="0 0 10 10"
+              style={{ position: "absolute", top: 4, left: 4 }}
+            >
+              <path d="M1 9 9 1 M1 5 5 1" stroke="var(--ink-mute)" strokeWidth="1.4" fill="none" />
+            </svg>
+          </div>
           <header style={{ padding: "14px 16px", borderBottom: "1px solid var(--line)" }}>
             <strong style={{ fontFamily: "var(--font-head)" }}>Stylist.</strong>
             <span className="muted" style={{ marginLeft: 8, fontSize: "0.85rem" }}>
