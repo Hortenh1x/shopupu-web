@@ -4,6 +4,10 @@ out
 dist
 .env.local
 .env*.local
+# real env files stay on the machine that runs the app: the server's copy carries
+# NEXT_PUBLIC_GOOGLE_CLIENT_ID, and a tracked one would overwrite it on deploy
+.env.production
+.env.production.local
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
