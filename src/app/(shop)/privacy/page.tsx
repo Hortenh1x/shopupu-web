@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/LocaleProvider";
+import { OPERATOR } from "@/lib/operator";
 
 export default function Page() {
   const { t } = useI18n();
@@ -21,8 +22,16 @@ export default function Page() {
       <p>{t("privacy.manage")}</p>
       <p>{t("privacy.export")}</p>
     </section>
+    <section className="stack">
+      <h2 className="subtitle">{t("privacy.retentionTitle")}</h2>
+      <p>{t("privacy.retention")}</p>
+    </section>
     <Link className="button buttonDark" href="/profile">{t("privacy.settings")}</Link>
-    <p className="muted">{t("privacy.operator")}</p>
+    <p className="muted">
+      {t("privacy.operator")}{" "}
+      <strong>{t("privacy.operatorLabel")}:</strong> {OPERATOR.name} ·{" "}
+      <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>
+    </p>
     <Link href="/about-demo">{t("nav.about")}</Link>
   </main>;
 }

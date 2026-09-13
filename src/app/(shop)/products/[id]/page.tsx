@@ -6,7 +6,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const { id } = await params;
   const product = await getServerProduct(id);
   const { t } = await getServerI18n();
-  return { title: t("demo.productTitle", { title: product.title }) };
+  // The key already carries the site name; bypass the layout template to avoid "· shopupu · shopupu".
+  return { title: { absolute: t("demo.productTitle", { title: product.title }) } };
 }
 
 export default async function Page({ params }: { params: Promise<{ id: string }> }) {

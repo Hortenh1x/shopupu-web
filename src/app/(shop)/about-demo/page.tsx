@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useI18n } from "@/lib/i18n/LocaleProvider";
+import { OPERATOR } from "@/lib/operator";
 
 export default function Page() {
   const { t } = useI18n();
@@ -21,6 +22,9 @@ export default function Page() {
       <h2 className="subtitle">{t("about.contactTitle")}</h2>
       <p>{t("about.contact")}</p>
       <p>{t("about.email")}</p>
+      <p>
+        {t("about.operator")} <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>
+      </p>
     </section>
     <Link className="button" href="/privacy">{t("nav.privacy")}</Link>
     <Link className="button buttonDark" href="/catalog">{t("about.explore")}</Link>

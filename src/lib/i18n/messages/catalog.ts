@@ -240,8 +240,24 @@ export const catalogMessages = {
     "de": "Kontoeinstellungen"
   },
   "privacy.operator": {
-    "en": "This page describes the demonstration's technical data handling. Operator contact details and the deployment-specific privacy notice must be supplied before public release.",
-    "de": "Diese Seite beschreibt die technische Datenverarbeitung der Demo. Vor einer öffentlichen Freigabe müssen die Kontaktdaten des Betreibers und die Datenschutzhinweise für die konkrete Bereitstellung ergänzt werden."
+    "en": "This page describes the technical data handling of a portfolio demonstration, not of a commercial store. Questions and requests about your data go to the operator:",
+    "de": "Diese Seite beschreibt die technische Datenverarbeitung einer Portfolio-Demo, nicht eines kommerziellen Shops. Fragen und Anfragen zu deinen Daten richtest du an den Betreiber:"
+  },
+  "privacy.operatorLabel": {
+    "en": "Operator",
+    "de": "Betreiber"
+  },
+  "privacy.retentionTitle": {
+    "en": "How long data is kept",
+    "de": "Wie lange Daten aufbewahrt werden"
+  },
+  "privacy.retention": {
+    "en": "Your account and everything linked to it stay until you erase the account from Security & data. Accounts that have not signed in for 12 months are removed by the operator. Fictional order and test-payment records of erased accounts are kept in pseudonymised form for up to 24 months so stock and payment history stay consistent. Security logs are kept for 12 months. Backups are rotated after 14 days; an erased account can therefore remain in a backup copy for up to 14 more days.",
+    "de": "Dein Konto und alles, was damit verknüpft ist, bleibt gespeichert, bis du das Konto unter „Sicherheit & Daten“ löschst. Konten ohne Anmeldung seit 12 Monaten entfernt der Betreiber. Fiktive Bestell- und Testzahlungsdaten gelöschter Konten bleiben bis zu 24 Monate pseudonymisiert erhalten, damit Bestand und Zahlungsverlauf konsistent bleiben. Sicherheitsprotokolle werden 12 Monate aufbewahrt. Sicherungskopien werden nach 14 Tagen überschrieben; ein gelöschtes Konto kann daher bis zu 14 weitere Tage in einer Sicherung enthalten sein."
+  },
+  "about.operator": {
+    "en": "shopupu is a portfolio project by Dmytro Bolibok. It is not a store and sells nothing. Contact:",
+    "de": "shopupu ist ein Portfolio-Projekt von Dmytro Bolibok. Es ist kein Shop und verkauft nichts. Kontakt:"
   },
   "catalog.countOne": {
     "en": "{count} style",
