@@ -1,16 +1,21 @@
 "use client";
 
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { AdminShell } from "@/features/admin/AdminShell";
 import { adminApi } from "@/lib/api/shop";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
 
 export default function Page() {
+  const { t, errorMessage, formatPrice, genderLabel } = useI18n();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
-  const products = useQuery({ queryKey: ["admin-products", page], queryFn: () => adminApi.products(page) });
-  const remove = useMutation({
+  const products = useSessionQuery({ queryKey: ["admin-products", page], queryFn: () => adminApi.products(page) });
+  const remove = useSessionMutation({
     mutationFn: (id: number) => adminApi.deleteProduct(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["admin-products"] })
   });
@@ -18,21 +23,22 @@ export default function Page() {
   const data = products.data;
 
   return (
-    <AdminShell title="Products">
+    <AdminShell title={t("admin.nav.products")}>
       <Link className="button buttonDark" href="/admin/products/new" style={{ alignSelf: "flex-start" }}>
-        New product
+        {t("admin.newProduct")}
       </Link>
-      {products.error ? <p className="errorText">{(products.error as Error).message}</p> : null}
+      {products.error ? <p className="errorText">{errorMessage(products.error)}</p> : null}
+      {remove.error ? <p className="errorText">{errorMessage(remove.error)}</p> : null}
       <table className="table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Title</th>
-            <th>Brand</th>
-            <th>Gender</th>
-            <th>Price</th>
-            <th>Variants</th>
-            <th>Status</th>
+            <th>{t("admin.id")}</th>
+            <th>{t("admin.field.title")}</th>
+            <th>{t("admin.brand")}</th>
+            <th>{t("admin.gender")}</th>
+            <th>{t("admin.price")}</th>
+            <th>{t("admin.variants")}</th>
+            <th>{t("admin.status")}</th>
             <th />
           </tr>
         </thead>
@@ -42,18 +48,21 @@ export default function Page() {
               <td>{product.id}</td>
               <td>{product.title}</td>
               <td>{product.brandName ?? "-"}</td>
-              <td>{product.gender?.toLowerCase() ?? "-"}</td>
-              <td>{Number(product.price).toFixed(2)}</td>
+              <td>{product.gender ? genderLabel(product.gender) : "-"}</td>
+              <td>{formatPrice(product.price)}</td>
               <td>{product.variants?.length ?? 0}</td>
-              <td>{product.enabled ? "enabled" : "disabled"}</td>
+              <td>{product.enabled ? t("common.enabled") : t("common.disabled")}</td>
               <td>
                 <div className="toolbar">
                   <Link className="button" href={`/admin/products/${product.id}`}>
-                    Edit
+                    {t("common.edit")}
                   </Link>
-                  <button className="button buttonRed" disabled={remove.isPending} onClick={() => remove.mutate(product.id)}>
-                    Delete
-                  </button>
+                  <ConfirmButton
+                    label={t("common.delete")}
+                    confirmLabel={t("common.confirmDelete")}
+                    disabled={remove.isPending}
+                    onConfirm={() => remove.mutate(product.id)}
+                  />
                 </div>
               </td>
             </tr>
@@ -63,11 +72,11 @@ export default function Page() {
       {data && data.totalPages > 1 ? (
         <div className="toolbar" style={{ justifyContent: "center" }}>
           <button className="button" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
-            Previous
+            {t("common.previous")}
           </button>
-          <span className="mono muted" style={{ fontSize: "0.88rem" }}>{page + 1} / {data.totalPages}</span>
+          <span className="mono muted" style={{ fontSize: "0.88rem" }}>{t("common.page", { page: page + 1, pages: data.totalPages })}</span>
           <button className="button" disabled={page >= data.totalPages - 1} onClick={() => setPage((p) => p + 1)}>
-            Next
+            {t("common.next")}
           </button>
         </div>
       ) : null}

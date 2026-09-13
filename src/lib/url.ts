@@ -20,3 +20,14 @@ export function isSafeHttpUrl(url: string | null | undefined): url is string {
     return false;
   }
 }
+
+export function isStripeCheckoutUrl(value: string | null | undefined): value is string {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === "checkout.stripe.com" && !url.username && !url.password
+      && (!url.port || url.port === "443");
+  } catch {
+    return false;
+  }
+}

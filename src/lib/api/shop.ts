@@ -1,7 +1,10 @@
-import { apiFetch, apiForm, apiJson } from "@/lib/api/client";
-import { getCartToken, setCartToken } from "@/lib/auth/session";
+import { ApiError, apiFetch, apiForm, apiJson } from "@/lib/api/client";
+import { captureSession, getCartToken, isCurrentSession, setCartToken, withSessionLock } from "@/lib/auth/session";
 import type {
+  Gender,
   AddressInput,
+  AuthResult,
+  MfaEnrollment,
   AdminReview,
   Brand,
   Cart,
@@ -26,6 +29,7 @@ import type {
   ShippingMethod,
   StylistChatResponse,
   StylistHistoryMessage,
+  StorefrontConfig,
   TokenPairResponse,
   UserAddress,
   UserDataExport,
@@ -38,21 +42,35 @@ import type {
 
 const v1 = "/api/v1";
 
+export const storefrontApi = {
+  config: () => apiFetch<StorefrontConfig>(`${v1}/storefront/config`, { auth: false })
+};
+
 // === Auth ===================================================================
+
+function guestHeaders(token: string | null): Record<string, string> {
+  return token ? { "X-Cart-Token": token } : {};
+}
 
 export const authApi = {
   // the guest cart token rides along so the backend merges the cart (CART-02)
-  login: (email: string, password: string) =>
-    apiJson<TokenPairResponse>(`${v1}/auth/login`, { email, password }, { auth: false, cartToken: true }),
-  register: (email: string, password: string, passwordConfirm: string) =>
+  login: (email: string, password: string, guestToken = getCartToken()) =>
+    apiJson<AuthResult>(`${v1}/auth/login`, { email, password }, { auth: false, headers: guestHeaders(guestToken) }),
+  register: (email: string, password: string, passwordConfirm: string, guestToken = getCartToken()) =>
     apiJson<TokenPairResponse>(
       `${v1}/auth/register`,
       { email, password, passwordConfirm },
-      { auth: false, cartToken: true }
+      { auth: false, headers: guestHeaders(guestToken) }
     ),
   // exchanges a Google ID token (from Google Identity Services) for our session tokens
-  googleLogin: (idToken: string) =>
-    apiJson<TokenPairResponse>(`${v1}/auth/google`, { idToken }, { auth: false, cartToken: true }),
+  googleLogin: (idToken: string, guestToken = getCartToken()) =>
+    apiJson<AuthResult>(`${v1}/auth/google`, { idToken }, { auth: false, headers: guestHeaders(guestToken) }),
+  startMfaEnrollment: (challengeToken: string) =>
+    apiJson<MfaEnrollment>(`${v1}/auth/mfa/enrollment/start`, { challengeToken }, { auth: false }),
+  confirmMfaEnrollment: (challengeToken: string, code: string) =>
+    apiJson<AuthResult>(`${v1}/auth/mfa/enrollment/confirm`, { challengeToken, code }, { auth: false }),
+  verifyMfa: (challengeToken: string, code?: string, recoveryCode?: string) =>
+    apiJson<AuthResult>(`${v1}/auth/mfa/verify`, { challengeToken, code, recoveryCode }, { auth: false }),
   logout: (refreshToken: string) => apiJson<void>(`${v1}/auth/logout`, { refreshToken }),
   changePassword: (currentPassword: string, newPassword: string) =>
     apiJson<void>(`${v1}/auth/change-password`, { currentPassword, newPassword }),
@@ -61,7 +79,9 @@ export const authApi = {
     apiJson<void>(`${v1}/auth/reset-password`, { token, newPassword }, { auth: false }),
   verifyEmail: (token: string) => apiJson<void>(`${v1}/auth/verify-email`, { token }, { auth: false }),
   resendVerification: () => apiFetch<void>(`${v1}/auth/resend-verification`, { method: "POST" }),
-  me: () => apiFetch<UserProfile>(`${v1}/auth/me`)
+  me: (accessToken?: string) => apiFetch<UserProfile>(`${v1}/auth/me`, accessToken
+    ? { auth: false, headers: { Authorization: `Bearer ${accessToken}` } }
+    : {})
 };
 
 // === Catalog ================================================================
@@ -139,8 +159,8 @@ export const aiApi = {
   /** 404 while a summary has not been generated yet — treat it as "nothing to show" */
   reviewSummary: (productId: number) =>
     apiFetch<ReviewSummary>(`${v1}/catalog/products/${productId}/review-summary`, { auth: false }),
-  stylistChat: (message: string, history: StylistHistoryMessage[]) =>
-    apiJson<StylistChatResponse>(`${v1}/catalog/stylist/chat`, { message, history }, { auth: false })
+  stylistChat: (message: string, history: StylistHistoryMessage[], constraints?: { gender?: Gender; maxTotalPrice?: number }) =>
+    apiJson<StylistChatResponse>(`${v1}/catalog/stylist/chat`, { message, history, ...constraints }, { auth: false })
 };
 
 // === Reviews ================================================================
@@ -155,26 +175,37 @@ export const reviewApi = {
 
 // === Cart (works for guests via X-Cart-Token) ===============================
 
-function rememberGuestToken(cart: Cart) {
-  if (cart.guestToken) {
-    setCartToken(cart.guestToken);
-  }
-  return cart;
+async function cartRequest(operation: (headers: Record<string, string>) => Promise<Cart>) {
+  const expected = captureSession();
+  const requestedToken = getCartToken();
+  const cart = await operation(guestHeaders(requestedToken));
+  return withSessionLock(() => {
+    if (!isCurrentSession(expected)) throw new ApiError(401, "Your session changed. Please try again.", { code: "SESSION_CHANGED" });
+    const currentToken = getCartToken();
+    if (currentToken !== requestedToken && currentToken !== cart.guestToken) {
+      throw new ApiError(409, "Your guest cart changed in another tab. Reload the cart before trying again.", { code: "CART_CHANGED" });
+    }
+    if (cart.guestToken) setCartToken(cart.guestToken);
+    return cart;
+  });
 }
 
 export const cartApi = {
-  get: () => apiFetch<Cart>(`${v1}/cart`, { cartToken: true }).then(rememberGuestToken),
+  get: () => cartRequest((headers) => apiFetch<Cart>(`${v1}/cart`, { headers })),
   add: (variantId: number, quantity: number) =>
-    apiJson<Cart>(`${v1}/cart/items`, { variantId, quantity }, { cartToken: true }).then(rememberGuestToken),
+    cartRequest((headers) => apiJson<Cart>(`${v1}/cart/items`, { variantId, quantity }, { headers })),
   setQuantity: (variantId: number, quantity: number) =>
-    apiJson<Cart>(`${v1}/cart/items/${variantId}`, { variantId, quantity }, { method: "PUT", cartToken: true }).then(
-      rememberGuestToken
-    ),
+    cartRequest((headers) => apiJson<Cart>(`${v1}/cart/items/${variantId}`, { variantId, quantity }, { method: "PUT", headers })),
   remove: (variantId: number) =>
-    apiFetch<Cart>(`${v1}/cart/items/${variantId}`, { method: "DELETE", cartToken: true }).then(rememberGuestToken),
-  clear: () => apiFetch<Cart>(`${v1}/cart`, { method: "DELETE", cartToken: true }).then(rememberGuestToken),
-  /** after a login merge the guest token is spent */
-  forgetGuestToken: () => setCartToken(null),
+    cartRequest((headers) => apiFetch<Cart>(`${v1}/cart/items/${variantId}`, { method: "DELETE", headers })),
+  clear: () => cartRequest((headers) => apiFetch<Cart>(`${v1}/cart`, { method: "DELETE", headers })),
+  /** Auth publication performs this inside its own lock; other callers are conditional too. */
+  forgetGuestToken: (mergedToken = getCartToken()) => {
+    const expected = captureSession();
+    return withSessionLock(() => {
+      if (isCurrentSession(expected) && mergedToken !== null && getCartToken() === mergedToken) setCartToken(null);
+    });
+  },
   hasGuestToken: () => Boolean(getCartToken())
 };
 
@@ -217,7 +248,8 @@ export const shippingApi = {
 export const paymentApi = {
   create: (orderId: number, idempotencyKey?: string) =>
     apiJson<Payment>(`${v1}/payments`, { orderId }, { idempotencyKey }),
-  get: (paymentId: number) => apiFetch<Payment>(`${v1}/payments/${paymentId}`)
+  get: (paymentId: number) => apiFetch<Payment>(`${v1}/payments/${paymentId}`),
+  simulateSuccess: (paymentId: number) => apiFetch<Payment>(`${v1}/payments/${paymentId}/simulate-success`, { method: "POST" })
 };
 
 // === Current user self-service =============================================
@@ -305,6 +337,8 @@ export const adminApi = {
   },
 
   refundPayment: (paymentId: number) => apiFetch<Payment>(`${v1}/admin/payments/${paymentId}/refund`, { method: "POST" }),
+  retryRefundPayment: (paymentId: number, failedOperationKey: string) =>
+    apiJson<Payment>(`${v1}/admin/payments/${paymentId}/refund/retry`, { failedOperationKey }),
 
   reviews: (params: URLSearchParams) => apiFetch<Page<AdminReview>>(`${v1}/admin/reviews?${params}`),
   updateReviewStatus: (reviewId: number, status: string) =>

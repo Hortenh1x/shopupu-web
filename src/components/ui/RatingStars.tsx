@@ -1,3 +1,6 @@
+"use client";
+
+import { useI18n } from "@/lib/i18n/LocaleProvider";
 const STARS = [1, 2, 3, 4, 5];
 
 function Star({ filled }: { filled: boolean }) {
@@ -15,16 +18,27 @@ function Star({ filled }: { filled: boolean }) {
 }
 
 export function RatingStars({ value, onChange }: { value: number; onChange?: (value: number) => void }) {
+  const { t, formatNumber } = useI18n();
+  const focusedStar = Math.max(1, Math.min(5, Math.round(value)));
   if (onChange) {
     return (
-      <div style={{ display: "inline-flex", gap: 2 }} role="radiogroup" aria-label="Rating">
+      <div style={{ display: "inline-flex", gap: 4 }} role="radiogroup" aria-label={t("common.ratingLabel")}>
         {STARS.map((star) => (
           <button
             key={star}
             type="button"
             role="radio"
             aria-checked={star === Math.round(value)}
-            aria-label={`${star} of 5`}
+            aria-label={t("common.rating", { rating: star })}
+            tabIndex={star === focusedStar ? 0 : -1}
+            onKeyDown={(event) => {
+              if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) return;
+              event.preventDefault();
+              const next = event.key === "Home" ? 1 : event.key === "End" ? 5 :
+                (star - 1 + (event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : 4)) % 5 + 1;
+              onChange(next);
+              (event.currentTarget.parentElement?.querySelectorAll("button")[next - 1] as HTMLButtonElement | undefined)?.focus();
+            }}
             onClick={() => onChange(star)}
             style={{ border: 0, background: "transparent", cursor: "pointer", padding: 2, display: "inline-flex" }}
           >
@@ -39,8 +53,8 @@ export function RatingStars({ value, onChange }: { value: number; onChange?: (va
   const percent = Math.max(0, Math.min(100, (value / 5) * 100));
   return (
     <span
-      style={{ position: "relative", display: "inline-flex", gap: 2, width: "fit-content", justifySelf: "start" }}
-      aria-label={`${value.toFixed(1)} out of 5`}
+      style={{ position: "relative", display: "inline-flex", gap: 4, width: "fit-content", justifySelf: "start" }}
+      aria-label={t("common.rating", { rating: formatNumber(value, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) })}
       role="img"
     >
       {STARS.map((star) => (
@@ -51,7 +65,7 @@ export function RatingStars({ value, onChange }: { value: number; onChange?: (va
           position: "absolute",
           inset: 0,
           display: "inline-flex",
-          gap: 2,
+          gap: 4,
           overflow: "hidden",
           clipPath: `inset(0 ${100 - percent}% 0 0)`
         }}

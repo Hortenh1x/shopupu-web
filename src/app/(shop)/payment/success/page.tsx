@@ -1,13 +1,6 @@
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
+// A return URL cannot establish payment status; the order links to its verified payment record.
 export default function Page() {
-  return (
-    <main className="page">
-      <section className="brutal stack" style={{ padding: "40px 32px", justifyItems: "start", gap: 12 }}>
-        <h1 className="title">Payment <span className="mark">succeeded</span>.</h1>
-        <p className="subhead" style={{ margin: 0 }}>The bank callback was accepted and the order should now be paid.</p>
-        <Link className="button buttonDark" href="/orders">Open orders</Link>
-      </section>
-    </main>
-  );
+  redirect("/orders");
 }

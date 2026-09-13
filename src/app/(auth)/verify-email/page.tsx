@@ -1,15 +1,21 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
 import Link from "next/link";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useState, type FormEvent } from "react";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { authApi } from "@/lib/api/shop";
+import { authApi, storefrontApi } from "@/lib/api/shop";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
 
 function VerifyEmailForm() {
+  const { t, errorMessage } = useI18n();
   const auth = useAuth();
+  const config = useQuery({ queryKey: ["storefront-config"], queryFn: storefrontApi.config });
+  const unavailable = config.data?.email.available === false;
   const params = useSearchParams();
   const [token, setToken] = useState(params.get("token") ?? "");
   const verify = useMutation({
@@ -21,7 +27,7 @@ function VerifyEmailForm() {
       }
     }
   });
-  const resend = useMutation({
+  const resend = useSessionMutation({
     mutationFn: () => authApi.resendVerification()
   });
 
@@ -33,11 +39,11 @@ function VerifyEmailForm() {
   if (verify.isSuccess) {
     return (
       <main className="page">
-        <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 14 }}>
-          <h1 className="title">Email <span className="mark">verified</span>.</h1>
-          <p className="subhead">Your email address is confirmed. Thank you!</p>
+        <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 16 }}>
+          <h1 className="title">{t("auth.email")} <span className="mark">{t("profile.verified")}</span>.</h1>
+          <p className="subhead">{t("auth.emailConfirmed")}</p>
           <Link className="button buttonDark" href="/">
-            Back to shop
+            {t("auth.backShop")}
           </Link>
         </section>
       </main>
@@ -46,29 +52,29 @@ function VerifyEmailForm() {
 
   return (
     <main className="page">
-      <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 14 }}>
-        <h1 className="title">Verify email.</h1>
-        <p className="muted">Paste the verification token from the email we sent you.</p>
+      <section className="brutal stack" style={{ maxWidth: 480, margin: "40px auto", padding: "40px 32px", gap: 16 }}>
+        <h1 className="title">{t("auth.verifyEmailTitle")}</h1>
+        <p className="muted">{t("auth.pasteVerification")}</p>
         <form className="stack" onSubmit={submit}>
           <label className="label">
-            Verification token
+            {t("auth.verificationToken")}
             <input className="input" required value={token} onChange={(event) => setToken(event.target.value)} />
           </label>
-          {verify.error ? <p className="errorText" style={{ margin: 0 }}>{(verify.error as Error).message}</p> : null}
+          {verify.error ? <p className="errorText" style={{ margin: 0 }}>{errorMessage(verify.error)}</p> : null}
           <button className="button buttonDark" disabled={verify.isPending}>
-            Verify
+            {t("auth.verify")}
           </button>
         </form>
         {auth.isReady && auth.isAuthenticated ? (
           <div className="card stack">
-            <p className="muted">Lost the email? We can send a new verification link to {auth.user?.email}.</p>
+            <p className="muted">{unavailable ? t("auth.mailDisabledOrders") : t("auth.resendFor", { email: auth.user?.email ?? "" })}</p>
             <div className="toolbar">
-              <button className="button" disabled={resend.isPending} onClick={() => resend.mutate()}>
-                Resend verification email
+              <button className="button" disabled={resend.isPending || unavailable} onClick={() => resend.mutate()}>
+                {t("auth.resend")}
               </button>
-              {resend.isSuccess ? <span className="status statusOk">sent</span> : null}
+              {resend.isSuccess ? <span className="status statusOk">{t("auth.requested")}</span> : null}
             </div>
-            {resend.error ? <p className="errorText" style={{ margin: 0 }}>{(resend.error as Error).message}</p> : null}
+            {resend.error ? <p className="errorText" style={{ margin: 0 }}>{errorMessage(resend.error)}</p> : null}
           </div>
         ) : null}
       </section>

@@ -1,17 +1,21 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { AdminShell } from "@/features/admin/AdminShell";
 import { adminApi, catalogApi } from "@/lib/api/shop";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
 
 export default function Page() {
+  const { t, errorMessage } = useI18n();
   const queryClient = useQueryClient();
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
   const [parentId, setParentId] = useState("");
   const categories = useQuery({ queryKey: ["categories"], queryFn: catalogApi.categories });
-  const create = useMutation({
+  const create = useSessionMutation({
     mutationFn: () =>
       adminApi.createCategory({ name, slug, description: "", parentId: parentId ? Number(parentId) : null }),
     onSuccess: () => {
@@ -21,7 +25,7 @@ export default function Page() {
       queryClient.invalidateQueries({ queryKey: ["categories"] });
     }
   });
-  const remove = useMutation({
+  const remove = useSessionMutation({
     mutationFn: (id: number) => adminApi.deleteCategory(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["categories"] })
   });
@@ -29,7 +33,7 @@ export default function Page() {
   const parentName = (id?: number | null) => categories.data?.find((c) => c.id === id)?.name ?? "-";
 
   return (
-    <AdminShell title="Categories">
+    <AdminShell title={t("admin.nav.categories")}>
       <form
         className="card toolbar"
         style={{ flexWrap: "wrap", alignItems: "flex-end" }}
@@ -39,17 +43,17 @@ export default function Page() {
         }}
       >
         <label className="label">
-          Name
+          {t("admin.name")}
           <input className="input" required value={name} onChange={(event) => setName(event.target.value)} />
         </label>
         <label className="label">
-          Slug
+          {t("admin.slug")}
           <input className="input" required value={slug} onChange={(event) => setSlug(event.target.value)} />
         </label>
         <label className="label">
-          Parent
+          {t("admin.parent")}
           <select className="select" value={parentId} onChange={(event) => setParentId(event.target.value)}>
-            <option value="">None (root)</option>
+            <option value="">{t("admin.rootParent")}</option>
             {categories.data?.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -58,17 +62,17 @@ export default function Page() {
           </select>
         </label>
         <button className="button buttonDark" disabled={create.isPending}>
-          Create
+          {t("admin.create")}
         </button>
       </form>
-      {create.error ? <p className="errorText">{(create.error as Error).message}</p> : null}
+      {create.error ? <p className="errorText">{errorMessage(create.error)}</p> : null}
       <table className="table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Slug</th>
-            <th>Parent</th>
+            <th>{t("admin.id")}</th>
+            <th>{t("admin.name")}</th>
+            <th>{t("admin.slug")}</th>
+            <th>{t("admin.parent")}</th>
             <th />
           </tr>
         </thead>
@@ -80,15 +84,18 @@ export default function Page() {
               <td className="muted">{category.slug}</td>
               <td>{parentName(category.parentId)}</td>
               <td>
-                <button className="button buttonRed" disabled={remove.isPending} onClick={() => remove.mutate(category.id)}>
-                  Delete
-                </button>
+                <ConfirmButton
+                  label={t("common.delete")}
+                  confirmLabel={t("common.confirmDelete")}
+                  disabled={remove.isPending}
+                  onConfirm={() => remove.mutate(category.id)}
+                />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {remove.error ? <p className="errorText">{(remove.error as Error).message}</p> : null}
+      {remove.error ? <p className="errorText">{errorMessage(remove.error)}</p> : null}
     </AdminShell>
   );
 }

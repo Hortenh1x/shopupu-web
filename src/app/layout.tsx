@@ -5,6 +5,8 @@ import { AppProviders } from "@/components/layout/AppProviders";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { StylistWidget } from "@/features/stylist/StylistWidget";
+import { DemoNotice } from "@/components/layout/DemoNotice";
+import { getServerI18n } from "@/lib/i18n/server";
 
 const display = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -23,16 +25,18 @@ const mono = JetBrains_Mono({
   variable: "--font-mono"
 });
 
-export const metadata: Metadata = {
-  title: "shopupu",
-  description: "Clothing catalog with size and color variants, live stock, guest cart and verified reviews."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerI18n();
+  return { title: "shopupu", description: t("demo.metadata") };
+}
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const { locale } = await getServerI18n();
   return (
-    <html lang="en" className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang={locale} className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body>
-        <AppProviders>
+        <AppProviders locale={locale}>
+          <DemoNotice />
           <SiteHeader />
           {children}
           <SiteFooter />

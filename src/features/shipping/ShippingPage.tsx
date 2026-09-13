@@ -1,47 +1,47 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Protected } from "@/components/layout/Protected";
 import { EmptyState } from "@/components/ui/EmptyState";
-import { formatPrice } from "@/features/catalog/ProductCard";
 import { orderApi, shippingApi, userApi } from "@/lib/api/shop";
 import type { ShippingMethod } from "@/lib/api/types";
 
 export const shippingSchema = z.object({
-  fullName: z.string().min(2).max(128),
-  line1: z.string().min(2).max(128),
-  line2: z.string().max(128).optional(),
-  city: z.string().min(2).max(64),
-  state: z.string().min(2).max(64),
-  postalCode: z.string().min(2).max(16),
-  country: z.string().min(2).max(64),
+  fullName: z.string().min(2, "min:2").max(128, "max:128"),
+  line1: z.string().min(2, "min:2").max(128, "max:128"),
+  line2: z.string().max(128, "max:128").optional(),
+  city: z.string().min(2, "min:2").max(64, "max:64"),
+  state: z.string().min(2, "min:2").max(64, "max:64"),
+  postalCode: z.string().min(2, "min:2").max(16, "max:16"),
+  country: z.string().min(2, "min:2").max(64, "max:64"),
   method: z.enum(["DHL", "STANDARD_POST", "LOCAL_PICKUP"])
 });
 
 type ShippingForm = z.infer<typeof shippingSchema>;
 
-const methodLabels: Record<ShippingMethod, string> = {
-  DHL: "DHL courier",
-  STANDARD_POST: "Standard post",
-  LOCAL_PICKUP: "Local pickup"
-};
+const methods: ShippingMethod[] = ["DHL", "STANDARD_POST", "LOCAL_PICKUP"];
 
 export function ShippingPage() {
+  const { t, errorMessage, formatPrice, formatNumber, shippingLabel } = useI18n();
   const params = useSearchParams();
   const queryClient = useQueryClient();
   const orderId = Number(params.get("orderId"));
 
-  const order = useQuery({
+  const order = useSessionQuery({
     queryKey: ["order", orderId],
     queryFn: () => orderApi.get(orderId),
     enabled: Number.isFinite(orderId) && orderId > 0
   });
-  const addresses = useQuery({ queryKey: ["addresses"], queryFn: userApi.addresses });
+  const addresses = useSessionQuery({ queryKey: ["addresses"], queryFn: userApi.addresses });
 
   const form = useForm<ShippingForm>({
     resolver: zodResolver(shippingSchema),
@@ -52,16 +52,17 @@ export function ShippingPage() {
       city: "",
       state: "",
       postalCode: "",
-      country: "Germany",
+      country: t("commerce.germany"),
       method: "STANDARD_POST"
     }
   });
   const chosenMethod = form.watch("method");
 
-  const submitShipping = useMutation({
-    mutationFn: async (values: ShippingForm) => {
+  const submitShipping = useSessionMutation({
+    mutationFn: async (values: ShippingForm, context) => {
       const { method, ...address } = values;
       await shippingApi.setAddress({ orderId, ...address });
+      context.assertCurrent();
       return shippingApi.setMethod(orderId, method);
     },
     onSuccess: () => {
@@ -87,15 +88,20 @@ export function ShippingPage() {
 
   function fieldError(name: keyof ShippingForm) {
     const message = form.formState.errors[name]?.message;
-    return message ? <span className="errorText">{message}</span> : null;
+    if (!message) return null;
+    const [bound, count] = message.split(":");
+    const translated = bound === "min" ? t("commerce.validationMin", { min: formatNumber(Number(count)) }) :
+      bound === "max" ? t("commerce.validationMax", { max: formatNumber(Number(count)) }) :
+      name === "method" ? t("commerce.chooseShipping") : errorMessage(message);
+    return <span className="errorText">{translated}</span>;
   }
 
   if (!Number.isFinite(orderId) || orderId <= 0) {
     return (
       <main className="page">
-        <EmptyState title="Missing order" body="Open shipping from checkout so the order id is present.">
+        <EmptyState title={t("commerce.missingOrder")} body={t("commerce.openShippingFromCheckout")}>
           <Link className="button buttonDark" href="/checkout">
-            Back to checkout
+            {t("commerce.backCheckout")}
           </Link>
         </EmptyState>
       </main>
@@ -105,12 +111,13 @@ export function ShippingPage() {
   return (
     <Protected>
       <main className="page">
-        <div className="stack" style={{ gap: 6, marginBottom: 24 }}>
-          <span className="kicker">Checkout · step 2 of 3</span>
-          <h1 className="title">Where should it go?</h1>
+        <div className="stack" style={{ gap: 8, marginBottom: 24 }}>
+          <span className="kicker">{t("commerce.step2")}</span>
+          <h1 className="title">{t("commerce.whereShipping")}</h1>
+          <p className="muted">{t("commerce.fictionalAddress")}</p>
           {order.data ? (
             <p className="mono muted" style={{ margin: 0, fontSize: "0.85rem" }}>
-              Order {order.data.orderNumber}
+              {t("commerce.orderNumber", { number: order.data.orderNumber })}
             </p>
           ) : null}
         </div>
@@ -118,13 +125,13 @@ export function ShippingPage() {
           <div className="card stack" style={{ padding: 24 }}>
             {addresses.data?.length ? (
               <label className="label">
-                Use saved address
+                {t("commerce.savedAddress")}
                 <select className="select" defaultValue="" onChange={(event) => prefillFromAddress(event.target.value)}>
-                  <option value="">Pick a saved address...</option>
+                  <option value="">{t("commerce.pickAddress")}</option>
                   {addresses.data.map((address) => (
                     <option key={address.id} value={address.id}>
                       {address.fullName}, {address.line1}, {address.city} ({address.country})
-                      {address.defaultAddress ? " - default" : ""}
+                      {address.defaultAddress ? t("commerce.defaultSuffix") : ""}
                     </option>
                   ))}
                 </select>
@@ -132,46 +139,46 @@ export function ShippingPage() {
             ) : null}
             <form className="stack" onSubmit={form.handleSubmit((values) => submitShipping.mutate(values))}>
               <label className="label">
-                Full name
+                {t("commerce.fullName")}
                 <input className="input" autoComplete="name" {...form.register("fullName")} />
                 {fieldError("fullName")}
               </label>
               <label className="label">
-                Address line 1
+                {t("commerce.line1")}
                 <input className="input" autoComplete="address-line1" {...form.register("line1")} />
                 {fieldError("line1")}
               </label>
               <label className="label">
-                Address line 2
+                {t("commerce.line2")}
                 <input className="input" autoComplete="address-line2" {...form.register("line2")} />
                 {fieldError("line2")}
               </label>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
                 <label className="label">
-                  City
+                  {t("commerce.city")}
                   <input className="input" autoComplete="address-level2" {...form.register("city")} />
                   {fieldError("city")}
                 </label>
                 <label className="label">
-                  State
+                  {t("commerce.state")}
                   <input className="input" autoComplete="address-level1" {...form.register("state")} />
                   {fieldError("state")}
                 </label>
                 <label className="label">
-                  Postal code
+                  {t("commerce.postalCode")}
                   <input className="input" autoComplete="postal-code" {...form.register("postalCode")} />
                   {fieldError("postalCode")}
                 </label>
                 <label className="label">
-                  Country
+                  {t("commerce.country")}
                   <input className="input" autoComplete="country-name" {...form.register("country")} />
                   {fieldError("country")}
                 </label>
               </div>
               <div className="stack" style={{ gap: 8 }}>
-                <span className="kicker">Shipping method</span>
+                <span className="kicker">{t("commerce.shippingMethod")}</span>
                 <div className="chipRow">
-                  {(Object.keys(methodLabels) as ShippingMethod[]).map((method) => (
+                  {methods.map((method) => (
                     <label key={method} className="chip" data-selected={chosenMethod === method}>
                       <input
                         type="radio"
@@ -179,7 +186,7 @@ export function ShippingPage() {
                         {...form.register("method")}
                         style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
                       />
-                      {methodLabels[method]}
+                      {shippingLabel(method)}
                     </label>
                   ))}
                 </div>
@@ -187,38 +194,38 @@ export function ShippingPage() {
               </div>
               {submitShipping.error ? (
                 <p className="errorText" style={{ margin: 0 }}>
-                  {(submitShipping.error as Error).message}
+                  {errorMessage(submitShipping.error)}
                 </p>
               ) : null}
               <button className="button buttonDark" disabled={submitShipping.isPending}>
-                {submitShipping.isPending ? "Saving..." : "Save shipping"}
+                {submitShipping.isPending ? t("commerce.saving") : t("commerce.saveShipping")}
               </button>
             </form>
           </div>
 
           <aside className="panelInk stack" style={{ position: "sticky", top: 84, padding: 28, gap: 12 }}>
             <h2 className="subtitle" style={{ margin: 0 }}>
-              Order total.
+              {t("commerce.orderTotal")}
             </h2>
             {order.data ? (
               <div className="stack" style={{ gap: 8 }}>
                 <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                  <span className="muted">Subtotal</span>
+                  <span className="muted">{t("commerce.subtotal")}</span>
                   <span className="price">{formatPrice(order.data.subtotalAmount)}</span>
                 </div>
                 <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                  <span className="muted">Shipping</span>
+                  <span className="muted">{t("commerce.shipping")}</span>
                   <span className="price">{formatPrice(order.data.shippingAmount)}</span>
                 </div>
                 {order.data.discountAmount > 0 ? (
                   <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                    <span className="muted">Discount{order.data.promoCode ? ` (${order.data.promoCode})` : ""}</span>
+                    <span className="muted">{t("commerce.discount")}{order.data.promoCode ? ` (${order.data.promoCode})` : ""}</span>
                     <span className="price">&minus;{formatPrice(order.data.discountAmount)}</span>
                   </div>
                 ) : null}
                 <hr className="divider" style={{ borderColor: "color-mix(in oklab, var(--cream-on-dark) 18%, transparent)" }} />
                 <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                  <span>Total</span>
+                  <span>{t("commerce.total")}</span>
                   <span className="price" style={{ fontSize: "1.6rem" }}>
                     {formatPrice(order.data.paymentAmount)}
                   </span>
@@ -226,17 +233,17 @@ export function ShippingPage() {
               </div>
             ) : (
               <p className="muted" style={{ margin: 0 }}>
-                Save the address and method to see the shipping cost.
+                {t("commerce.saveToSeeShipping")}
               </p>
             )}
-            {order.error ? <p className="errorText" style={{ margin: 0 }}>{(order.error as Error).message}</p> : null}
+            {order.error ? <p className="errorText" style={{ margin: 0 }}>{errorMessage(order.error)}</p> : null}
             {submitShipping.isSuccess ? (
               <Link className="button buttonAccent" href={`/checkout/payment?orderId=${orderId}`}>
-                Continue to payment
+                {t("commerce.continuePayment")}
               </Link>
             ) : (
               <p className="muted" style={{ margin: 0, fontSize: "0.85rem" }}>
-                Payment follows once shipping is saved.
+                {t("commerce.paymentAfterShipping")}
               </p>
             )}
           </aside>

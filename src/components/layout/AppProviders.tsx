@@ -3,11 +3,13 @@
 import type { ReactNode } from "react";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import { QueryProvider } from "@/lib/query/QueryProvider";
+import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
+import type { Locale } from "@/lib/i18n/core";
 
-export function AppProviders({ children }: { children: ReactNode }) {
+export function AppProviders({ children, locale = "en" }: { children: ReactNode; locale?: Locale }) {
   return (
-    <QueryProvider>
+    <LocaleProvider initialLocale={locale}><QueryProvider>
       <AuthProvider>{children}</AuthProvider>
-    </QueryProvider>
+    </QueryProvider></LocaleProvider>
   );
 }

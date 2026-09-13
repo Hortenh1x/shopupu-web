@@ -1,28 +1,34 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { authApi, userApi } from "@/lib/api/shop";
+import { authApi, userApi, storefrontApi } from "@/lib/api/shop";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import type { UserGender } from "@/lib/api/types";
 
 const SIZES = ["", "XS", "S", "M", "L", "XL", "XXL"];
-const GENDERS: { value: UserGender | ""; label: string }[] = [
-  { value: "", label: "not set" },
-  { value: "MALE", label: "Male" },
-  { value: "FEMALE", label: "Female" },
-  { value: "OTHER", label: "Other" }
-];
 
 export function ProfileForm() {
+  const { t, errorMessage, roleLabel } = useI18n();
+  const GENDERS: { value: UserGender | ""; label: string }[] = [
+    { value: "", label: t("profile.notSet") },
+    { value: "MALE", label: t("profile.male") },
+    { value: "FEMALE", label: t("profile.female") },
+    { value: "OTHER", label: t("profile.other") }
+  ];
   const auth = useAuth();
+  const config = useQuery({ queryKey: ["storefront-config"], queryFn: storefrontApi.config });
+  const emailUnavailable = config.data?.email.available === false;
   const [firstName, setFirstName] = useState(auth.user?.firstName ?? "");
   const [lastName, setLastName] = useState(auth.user?.lastName ?? "");
   const [phone, setPhone] = useState(auth.user?.phone ?? "");
   const [preferredSize, setPreferredSize] = useState(auth.user?.preferredSize ?? "");
   const [gender, setGender] = useState<UserGender | "">(auth.user?.gender ?? "");
 
-  const save = useMutation({
+  const save = useSessionMutation({
     mutationFn: () =>
       userApi.updateProfile({
         firstName: firstName || null,
@@ -33,7 +39,7 @@ export function ProfileForm() {
       }),
     onSuccess: () => auth.reloadUser()
   });
-  const resend = useMutation({ mutationFn: () => authApi.resendVerification() });
+  const resend = useSessionMutation({ mutationFn: () => authApi.resendVerification() });
 
   return (
     <div className="split">
@@ -45,32 +51,32 @@ export function ProfileForm() {
         }}
       >
         <h2 className="subtitle" style={{ margin: 0 }}>
-          Personal data
+          {t("profile.personalData")}
         </h2>
         <label className="label">
-          First name
+          {t("profile.firstName")}
           <input className="input" value={firstName} onChange={(e) => setFirstName(e.target.value)} maxLength={128} />
         </label>
         <label className="label">
-          Last name
+          {t("profile.lastName")}
           <input className="input" value={lastName} onChange={(e) => setLastName(e.target.value)} maxLength={128} />
         </label>
         <label className="label">
-          Phone
-          <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={32} placeholder="+380..." />
+          {t("profile.phone")}
+          <input className="input" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={32} placeholder={t("profile.phoneExample")} />
         </label>
         <label className="label">
-          Preferred size
+          {t("profile.preferredSize")}
           <select className="select" value={preferredSize} onChange={(e) => setPreferredSize(e.target.value)}>
             {SIZES.map((size) => (
               <option key={size} value={size}>
-                {size || "not set"}
+                {size || t("profile.notSet")}
               </option>
             ))}
           </select>
         </label>
         <label className="label">
-          Gender
+          {t("profile.gender")}
           <select className="select" value={gender} onChange={(e) => setGender(e.target.value as UserGender | "")}>
             {GENDERS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -79,32 +85,34 @@ export function ProfileForm() {
             ))}
           </select>
         </label>
-        {save.error ? <p className="errorText">{(save.error as Error).message}</p> : null}
-        {save.isSuccess ? <p className="status statusOk">saved</p> : null}
+        {save.error ? <p className="errorText">{errorMessage(save.error)}</p> : null}
+        {save.isSuccess ? <p className="status statusOk">{t("profile.saved")}</p> : null}
         <button className="button buttonDark" disabled={save.isPending}>
-          Save profile
+          {t("profile.save")}
         </button>
       </form>
 
       <aside className="card stack">
         <h2 className="subtitle" style={{ margin: 0 }}>
-          Account
+          {t("profile.account")}
         </h2>
         <p>
-          Email: {auth.user?.email}{" "}
+          {t("auth.email")}: {auth.user?.email}{" "}
           {auth.user?.emailVerified ? (
-            <span className="status statusOk">verified</span>
+            <span className="status statusOk">{t("profile.verified")}</span>
           ) : (
-            <span className="muted">not verified</span>
+            <span className="muted">{t("profile.notVerified")}</span>
           )}
         </p>
-        <p className="muted">Roles: {auth.user?.roles?.join(", ") || "CUSTOMER"}</p>
+        <p className="muted">{t("profile.roles")} {auth.user?.roles?.map(roleLabel).join(", ") || roleLabel("CUSTOMER")}</p>
         {!auth.user?.emailVerified ? (
           <>
-            <button className="button" disabled={resend.isPending} onClick={() => resend.mutate()}>
-              Resend verification email
+            {emailUnavailable ? <p className="muted">{t("profile.mailDisabled")}</p> : null}
+            <button className="button" disabled={resend.isPending || emailUnavailable} onClick={() => resend.mutate()}>
+              {t("auth.resend")}
             </button>
-            {resend.isSuccess ? <p className="status statusOk">sent - check your inbox</p> : null}
+            {resend.isSuccess ? <p className="status statusOk">{t("profile.resendRequested")}</p> : null}
+            {resend.error ? <p role="alert" className="errorText">{errorMessage(resend.error)}</p> : null}
           </>
         ) : null}
       </aside>

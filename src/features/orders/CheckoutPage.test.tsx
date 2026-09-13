@@ -1,9 +1,9 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen } from "@testing-library/react";
+import { MutationCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { CheckoutPage } from "@/features/orders/CheckoutPage";
-import { clearSession } from "@/lib/auth/session";
+import { clearSession, setTokens } from "@/lib/auth/session";
 import { installFetchMock, jsonResponse, type RecordedRequest } from "@/test/fetchMock";
 
 const push = vi.fn();
@@ -43,8 +43,8 @@ function renderCheckout() {
 }
 
 describe("CheckoutPage promo + checkout", () => {
-  beforeEach(() => {
-    clearSession();
+  beforeEach(async () => {
+    await clearSession();
     push.mockClear();
   });
 
@@ -110,4 +110,48 @@ describe("CheckoutPage promo + checkout", () => {
 
     expect(checkoutRequest?.body).toEqual({ promoCode: null });
   });
+
+  it("recovers the same checkout after a lost response and a reload with an empty cart", async () => {
+    const mock = installFetchMock();
+    let attempts = 0;
+    mock.on("GET", "/api/v1/cart", () => jsonResponse(200, attempts ? { items: [], subtotal: 0 } : cart));
+    mock.on("POST", "/api/v1/orders/checkout", () => {
+      if (++attempts === 1) throw new TypeError("Response lost after commit");
+      return jsonResponse(200, { id: 9, orderNumber: "SU-9", status: "CREATED", items: [] });
+    });
+    const user = userEvent.setup();
+    const first = renderCheckout();
+    await user.click(await screen.findByRole("button", { name: "Place order" }));
+    await screen.findByText(/Unable to confirm the order/);
+    first.unmount();
+    renderCheckout();
+    await user.click(await screen.findByRole("button", { name: "Recover order" }));
+    await vi.waitFor(() => expect(push).toHaveBeenCalledWith("/checkout/shipping?orderId=9"));
+    const requests = mock.sent("POST", "/api/v1/orders/checkout");
+    expect(requests).toHaveLength(2);
+    expect(requests[1].headers.get("Idempotency-Key")).toBe(requests[0].headers.get("Idempotency-Key"));
+    expect(requests[1].body).toEqual(requests[0].body);
+  });
+  it("never redirects B when A's completed checkout callback is delayed", async () => {
+    const mock = installFetchMock();
+    mock.on("GET", "/api/v1/cart", () => jsonResponse(200, cart));
+    mock.on("POST", "/api/v1/orders/checkout", () => jsonResponse(200, { id: 77, orderNumber: "SU-77", status: "CREATED", items: [] }));
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    const entered = vi.fn();
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } },
+      mutationCache: new MutationCache({ onSuccess: async () => { entered(); await gate; } }) });
+    render(<QueryClientProvider client={client}><CheckoutPage /></QueryClientProvider>);
+    await userEvent.setup().click(await screen.findByRole("button", { name: "Place order" }));
+    await waitFor(() => expect(entered).toHaveBeenCalled());
+    await act(async () => {
+      await clearSession();
+      setTokens({ accessToken: "access-b", refreshToken: "refresh-b" });
+      client.clear();
+      release();
+    });
+    await waitFor(() => expect(client.isMutating()).toBe(0));
+    expect(push).not.toHaveBeenCalled();
+  });
+
 });

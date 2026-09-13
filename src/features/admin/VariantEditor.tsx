@@ -1,9 +1,12 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { adminApi } from "@/lib/api/shop";
 import type { Variant, VariantInput } from "@/lib/api/types";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
 
 type VariantDraft = {
   sku: string;
@@ -30,14 +33,15 @@ function toInput(draft: VariantDraft): VariantInput {
 }
 
 export function VariantEditor({ productId, basePrice }: { productId: number; basePrice: number }) {
+  const { t, errorMessage, formatPrice } = useI18n();
   const queryClient = useQueryClient();
-  const variants = useQuery({ queryKey: ["admin-variants", productId], queryFn: () => adminApi.variants(productId) });
+  const variants = useSessionQuery({ queryKey: ["admin-variants", productId], queryFn: () => adminApi.variants(productId) });
   const [draft, setDraft] = useState<VariantDraft>(emptyDraft);
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["admin-variants", productId] });
 
-  const save = useMutation({
+  const save = useSessionMutation({
     mutationFn: () =>
       editingId ? adminApi.updateVariant(editingId, toInput(draft)) : adminApi.addVariant(productId, toInput(draft)),
     onSuccess: () => {
@@ -46,7 +50,7 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
       invalidate();
     }
   });
-  const disable = useMutation({
+  const disable = useSessionMutation({
     mutationFn: (variantId: number) => adminApi.deleteVariant(variantId),
     onSuccess: invalidate
   });
@@ -67,19 +71,19 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
   return (
     <section className="card stack">
       <h2 className="subtitle" style={{ margin: 0 }}>
-        Variants (size / color / SKU)
+        {t("admin.variantsTitle")}
       </h2>
-      {variants.error ? <p className="errorText">{(variants.error as Error).message}</p> : null}
+      {variants.error ? <p className="errorText">{errorMessage(variants.error)}</p> : null}
       <table className="table">
         <thead>
           <tr>
-            <th>SKU</th>
-            <th>Size</th>
-            <th>Color</th>
-            <th>Price</th>
-            <th>Old price</th>
-            <th>Available</th>
-            <th>Enabled</th>
+            <th>{t("admin.sku")}</th>
+            <th>{t("admin.size")}</th>
+            <th>{t("admin.color")}</th>
+            <th>{t("admin.price")}</th>
+            <th>{t("admin.field.oldPrice")}</th>
+            <th>{t("admin.available")}</th>
+            <th>{t("common.enabled")}</th>
             <th />
           </tr>
         </thead>
@@ -89,18 +93,18 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
               <td className="muted">{variant.sku}</td>
               <td>{variant.size}</td>
               <td>{variant.color ?? "-"}</td>
-              <td>{Number(variant.price).toFixed(2)}</td>
-              <td>{variant.oldPrice != null ? Number(variant.oldPrice).toFixed(2) : "-"}</td>
+              <td>{formatPrice(variant.price)}</td>
+              <td>{variant.oldPrice != null ? formatPrice(variant.oldPrice) : "-"}</td>
               <td>{variant.available ?? 0}</td>
-              <td>{variant.enabled ? "yes" : "no"}</td>
+              <td>{variant.enabled ? t("common.yes") : t("common.no")}</td>
               <td>
                 <div className="toolbar">
                   <button className="button" onClick={() => startEdit(variant)}>
-                    Edit
+                    {t("common.edit")}
                   </button>
                   {variant.enabled ? (
                     <button className="button buttonRed" disabled={disable.isPending} onClick={() => disable.mutate(variant.id)}>
-                      Disable
+                      {t("admin.disable")}
                     </button>
                   ) : null}
                 </div>
@@ -110,7 +114,7 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
           {!variants.data?.length ? (
             <tr>
               <td colSpan={8} className="muted">
-                No variants yet - the product cannot be bought until a variant with stock exists.
+                {t("admin.noVariants")}
               </td>
             </tr>
           ) : null}
@@ -126,7 +130,7 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
         }}
       >
         <label className="label">
-          SKU
+          {t("admin.sku")}
           <input
             className="input"
             required
@@ -136,7 +140,7 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
           />
         </label>
         <label className="label">
-          Size
+          {t("admin.size")}
           <input
             className="input"
             required
@@ -147,17 +151,17 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
           />
         </label>
         <label className="label">
-          Color
+          {t("admin.color")}
           <input
             className="input"
-            placeholder="black"
+            placeholder={t("admin.colorPlaceholder")}
             value={draft.color}
             onChange={(e) => setDraft((d) => ({ ...d, color: e.target.value }))}
             style={{ width: 110 }}
           />
         </label>
         <label className="label">
-          Price
+          {t("admin.price")}
           <input
             className="input"
             inputMode="decimal"
@@ -168,7 +172,7 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
           />
         </label>
         <label className="label">
-          Old price
+          {t("admin.field.oldPrice")}
           <input
             className="input"
             inputMode="decimal"
@@ -178,7 +182,7 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
           />
         </label>
         <label className="label">
-          Stock
+          {t("admin.stock")}
           <input
             className="input"
             type="number"
@@ -194,10 +198,10 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
             checked={draft.enabled}
             onChange={(e) => setDraft((d) => ({ ...d, enabled: e.target.checked }))}
           />
-          Enabled
+          {t("common.enabled")}
         </label>
         <button className="button buttonDark" disabled={save.isPending}>
-          {editingId ? "Save variant" : "Add variant"}
+          {editingId ? t("admin.saveVariant") : t("admin.addVariant")}
         </button>
         {editingId ? (
           <button
@@ -208,12 +212,12 @@ export function VariantEditor({ productId, basePrice }: { productId: number; bas
               setDraft(emptyDraft);
             }}
           >
-            Cancel
+            {t("common.cancel")}
           </button>
         ) : null}
       </form>
-      {save.error ? <p className="errorText">{(save.error as Error).message}</p> : null}
-      <p className="muted">Note: stock updates the inventory level; it cannot go below the currently reserved quantity.</p>
+      {save.error ? <p className="errorText">{errorMessage(save.error)}</p> : null}
+      <p className="muted">{t("admin.stockNote")}</p>
     </section>
   );
 }

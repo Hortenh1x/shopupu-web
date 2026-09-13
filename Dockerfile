@@ -10,7 +10,7 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1 BUILD_STANDALONE=1
 # NEXT_PUBLIC_* values are inlined into the bundle at build time, so they are
 # build ARGs, not runtime env. Defaults target the shopupu.net deployment.
-ARG NEXT_PUBLIC_API_BASE_URL=https://shopupu.net
+ARG NEXT_PUBLIC_API_BASE_URL=http://localhost:8080
 ARG NEXT_PUBLIC_GOOGLE_CLIENT_ID=
 ARG NEXT_PUBLIC_BANK_APP_PROTOCOL=
 ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL \
@@ -22,6 +22,8 @@ RUN npm run build
 
 # --- runner: minimal production image ---
 FROM node:24-slim AS runner
+ARG VCS_REF=unknown
+LABEL org.opencontainers.image.revision=$VCS_REF
 WORKDIR /app
 ENV NODE_ENV=production NEXT_TELEMETRY_DISABLED=1 PORT=3000 HOSTNAME=0.0.0.0
 

@@ -1,21 +1,15 @@
-import Link from "next/link";
-import { AdminShell } from "@/features/admin/AdminShell";
+"use client";
 
-const WORKSPACES = [
-  { href: "/admin/products", label: "Products", note: "Clothing attributes, variants, stock and images" },
-  { href: "/admin/categories", label: "Categories", note: "Tree, slugs and descriptions" },
-  { href: "/admin/orders", label: "Orders", note: "Status transitions, history, shipping and refunds" },
-  { href: "/admin/reviews", label: "Reviews", note: "Moderation queue: approve or reject" },
-  { href: "/admin/promos", label: "Promos", note: "Codes, limits and redemption counts" },
-  { href: "/admin/users", label: "Users", note: "Accounts and roles" },
-  { href: "/admin/ai", label: "AI maintenance", note: "Embeddings, recommendations and review summaries" }
-];
+import Link from "next/link";
+import { ADMIN_NAV, AdminShell } from "@/features/admin/AdminShell";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
 
 export default function Page() {
+  const { t } = useI18n();
   return (
-    <AdminShell title="Back office">
+    <AdminShell title={t("admin.title")}>
       <div className="card" style={{ padding: "4px 24px" }}>
-        {WORKSPACES.map((item, index) => (
+        {ADMIN_NAV.map((item, index) => (
           <Link
             key={item.href}
             href={item.href}
@@ -26,12 +20,12 @@ export default function Page() {
               borderTop: index > 0 ? "1px solid var(--line)" : undefined
             }}
           >
-            <span className="stack" style={{ gap: 2 }}>
+            <span className="stack" style={{ gap: 4 }}>
               <span style={{ fontWeight: 650, fontFamily: "var(--font-head)", fontSize: "1.05rem" }}>
-                {item.label}
+                {t(item.href === "/admin/ai" ? "admin.nav.aiMaintenance" : item.label)}
               </span>
               <span className="muted" style={{ fontSize: "0.9rem" }}>
-                {item.note}
+                {t(item.note)}
               </span>
             </span>
             <span aria-hidden="true" className="mono muted">

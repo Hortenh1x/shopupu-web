@@ -1,6 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { type FormEvent, useEffect, useState } from "react";
@@ -27,6 +29,7 @@ const GENDERS = ["MEN", "WOMEN", "UNISEX", "KIDS"];
 const SIZES = ["XS", "S", "M", "L", "XL", "XXL"];
 
 export function CatalogPage() {
+  const { t, genderLabel, formatNumber, errorMessage } = useI18n();
   const searchParams = useSearchParams();
   const router = useRouter();
   const categories = useQuery({ queryKey: ["categories"], queryFn: catalogApi.categories });
@@ -44,6 +47,8 @@ export function CatalogPage() {
 
   const products = useQuery({
     queryKey: ["catalog", searchKey],
+    // the previous results stay on screen (dimmed) while a filter or page change loads
+    placeholderData: keepPreviousData,
     queryFn: () =>
       aiApplied
         ? // natural-language mode: the backend parses the query into filters
@@ -69,25 +74,39 @@ export function CatalogPage() {
     setFilters((current) => ({ ...current, [name]: value }));
   }
 
+  // selects, chips and toggles answer on the spot; typed fields wait for Enter/Search
+  function chooseFilter<K extends keyof FilterState>(name: K, value: FilterState[K]) {
+    const next = { ...filters, [name]: value };
+    setFilters(next);
+    commitFilters(next, { replace: true });
+  }
+
   function applyFilters(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
+    commitFilters(filters);
+  }
+
+  function commitFilters(state: FilterState, { replace = false } = {}) {
     const next = new URLSearchParams();
-    if (filters.q.trim()) next.set("q", filters.q.trim());
-    if (filters.ai && filters.q.trim()) {
+    if (state.q.trim()) next.set("q", state.q.trim());
+    if (state.ai && state.q.trim()) {
       next.set("ai", "1");
     } else {
-      if (filters.category) next.set("category", filters.category);
-      if (filters.brand) next.set("brand", filters.brand);
-      if (filters.gender) next.set("gender", filters.gender);
-      if (filters.size.trim()) next.set("size", filters.size.trim());
-      if (filters.color.trim()) next.set("color", filters.color.trim());
-      if (filters.minPrice.trim()) next.set("minPrice", filters.minPrice.trim());
-      if (filters.maxPrice.trim()) next.set("maxPrice", filters.maxPrice.trim());
-      if (filters.inStock) next.set("inStock", "true");
-      if (filters.sort !== "createdAt,desc") next.set("sort", filters.sort);
+      if (state.category) next.set("category", state.category);
+      if (state.brand) next.set("brand", state.brand);
+      if (state.gender) next.set("gender", state.gender);
+      if (state.size.trim()) next.set("size", state.size.trim());
+      if (state.color.trim()) next.set("color", state.color.trim());
+      if (state.minPrice.trim()) next.set("minPrice", state.minPrice.trim());
+      if (state.maxPrice.trim()) next.set("maxPrice", state.maxPrice.trim());
+      if (state.inStock) next.set("inStock", "true");
+      if (state.sort !== "createdAt,desc") next.set("sort", state.sort);
     }
     next.set("page", "1");
-    router.push(`/catalog?${next.toString()}`);
+    const href = `/catalog?${next.toString()}`;
+    // a chip toggle refines the current view: no history entry, no jump to the top
+    if (replace) router.replace(href, { scroll: false });
+    else router.push(href);
   }
 
   const hasActiveFilters = searchKey !== "" && searchKey !== "page=1";
@@ -96,10 +115,10 @@ export function CatalogPage() {
   return (
     <main className="page">
       <div className="railHeader">
-        <h1 className="title">Catalog</h1>
+        <h1 className="title">{t("nav.catalog")}</h1>
         {totalElements != null ? (
           <span className="mono muted" style={{ fontSize: "0.88rem", justifySelf: "end" }}>
-            {totalElements} style{totalElements === 1 ? "" : "s"}
+            {t(totalElements === 1 ? "catalog.countOne" : "catalog.countMany", { count: formatNumber(totalElements) })}
           </span>
         ) : null}
       </div>
@@ -109,8 +128,8 @@ export function CatalogPage() {
           <input
             className="input"
             style={{ flex: "1 1 260px" }}
-            placeholder={filters.ai ? "Try: warm jacket for men under 100" : "Search the catalog"}
-            aria-label="Search"
+            placeholder={filters.ai ? t("catalog.smartPlaceholder") : t("catalog.searchPlaceholder")}
+            aria-label={t("catalog.search")}
             value={filters.q}
             onChange={(e) => setFilter("q", e.target.value)}
           />
@@ -118,16 +137,16 @@ export function CatalogPage() {
             type="button"
             className="chip"
             data-selected={filters.ai}
-            onClick={() => setFilter("ai", !filters.ai)}
-            title="Describe what you need in plain words; the shop parses it into filters"
+            onClick={() => chooseFilter("ai", !filters.ai)}
+            title={t("catalog.smartTitle")}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M12 1c.62 5.9 4.28 9.56 11 11-6.72 1.44-10.38 5.1-11 11-.62-5.9-4.28-9.56-11-11 6.72-1.44 10.38-5.1 11-11Z" />
             </svg>
-            Smart search
+            {t("catalog.smart")}
           </button>
           <button className="button buttonDark" type="submit">
-            Search
+            {t("catalog.search")}
           </button>
         </div>
 
@@ -138,16 +157,16 @@ export function CatalogPage() {
             margin: 0,
             padding: 0,
             display: "grid",
-            gap: 14,
+            gap: 16,
             opacity: filters.ai ? 0.45 : 1,
             transition: "opacity 160ms var(--ease-out)"
           }}
         >
           <div className="toolbar" style={{ alignItems: "end" }}>
             <label className="label" style={{ flex: "1 1 150px" }}>
-              Category
-              <select className="select" value={filters.category} onChange={(e) => setFilter("category", e.target.value)}>
-                <option value="">All</option>
+              {t("catalog.category")}
+              <select className="select" value={filters.category} onChange={(e) => chooseFilter("category", e.target.value)}>
+                <option value="">{t("catalog.all")}</option>
                 {categories.data?.map((category) => (
                   <option key={category.id} value={category.id}>
                     {category.name}
@@ -156,9 +175,9 @@ export function CatalogPage() {
               </select>
             </label>
             <label className="label" style={{ flex: "1 1 150px" }}>
-              Brand
-              <select className="select" value={filters.brand} onChange={(e) => setFilter("brand", e.target.value)}>
-                <option value="">All</option>
+              {t("catalog.brand")}
+              <select className="select" value={filters.brand} onChange={(e) => chooseFilter("brand", e.target.value)}>
+                <option value="">{t("catalog.all")}</option>
                 {brands.data?.map((brand) => (
                   <option key={brand.id} value={brand.id}>
                     {brand.name}
@@ -167,30 +186,30 @@ export function CatalogPage() {
               </select>
             </label>
             <label className="label" style={{ flex: "1 1 130px" }}>
-              Gender
-              <select className="select" value={filters.gender} onChange={(e) => setFilter("gender", e.target.value)}>
-                <option value="">All</option>
+              {t("catalog.gender")}
+              <select className="select" value={filters.gender} onChange={(e) => chooseFilter("gender", e.target.value)}>
+                <option value="">{t("catalog.all")}</option>
                 {GENDERS.map((gender) => (
                   <option key={gender} value={gender}>
-                    {gender.toLowerCase()}
+                    {genderLabel(gender)}
                   </option>
                 ))}
               </select>
             </label>
             <label className="label" style={{ flex: "1 1 130px" }}>
-              Sort
-              <select className="select" value={filters.sort} onChange={(e) => setFilter("sort", e.target.value)}>
-                <option value="createdAt,desc">Newest</option>
-                <option value="title,asc">Name A-Z</option>
-                <option value="price,asc">Price low</option>
-                <option value="price,desc">Price high</option>
+              {t("catalog.sort")}
+              <select className="select" value={filters.sort} onChange={(e) => chooseFilter("sort", e.target.value)}>
+                <option value="createdAt,desc">{t("catalog.newest")}</option>
+                <option value="title,asc">{t("catalog.name")}</option>
+                <option value="price,asc">{t("catalog.priceLow")}</option>
+                <option value="price,desc">{t("catalog.priceHigh")}</option>
               </select>
             </label>
           </div>
 
-          <div className="toolbar" style={{ alignItems: "end", rowGap: 14 }}>
-            <div className="stack" style={{ gap: 7 }}>
-              <span className="kicker">Size</span>
+          <div className="toolbar" style={{ alignItems: "end", rowGap: 16 }}>
+            <div className="stack" style={{ gap: 8 }}>
+              <span className="kicker">{t("catalog.size")}</span>
               <div className="chipRow">
                 {SIZES.map((s) => (
                   <button
@@ -198,7 +217,7 @@ export function CatalogPage() {
                     type="button"
                     className="chip"
                     data-selected={filters.size === s}
-                    onClick={() => setFilter("size", filters.size === s ? "" : s)}
+                    onClick={() => chooseFilter("size", filters.size === s ? "" : s)}
                   >
                     {s}
                   </button>
@@ -206,24 +225,24 @@ export function CatalogPage() {
               </div>
             </div>
             <label className="label" style={{ width: 120 }}>
-              Color
-              <input className="input" placeholder="black" value={filters.color} onChange={(e) => setFilter("color", e.target.value)} />
+              {t("catalog.color")}
+              <input className="input" placeholder={t("catalog.colorPlaceholder")} value={filters.color} onChange={(e) => setFilter("color", e.target.value)} />
             </label>
             <label className="label" style={{ width: 104 }}>
-              Min &euro;
+              {t("catalog.min")}
               <input className="input" value={filters.minPrice} onChange={(e) => setFilter("minPrice", e.target.value)} inputMode="decimal" />
             </label>
             <label className="label" style={{ width: 104 }}>
-              Max &euro;
+              {t("catalog.max")}
               <input className="input" value={filters.maxPrice} onChange={(e) => setFilter("maxPrice", e.target.value)} inputMode="decimal" />
             </label>
             <label className="checkboxRow" style={{ paddingBottom: 10 }}>
               <input
                 type="checkbox"
                 checked={filters.inStock}
-                onChange={(e) => setFilter("inStock", e.target.checked)}
+                onChange={(e) => chooseFilter("inStock", e.target.checked)}
               />
-              In stock only
+              {t("catalog.stockOnly")}
             </label>
           </div>
         </fieldset>
@@ -231,7 +250,7 @@ export function CatalogPage() {
         {hasActiveFilters ? (
           <div>
             <Link className="muted" style={{ fontSize: "0.88rem", textDecoration: "underline" }} href="/catalog">
-              Reset everything
+              {t("catalog.resetAll")}
             </Link>
           </div>
         ) : null}
@@ -245,22 +264,22 @@ export function CatalogPage() {
             ))}
           </div>
         ) : products.error ? (
-          <p className="errorText">{(products.error as Error).message}</p>
+          <p className="errorText">{errorMessage(products.error)}</p>
         ) : (
           <>
-            <div className="grid">
+            <div className="grid" data-busy={products.isPlaceholderData} aria-busy={products.isPlaceholderData}>
               {products.data?.content?.map((product) => <ProductCard key={product.id} product={product} />)}
             </div>
             {!products.data?.content?.length ? (
               <div className="brutal stack" style={{ padding: "40px 32px", justifyItems: "start" }}>
                 <h2 className="subtitle" style={{ margin: 0 }}>
-                  Nothing matches these filters.
+                  {t("catalog.empty")}
                 </h2>
                 <p className="muted" style={{ margin: 0 }}>
-                  Try a broader search{aiApplied ? " or switch smart search off" : ""}.
+                  {t(aiApplied ? "catalog.emptySmartHint" : "catalog.emptyHint")}
                 </p>
                 <Link className="button" href="/catalog">
-                  Reset filters
+                  {t("catalog.reset")}
                 </Link>
               </div>
             ) : null}

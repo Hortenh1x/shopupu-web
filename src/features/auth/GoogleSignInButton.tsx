@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
 import { useEffect, useRef, useState } from "react";
 
 const GSI_SRC = "https://accounts.google.com/gsi/client";
@@ -66,13 +68,14 @@ function GoogleGlyph() {
 }
 
 /**
- * "Continue with Google" — always visible. When NEXT_PUBLIC_GOOGLE_CLIENT_ID is
+ * t("auth.google") — always visible. When NEXT_PUBLIC_GOOGLE_CLIENT_ID is
  * set, Google Identity Services renders its official button (which yields the ID
  * token our backend verifies). Until then it shows a styled placeholder button
  * so the option is present in the UI; clicking it explains that Google isn't
  * configured yet.
  */
 export function GoogleSignInButton({ onCredential }: { onCredential: (idToken: string) => void }) {
+  const { t, locale } = useI18n();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const containerRef = useRef<HTMLDivElement>(null);
   const [rendered, setRendered] = useState(false);
@@ -86,6 +89,8 @@ export function GoogleSignInButton({ onCredential }: { onCredential: (idToken: s
       return;
     }
     let cancelled = false;
+    containerRef.current?.replaceChildren();
+    setRendered(false);
     loadGsi()
       .then(() => {
         if (cancelled || !containerRef.current || !window.google) {
@@ -94,7 +99,7 @@ export function GoogleSignInButton({ onCredential }: { onCredential: (idToken: s
         window.google.accounts.id.initialize({
           client_id: clientId,
           callback: (response) => {
-            if (response.credential) {
+            if (!cancelled && response.credential) {
               onCredentialRef.current(response.credential);
             }
           }
@@ -105,7 +110,8 @@ export function GoogleSignInButton({ onCredential }: { onCredential: (idToken: s
           size: "large",
           text: "continue_with",
           shape: "pill",
-          width
+          width,
+          locale
         });
         if (!cancelled) {
           setRendered(true);
@@ -117,10 +123,10 @@ export function GoogleSignInButton({ onCredential }: { onCredential: (idToken: s
     return () => {
       cancelled = true;
     };
-  }, [clientId]);
+  }, [clientId, locale]);
 
   return (
-    <div className="stack" style={{ gap: 6 }}>
+    <div className="stack" style={{ gap: 8 }}>
       {/* Google Identity Services injects its official button here when configured. */}
       <div ref={containerRef} style={{ display: "flex", justifyContent: "center" }} />
       {!rendered ? (
@@ -135,12 +141,12 @@ export function GoogleSignInButton({ onCredential }: { onCredential: (idToken: s
           }}
         >
           <GoogleGlyph />
-          Continue with Google
+          {t("auth.google")}
         </button>
       ) : null}
       {hint ? (
         <span className="muted" style={{ fontSize: "0.78rem", textAlign: "center" }}>
-          Google sign-in isn’t configured yet — set NEXT_PUBLIC_GOOGLE_CLIENT_ID.
+          {t("auth.googleUnavailable")}
         </span>
       ) : null}
     </div>

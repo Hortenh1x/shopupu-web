@@ -37,7 +37,21 @@ for (const name of ["localStorage", "sessionStorage"] as const) {
   });
 }
 
+// Model the cross-tab writer lock used by modern browsers on HTTPS/localhost.
+let lockTail: Promise<unknown> = Promise.resolve();
+Object.defineProperty(navigator, "locks", {
+  configurable: true,
+  value: {
+    request: (_name: string, operation: () => unknown) => {
+      const next = lockTail.then(operation);
+      lockTail = next.catch(() => undefined);
+      return next;
+    }
+  }
+});
+
 afterEach(() => {
   cleanup();
   window.localStorage.clear();
+  window.sessionStorage.clear();
 });

@@ -1,22 +1,28 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
 import { useState } from "react";
 import { authApi, userApi } from "@/lib/api/shop";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { newPasswordError } from "@/lib/auth/passwordPolicy";
 
 export function SecurityPanel() {
+  const { t, errorMessage } = useI18n();
   const auth = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [policyError, setPolicyError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const changePassword = useMutation({
+  const changePassword = useSessionMutation({
     mutationFn: () => authApi.changePassword(currentPassword, newPassword)
   });
-  const exportData = useMutation({
-    mutationFn: async () => {
+  const exportData = useSessionMutation({
+    mutationFn: async (_: void, context) => {
       const data = await userApi.exportData();
+      context.assertCurrent();
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
@@ -26,7 +32,7 @@ export function SecurityPanel() {
       URL.revokeObjectURL(url);
     }
   });
-  const deleteAccount = useMutation({
+  const deleteAccount = useSessionMutation({
     mutationFn: () => userApi.deleteAccount(),
     onSuccess: () => auth.logout()
   });
@@ -37,14 +43,16 @@ export function SecurityPanel() {
         className="card stack"
         onSubmit={(event) => {
           event.preventDefault();
-          changePassword.mutate();
+          const issue = newPasswordError(newPassword);
+          setPolicyError(issue);
+          if (!issue) changePassword.mutate();
         }}
       >
         <h2 className="subtitle" style={{ margin: 0 }}>
-          Change password
+          {t("profile.changePassword")}
         </h2>
         <label className="label">
-          Current password
+          {t("profile.currentPassword")}
           <input
             className="input"
             type="password"
@@ -54,66 +62,67 @@ export function SecurityPanel() {
           />
         </label>
         <label className="label">
-          New password (min 8 characters)
+          {t("profile.newPasswordMin")}
           <input
             className="input"
             type="password"
             required
-            minLength={8}
-            maxLength={128}
+            minLength={15}
+            autoComplete="new-password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
           />
         </label>
-        {changePassword.error ? <p className="errorText">{(changePassword.error as Error).message}</p> : null}
+        <p className="muted">{t("profile.passwordBytes")}</p>
+        {policyError ? <p role="alert" className="errorText">{errorMessage(policyError)}</p> : null}
+        {changePassword.error ? <p className="errorText">{errorMessage(changePassword.error)}</p> : null}
         {changePassword.isSuccess ? (
           <div className="stack">
-            <p className="status statusOk">Password changed. All sessions were logged out.</p>
+            <p className="status statusOk">{t("profile.passwordChanged")}</p>
             <button type="button" className="button buttonDark" onClick={auth.logout}>
-              Login again
+              {t("profile.loginAgain")}
             </button>
           </div>
         ) : (
           <button className="button buttonDark" disabled={changePassword.isPending}>
-            Change password
+            {t("profile.changePassword")}
           </button>
         )}
       </form>
 
       <div className="card stack">
         <h2 className="subtitle" style={{ margin: 0 }}>
-          My data (GDPR)
+          {t("profile.myData")}
         </h2>
-        <p className="muted">Download everything we store about you as JSON.</p>
+        <p className="muted">{t("profile.exportScope")}</p>
         <button className="button" disabled={exportData.isPending} onClick={() => exportData.mutate()}>
-          Download my data
+          {t("profile.download")}
         </button>
-        {exportData.error ? <p className="errorText">{(exportData.error as Error).message}</p> : null}
+        {exportData.error ? <p className="errorText">{errorMessage(exportData.error)}</p> : null}
 
-        <hr style={{ width: "100%", border: "none", borderTop: "1px solid var(--color-border-soft)" }} />
+        <hr style={{ width: "100%", border: "none", borderTop: "1px solid var(--line)" }} />
 
         <h2 className="subtitle" style={{ margin: 0 }}>
-          Delete account
+          {t("profile.deleteAccount")}
         </h2>
         <p className="muted">
-          The account is anonymized permanently: personal data, addresses, wishlist and reviews are erased. Order
-          history is kept anonymized for accounting.
+          {t("profile.eraseScope")}
         </p>
         {!confirmDelete ? (
           <button className="button buttonRed" onClick={() => setConfirmDelete(true)}>
-            Delete my account
+            {t("profile.deleteMine")}
           </button>
         ) : (
           <div className="toolbar">
             <button className="button buttonRed" disabled={deleteAccount.isPending} onClick={() => deleteAccount.mutate()}>
-              Yes, delete permanently
+              {t("profile.deleteConfirm")}
             </button>
             <button className="button" onClick={() => setConfirmDelete(false)}>
-              Keep my account
+              {t("profile.keepAccount")}
             </button>
           </div>
         )}
-        {deleteAccount.error ? <p className="errorText">{(deleteAccount.error as Error).message}</p> : null}
+        {deleteAccount.error ? <p className="errorText">{errorMessage(deleteAccount.error)}</p> : null}
       </div>
     </div>
   );

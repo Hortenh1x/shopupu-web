@@ -1,13 +1,15 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { authApi, cartApi } from "@/lib/api/shop";
-import { clearSession, getCartToken, setCartToken } from "@/lib/auth/session";
+import { clearSession, captureSession, getCartToken, setCartToken, startSession } from "@/lib/auth/session";
 import { installFetchMock, jsonResponse } from "@/test/fetchMock";
+
+const buyer = { id: 7, email: "demo@example.invalid", roles: ["CUSTOMER"], emailVerified: false, enabled: true };
 
 const emptyCart = { items: [], totalItems: 0, subtotal: 0 };
 
 describe("guest cart token (CART-01/CART-02)", () => {
-  beforeEach(() => {
-    clearSession();
+  beforeEach(async () => {
+    await clearSession();
     setCartToken(null);
   });
 
@@ -56,10 +58,46 @@ describe("guest cart token (CART-01/CART-02)", () => {
     setCartToken("guest-1");
     mock.on("GET", "/api/v1/cart", () => jsonResponse(200, emptyCart));
 
-    cartApi.forgetGuestToken();
+    await cartApi.forgetGuestToken();
     await cartApi.get();
 
     expect(getCartToken()).toBeNull();
     expect(mock.requests[0].headers.get("X-Cart-Token")).toBeNull();
   });
+  it("does not let a late G response overwrite a new guest cart G2", async () => {
+    setCartToken("guest-1");
+    let release!: (response: Response) => void;
+    const mock = installFetchMock();
+    mock.on("GET", "/api/v1/cart", () => new Promise<Response>((resolve) => { release = resolve; }));
+    const request = cartApi.get();
+    const rejected = expect(request).rejects.toMatchObject({ problem: { code: "CART_CHANGED" } });
+    await vi.waitFor(() => expect(release).toBeTypeOf("function"));
+    setCartToken("guest-2");
+    release(jsonResponse(200, { ...emptyCart, guestToken: "guest-1" }));
+    await rejected;
+    expect(getCartToken()).toBe("guest-2");
+  });
+
+  it("does not restore a spent guest token after another account is published", async () => {
+    setCartToken("guest-1");
+    let release!: (response: Response) => void;
+    const mock = installFetchMock();
+    mock.on("GET", "/api/v1/cart", () => new Promise<Response>((resolve) => { release = resolve; }));
+    const request = cartApi.get();
+    const rejected = expect(request).rejects.toMatchObject({ problem: { code: "SESSION_CHANGED" } });
+    await vi.waitFor(() => expect(release).toBeTypeOf("function"));
+    await startSession({ accessToken: "b-access", refreshToken: "b-refresh" }, buyer, captureSession(), undefined, "guest-1");
+    release(jsonResponse(200, { ...emptyCart, guestToken: "guest-1" }));
+    await rejected;
+    expect(getCartToken()).toBeNull();
+  });
+
+  it("only forgets the guest token bound to the first authentication factor", async () => {
+    setCartToken("guest-1");
+    const original = getCartToken();
+    setCartToken("guest-2");
+    await startSession({ accessToken: "b-access", refreshToken: "b-refresh" }, buyer, captureSession(), undefined, original);
+    expect(getCartToken()).toBe("guest-2");
+  });
+
 });

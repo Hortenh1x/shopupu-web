@@ -1,9 +1,14 @@
+"use client";
+
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
 import Link from "next/link";
 import type { Product, ProductListItem } from "@/lib/api/types";
 
 type ProductCardProduct = Product | ProductListItem;
 
 export function ProductCard({ product }: { product: ProductCardProduct }) {
+  const { t, formatPrice, genderLabel } = useI18n();
   const preview = getPreviewImage(product);
   const onSale = product.oldPrice != null && Number(product.oldPrice) > Number(product.price);
 
@@ -20,16 +25,16 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
               </svg>
             </span>
           )}
-          {onSale ? <span className="badgeSale">Sale</span> : null}
+          {onSale ? <span className="badgeSale">{t("product.sale")}</span> : null}
         </div>
         <div className="productBody">
           <span className="kicker">
-            {[product.brandName, "gender" in product && product.gender ? product.gender.toLowerCase() : null]
+            {[product.brandName, "gender" in product && product.gender ? genderLabel(product.gender) : null]
               .filter(Boolean)
               .join(" · ") || "shopupu"}
           </span>
           <h3 className="productTitle">{product.title}</h3>
-          <span style={{ display: "inline-flex", gap: 10, alignItems: "baseline" }}>
+          <span style={{ display: "inline-flex", gap: 12, alignItems: "baseline" }}>
             <span className="price">{formatPrice(product.price)}</span>
             {onSale ? <span className="priceOld">{formatPrice(product.oldPrice!)}</span> : null}
           </span>
@@ -39,9 +44,7 @@ export function ProductCard({ product }: { product: ProductCardProduct }) {
   );
 }
 
-export function formatPrice(value: number | string) {
-  return `€${Number(value).toFixed(2)}`;
-}
+export { formatPrice } from "@/lib/i18n/core";
 
 function getPreviewImage(product: ProductCardProduct) {
   if (isFullProduct(product)) {

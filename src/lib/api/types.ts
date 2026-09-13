@@ -26,6 +26,18 @@ export type UserProfile = {
   roles: string[];
 };
 
+export type AuthenticatedResult = TokenPairResponse & {
+  status: "AUTHENTICATED";
+  recoveryCodes?: string[];
+};
+export type AuthChallenge = {
+  status: "MFA_REQUIRED" | "MFA_ENROLLMENT_REQUIRED";
+  challengeToken: string;
+  expiresAt: string;
+};
+export type AuthResult = AuthenticatedResult | AuthChallenge;
+export type MfaEnrollment = { secret: string; otpauthUri: string; expiresAt: string };
+
 export type TokenPairResponse = {
   accessToken: string;
   refreshToken: string;
@@ -78,8 +90,10 @@ export type UserDataExport = {
   profile: UserProfile;
   addresses: UserAddress[];
   orders: Array<{ orderNumber: string; status: string; paymentAmount: number; createdAt?: string }>;
-  reviews: Array<{ productId: number; rating: number; body: string; status: string; createdAt?: string }>;
+  reviews: Array<{ productId: number; rating: number; body: string; status: string; source: ReviewSource; createdAt?: string }>;
   exportedAt: string;
+  records: Record<string, Array<Record<string, unknown>>>;
+  scope: string[];
 };
 
 // === Catalog ================================================================
@@ -356,6 +370,8 @@ export type Payment = {
   externalPaymentId?: string | null;
   paymentUrl?: string | null;
   clientToken?: string | null;
+  refundStatus?: "PENDING" | "UNKNOWN" | "SUCCEEDED" | "FAILED" | "CANCELED" | null;
+  refundOperationKey?: string | null;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -363,6 +379,7 @@ export type Payment = {
 // === Reviews ================================================================
 
 export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
+export type ReviewSource = "UNKNOWN" | "CUSTOMER_SUBMITTED" | "SYNTHETIC_DEMO";
 
 export type Review = {
   id: number;
@@ -372,6 +389,7 @@ export type Review = {
   rating: number;
   body: string;
   status: ReviewStatus;
+  source: ReviewSource;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -385,6 +403,7 @@ export type AdminReview = {
   rating: number;
   body: string;
   status: ReviewStatus;
+  source: ReviewSource;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -428,6 +447,7 @@ export type StylistChatResponse = {
 // === Errors =================================================================
 
 export type ApiProblem = {
+  locale?: "en" | "de";
   status?: number;
   title?: string;
   detail?: string;
@@ -435,4 +455,13 @@ export type ApiProblem = {
   message?: string;
   requestId?: string;
   errors?: Array<{ field: string; message: string }>;
+};
+export type StorefrontConfig = {
+  demoMode: boolean;
+  fictionalProducts: boolean;
+  supportedLocales: string[];
+  payments: { provider: string; mode: "LOCAL_SIMULATION" | "STRIPE_TEST" | "UNAVAILABLE"; available: boolean; testMode: boolean };
+  email: { available: boolean };
+  google: { available: boolean };
+  ai: { available: boolean };
 };

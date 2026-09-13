@@ -4,135 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/users/me/profile": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getProfile"];
-        put: operations["updateProfile"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/consents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getConsents"];
-        put: operations["updateConsent"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/addresses/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: operations["updateAddress"];
-        post?: never;
-        delete: operations["deleteAddress"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/reviews/{reviewId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: operations["updateReview"];
-        post?: never;
-        delete: operations["deleteReview"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/cart/items/{variantId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: operations["setQuantity"];
-        post?: never;
-        delete: operations["removeItem"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/catalog/variants/{variantId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: operations["updateVariant"];
-        post?: never;
-        delete: operations["deleteVariant"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/catalog/products/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getProduct"];
-        put: operations["updateProduct"];
-        post?: never;
-        delete: operations["deleteProduct"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/catalog/categories/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put: operations["updateCategory"];
-        post?: never;
-        delete: operations["deleteCategory"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/wishlist/{productId}": {
+    "/api/v1/admin/ai/embeddings/backfill": {
         parameters: {
             query?: never;
             header?: never;
@@ -141,455 +13,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["addToWishlist"];
-        delete: operations["removeFromWishlist"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/addresses": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getAddresses"];
-        put?: never;
-        post: operations["addAddress"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/users/me/addresses/{id}/default": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["setDefaultAddress"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/shipping/method": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["setMethod"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/shipping/address": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["setAddress"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/promo/validate": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["validate"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/products/{productId}/reviews": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["createReview"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/payments": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["createPayment"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/payments/callback": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["handleCallback"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/orders/checkout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["createOrder"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/catalog/stylist/chat": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["chat"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/cart/items": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["addItem"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/verify-email": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["verifyEmail"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/reset-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["resetPassword"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/resend-verification": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["resendVerification"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/register": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["register"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["refresh"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/logout": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["logout"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["login"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/google": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["google"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/forgot-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["forgotPassword"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/change-password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["changePassword"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/promo": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["list"];
-        put?: never;
-        post: operations["create"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/payments/{id}/refund": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["refund"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/catalog/products": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getProducts"];
-        put?: never;
-        post: operations["createProduct"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/catalog/products/{id}/variants": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getVariants"];
-        put?: never;
-        post: operations["addVariant"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/catalog/products/{id}/images": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["uploadProductImage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/catalog/categories": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["createCategory"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/ai/review-summaries/refresh": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post: operations["refreshReviewSummaries"];
+        post: operations["backfillEmbeddings"];
         delete?: never;
         options?: never;
         head?: never;
@@ -612,7 +36,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/ai/embeddings/backfill": {
+    "/api/v1/admin/ai/review-summaries/refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -621,14 +45,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post: operations["backfillEmbeddings"];
+        post: operations["refreshReviewSummaries"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/orders/{id}/cancel": {
+    "/api/v1/admin/catalog/categories": {
         parameters: {
             query?: never;
             header?: never;
@@ -637,14 +61,14 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        post?: never;
+        post: operations["createCategory"];
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["cancelOrder"];
+        patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/shipping/{orderId}/status": {
+    "/api/v1/admin/catalog/categories/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -652,31 +76,79 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
+        put: operations["updateCategory"];
         post?: never;
-        delete?: never;
+        delete: operations["deleteCategory"];
         options?: never;
         head?: never;
-        patch: operations["updateStatus"];
+        patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/reviews/{reviewId}/status": {
+    "/api/v1/admin/catalog/products": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getProducts"];
         put?: never;
-        post?: never;
+        post: operations["createProduct"];
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["updateReviewStatus"];
+        patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/promo/{id}/enabled": {
+    "/api/v1/admin/catalog/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProduct"];
+        put: operations["updateProduct"];
+        post?: never;
+        delete: operations["deleteProduct"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/products/{id}/images": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["uploadProductImage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/products/{id}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getVariants"];
+        put?: never;
+        post: operations["addVariant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/products/{productId}/images/{imageId}": {
         parameters: {
             query?: never;
             header?: never;
@@ -686,10 +158,74 @@ export interface paths {
         get?: never;
         put?: never;
         post?: never;
+        delete: operations["deleteProductImage"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/catalog/variants/{variantId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateVariant"];
+        post?: never;
+        delete: operations["deleteVariant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrders_1"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
-        patch: operations["setEnabled"];
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrder"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/orders/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrderHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/admin/orders/{id}/status": {
@@ -708,14 +244,78 @@ export interface paths {
         patch: operations["updateOrderStatus"];
         trace?: never;
     };
-    "/api/v1/users/me/wishlist": {
+    "/api/v1/admin/payments/{id}/refund": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getWishlist"];
+        get?: never;
+        put?: never;
+        post: operations["refund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/payments/{id}/refund/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["retryRefund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/promo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list"];
+        put?: never;
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/promo/{id}/enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["setEnabled"];
+        trace?: never;
+    };
+    "/api/v1/admin/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getReviews"];
         put?: never;
         post?: never;
         delete?: never;
@@ -724,14 +324,62 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/users/me/export": {
+    "/api/v1/admin/reviews/{reviewId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["exportData"];
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["deleteReview_1"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/reviews/{reviewId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateReviewStatus"];
+        trace?: never;
+    };
+    "/api/v1/admin/shipping/{orderId}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["updateStatus"];
+        trace?: never;
+    };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getUsers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -740,14 +388,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/shipping/{orderId}": {
+    "/api/v1/auth/change-password": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["get"];
+        get?: never;
+        put?: never;
+        post: operations["changePassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/forgot-password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["forgotPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/google": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["google"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["login"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["logout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getCurrentUser"];
         put?: never;
         post?: never;
         delete?: never;
@@ -756,206 +484,190 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/payments/{id}": {
+    "/api/v1/auth/mfa/enrollment/confirm": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getPayment"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["confirm"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/orders": {
+    "/api/v1/auth/mfa/enrollment/start": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getOrders"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["start"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/orders/{id}": {
+    "/api/v1/auth/mfa/verify": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getOrderById"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["verify"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products": {
+    "/api/v1/auth/refresh": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getAllProducts"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["refresh"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products/{productId}/reviews": {
+    "/api/v1/auth/register": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getProductReviews"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["register"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products/{productId}/rating": {
+    "/api/v1/auth/resend-verification": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getProductRating"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["resendVerification"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products/{id}": {
+    "/api/v1/auth/reset-password": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getProduct_1"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["resetPassword"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products/{id}/similar": {
+    "/api/v1/auth/verify-email": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["similar"];
+        get?: never;
         put?: never;
-        post?: never;
+        post: operations["verifyEmail"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products/{id}/review-summary": {
+    "/api/v1/cart": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["reviewSummary"];
+        get: operations["getCart"];
         put?: never;
         post?: never;
+        delete: operations["clear"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/cart/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["addItem"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products/{id}/bought-together": {
+    "/api/v1/cart/items/{variantId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["boughtTogether"];
-        put?: never;
+        get?: never;
+        put: operations["setQuantity"];
         post?: never;
-        delete?: never;
+        delete: operations["removeItem"];
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/products/semantic-search": {
+    "/api/v1/catalog/brands": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["semanticSearch"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/catalog/products/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["searchProducts"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/catalog/products/nl-search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["nlSearch"];
+        get: operations["listBrands"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1012,14 +724,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/catalog/brands": {
+    "/api/v1/catalog/products": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["listBrands"];
+        get: operations["getAllProducts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1028,30 +740,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/cart": {
+    "/api/v1/catalog/products/nl-search": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getCart"];
-        put?: never;
-        post?: never;
-        delete: operations["clear"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["getCurrentUser"];
+        get: operations["nlSearch"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1060,14 +756,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/users": {
+    "/api/v1/catalog/products/search": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getUsers"];
+        get: operations["searchProducts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1076,14 +772,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/reviews": {
+    "/api/v1/catalog/products/semantic-search": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getReviews"];
+        get: operations["semanticSearch"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1092,14 +788,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/orders": {
+    "/api/v1/catalog/products/{id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getOrders_1"];
+        get: operations["getProduct_1"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1108,14 +804,14 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/orders/{id}": {
+    "/api/v1/catalog/products/{id}/bought-together": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getOrder"];
+        get: operations["boughtTogether"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1124,14 +820,318 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/orders/{id}/history": {
+    "/api/v1/catalog/products/{id}/review-summary": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["getOrderHistory"];
+        get: operations["reviewSummary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/products/{id}/similar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["similar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/products/{productId}/rating": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProductRating"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/products/{productId}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProductReviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/catalog/stylist/chat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["chat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getOrderById"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["cancelOrder"];
+        trace?: never;
+    };
+    "/api/v1/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createPayment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["handleCallback"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getPayment"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/payments/{id}/simulate-success": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["simulateSuccess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/products/{productId}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["createReview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/promo/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["validate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/reviews/{reviewId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateReview"];
+        post?: never;
+        delete: operations["deleteReview"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shipping/address": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["setAddress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shipping/method": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["setMethod"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shipping/{orderId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/storefront/config": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["configuration"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1156,23 +1156,39 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/reviews/{reviewId}": {
+    "/api/v1/users/me/addresses": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getAddresses"];
         put?: never;
-        post?: never;
-        delete: operations["deleteReview_1"];
+        post: operations["addAddress"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/catalog/products/{productId}/images/{imageId}": {
+    "/api/v1/users/me/addresses/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["updateAddress"];
+        post?: never;
+        delete: operations["deleteAddress"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/addresses/{id}/default": {
         parameters: {
             query?: never;
             header?: never;
@@ -1181,8 +1197,88 @@ export interface paths {
         };
         get?: never;
         put?: never;
+        post: operations["setDefaultAddress"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getConsents"];
+        put: operations["updateConsent"];
         post?: never;
-        delete: operations["deleteProductImage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["exportData"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getProfile"];
+        put: operations["updateProfile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/wishlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getWishlist"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/users/me/wishlist/{productId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["addToWishlist"];
+        delete: operations["removeFromWishlist"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1192,27 +1288,111 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        UpdateProfileRequest: {
-            firstName?: string;
-            lastName?: string;
-            phone?: string;
-            preferredSize?: string;
-            /** @enum {string} */
-            gender?: "MALE" | "FEMALE" | "OTHER";
+        AddOrUpdateItemRequest: {
+            /** Format: int32 */
+            quantity: number;
+            /** Format: int64 */
+            variantId: number;
         };
-        UserProfile: {
+        AddressRequest: {
+            city: string;
+            country: string;
+            defaultAddress?: boolean;
+            fullName: string;
+            line1: string;
+            line2?: string;
+            postalCode: string;
+            state?: string;
+        };
+        AddressResponse: {
+            city?: string;
+            country?: string;
+            defaultAddress?: boolean;
+            fullName?: string;
             /** Format: int64 */
             id?: number;
-            email?: string;
-            firstName?: string;
-            lastName?: string;
-            phone?: string;
-            preferredSize?: string;
+            line1?: string;
+            line2?: string;
+            postalCode?: string;
+            state?: string;
+        };
+        AdminReviewResponse: {
+            body?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            productId?: number;
+            productTitle?: string;
+            /** Format: int32 */
+            rating?: number;
             /** @enum {string} */
-            gender?: "MALE" | "FEMALE" | "OTHER";
-            enabled?: boolean;
-            emailVerified?: boolean;
-            roles?: string[];
+            source?: "UNKNOWN" | "CUSTOMER_SUBMITTED" | "SYNTHETIC_DEMO";
+            /** @enum {string} */
+            status?: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
+            /** Format: date-time */
+            updatedAt?: string;
+            userEmail?: string;
+            /** Format: int64 */
+            userId?: number;
+        };
+        BrandResponse: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            slug?: string;
+        };
+        CartItemDto: {
+            color?: string;
+            lineTotal?: number;
+            price?: number;
+            /** Format: int64 */
+            productId?: number;
+            /** Format: int32 */
+            quantity?: number;
+            size?: string;
+            sku?: string;
+            title?: string;
+            /** Format: int64 */
+            variantId?: number;
+        };
+        CartResponse: {
+            guestToken?: string;
+            items?: components["schemas"]["CartItemDto"][];
+            subtotal?: number;
+            /** Format: int32 */
+            totalItems?: number;
+        };
+        CategoryRequest: {
+            description?: string;
+            name: string;
+            /** Format: int64 */
+            parentId?: number;
+            slug: string;
+        };
+        CategoryResponse: {
+            description?: string;
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            /** Format: int64 */
+            parentId?: number;
+            slug?: string;
+        };
+        ChallengeRequest: {
+            challengeToken: string;
+        };
+        ChangePasswordRequest: {
+            currentPassword: string;
+            newPassword: string;
+        };
+        CheckoutRequest: {
+            promoCode?: string;
+        };
+        ConfirmRequest: {
+            challengeToken: string;
+            code: string;
         };
         ConsentRequest: {
             /** @enum {string} */
@@ -1223,440 +1403,260 @@ export interface components {
         ConsentResponse: {
             /** @enum {string} */
             consentType?: "MARKETING_EMAIL" | "COOKIES_ANALYTICS" | "DATA_PROCESSING";
+            /** Format: date-time */
+            createdAt?: string;
             granted?: boolean;
             policyVersion?: string;
-            /** Format: date-time */
-            createdAt?: string;
-        };
-        AddressRequest: {
-            fullName: string;
-            line1: string;
-            line2?: string;
-            city: string;
-            state?: string;
-            postalCode: string;
-            country: string;
-            defaultAddress?: boolean;
-        };
-        AddressResponse: {
-            /** Format: int64 */
-            id?: number;
-            fullName?: string;
-            line1?: string;
-            line2?: string;
-            city?: string;
-            state?: string;
-            postalCode?: string;
-            country?: string;
-            defaultAddress?: boolean;
-        };
-        UpdateReviewRequest: {
-            /** Format: int32 */
-            rating?: number;
-            body: string;
-        };
-        ReviewResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            productId?: number;
-            /** Format: int64 */
-            userId?: number;
-            username?: string;
-            /** Format: int32 */
-            rating?: number;
-            body?: string;
-            /** @enum {string} */
-            status?: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        };
-        AddOrUpdateItemRequest: {
-            /** Format: int64 */
-            variantId: number;
-            /** Format: int32 */
-            quantity: number;
-        };
-        CartItemDto: {
-            /** Format: int64 */
-            variantId?: number;
-            /** Format: int64 */
-            productId?: number;
-            title?: string;
-            sku?: string;
-            size?: string;
-            color?: string;
-            price?: number;
-            /** Format: int32 */
-            quantity?: number;
-            lineTotal?: number;
-        };
-        CartResponse: {
-            items?: components["schemas"]["CartItemDto"][];
-            /** Format: int32 */
-            totalItems?: number;
-            subtotal?: number;
-            guestToken?: string;
-        };
-        VariantRequest: {
-            sku: string;
-            size: string;
-            color?: string;
-            price?: number;
-            oldPrice?: number;
-            /** Format: int32 */
-            stock?: number;
-            enabled?: boolean;
-        };
-        VariantResponse: {
-            /** Format: int64 */
-            id?: number;
-            sku?: string;
-            size?: string;
-            color?: string;
-            price?: number;
-            oldPrice?: number;
-            enabled?: boolean;
-            /** Format: int32 */
-            available?: number;
-        };
-        ProductRequest: {
-            /** Format: int64 */
-            categoryId: number;
-            title: string;
-            slug?: string;
-            description?: string;
-            price: number;
-            oldPrice?: number;
-            brandName?: string;
-            /** @enum {string} */
-            gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
-            season?: string;
-            material?: string;
-            careInstructions?: string;
-            metaTitle?: string;
-            metaDescription?: string;
-            enabled?: boolean;
-        };
-        ProductResponse: {
-            /** Format: int64 */
-            id?: number;
-            title?: string;
-            slug?: string;
-            description?: string;
-            price?: number;
-            oldPrice?: number;
-            enabled?: boolean;
-            /** @enum {string} */
-            gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
-            season?: string;
-            material?: string;
-            careInstructions?: string;
-            metaTitle?: string;
-            metaDescription?: string;
-            /** Format: int64 */
-            brandId?: number;
-            brandName?: string;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: int64 */
-            categoryId?: number;
-            categoryName?: string;
-            categorySlug?: string;
-            images?: components["schemas"]["ProductResponseImage"][];
-            variants?: components["schemas"]["VariantResponse"][];
-        };
-        ProductResponseImage: {
-            /** Format: int64 */
-            id?: number;
-            url?: string;
-            altText?: string;
-            /** Format: int32 */
-            position?: number;
-        };
-        CategoryRequest: {
-            name: string;
-            slug: string;
-            description?: string;
-            /** Format: int64 */
-            parentId?: number;
-        };
-        CategoryResponse: {
-            /** Format: int64 */
-            id?: number;
-            name?: string;
-            slug?: string;
-            description?: string;
-            /** Format: int64 */
-            parentId?: number;
-        };
-        SetShippingMethodRequest: {
-            /** Format: int64 */
-            orderId: number;
-            /** @enum {string} */
-            method: "DHL" | "LOCAL_PICKUP" | "STANDARD_POST";
-        };
-        ShipmentDto: {
-            /** Format: int64 */
-            orderId?: number;
-            /** @enum {string} */
-            method?: "DHL" | "LOCAL_PICKUP" | "STANDARD_POST";
-            /** @enum {string} */
-            shippingStatus?: "PENDING" | "PREPARING" | "SHIPPED" | "DELIVERED" | "READY_FOR_PICKUP" | "PICKED_UP" | "CANCELED";
-            /** @enum {string} */
-            orderStatus?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
-            shippingCost?: number;
-            currency?: string;
-            trackingNumber?: string;
-            address?: components["schemas"]["ShippingAddressDto"];
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        };
-        ShippingAddressDto: {
-            /** Format: int64 */
-            id?: number;
-            fullName?: string;
-            line1?: string;
-            line2?: string;
-            city?: string;
-            state?: string;
-            postalCode?: string;
-            country?: string;
-        };
-        SetShippingAddressRequest: {
-            /** Format: int64 */
-            orderId: number;
-            fullName: string;
-            line1: string;
-            line2?: string;
-            city: string;
-            state: string;
-            postalCode: string;
-            country: string;
-        };
-        ValidatePromoRequest: {
-            code: string;
-        };
-        ValidatePromoResponse: {
-            code?: string;
-            /** @enum {string} */
-            promoType?: "PERCENT" | "FIXED" | "FREE_SHIPPING";
-            discount?: number;
-        };
-        CreateReviewRequest: {
-            /** Format: int32 */
-            rating?: number;
-            body: string;
-            /** Format: int64 */
-            orderId?: number;
         };
         CreatePaymentRequest: {
             /** Format: int64 */
             orderId: number;
         };
-        PaymentResponse: {
-            /** Format: int64 */
-            id?: number;
+        CreateReviewRequest: {
+            body: string;
             /** Format: int64 */
             orderId?: number;
-            externalPaymentId?: string;
-            provider?: string;
-            /** @enum {string} */
-            status?: "CREATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "EXPIRED" | "REFUNDED";
-            amount?: number;
-            currency?: string;
-            paymentUrl?: string;
-            clientToken?: string;
+            /** Format: int32 */
+            rating?: number;
+        };
+        Enrollment: {
+            /** Format: date-time */
+            expiresAt?: string;
+            otpauthUri?: string;
+            secret?: string;
+        };
+        ExportedOrder: {
             /** Format: date-time */
             createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-        };
-        CheckoutRequest: {
-            promoCode?: string;
-        };
-        OrderDto: {
-            /** Format: int64 */
-            id?: number;
             orderNumber?: string;
-            subtotalAmount?: number;
-            shippingAmount?: number;
-            discountAmount?: number;
-            promoCode?: string;
             paymentAmount?: number;
-            /** @enum {string} */
-            status?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+            status?: string;
+        };
+        ExportedReview: {
+            body?: string;
             /** Format: date-time */
             createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
-            items?: components["schemas"]["OrderItemDto"][];
-        };
-        OrderItemDto: {
-            /** Format: int64 */
-            id?: number;
             /** Format: int64 */
             productId?: number;
-            /** Format: int64 */
-            variantId?: number;
-            title?: string;
-            sku?: string;
-            size?: string;
-            color?: string;
-            brand?: string;
-            price?: number;
             /** Format: int32 */
-            quantity?: number;
-            lineTotal?: number;
+            rating?: number;
+            source?: string;
+            status?: string;
         };
-        HistoryMessage: {
-            role: string;
-            content: string;
+        Feature: {
+            available?: boolean;
         };
-        StylistChatRequest: {
-            message: string;
-            history?: components["schemas"]["HistoryMessage"][];
-        };
-        ProductListItem: {
-            /** Format: int64 */
-            id?: number;
-            title?: string;
-            slug?: string;
-            price?: number;
-            oldPrice?: number;
-            brandName?: string;
-            /** @enum {string} */
-            gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
-            enabled?: boolean;
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: int64 */
-            categoryId?: number;
-            categorySlug?: string;
-            imageUrl?: string;
-            imageAltText?: string;
-        };
-        StylistChatResponse: {
-            reply?: string;
-            slots?: components["schemas"]["StylistSlot"][];
-            unavailable?: string[];
-            degraded?: boolean;
-        };
-        StylistSlot: {
-            slot?: string;
-            products?: components["schemas"]["ProductListItem"][];
-        };
-        VerifyEmailRequest: {
-            token: string;
-        };
-        ResetPasswordRequest: {
-            token: string;
-            newPassword: string;
-        };
-        RegisterRequest: {
+        ForgotPasswordRequest: {
             /** Format: email */
             email: string;
-            password: string;
-            passwordConfirm: string;
-            passwordConfirmed?: boolean;
         };
-        TokenPairResponse: {
-            accessToken?: string;
-            refreshToken?: string;
+        GoogleLoginRequest: {
+            idToken: string;
         };
-        RefreshRequest: {
-            refreshToken: string;
+        HistoryMessage: {
+            content: string;
+            role: string;
         };
         LoginRequest: {
             /** Format: email */
             email: string;
             password: string;
         };
-        GoogleLoginRequest: {
-            idToken: string;
-        };
-        ForgotPasswordRequest: {
-            /** Format: email */
-            email: string;
-        };
-        ChangePasswordRequest: {
-            currentPassword: string;
-            newPassword: string;
-        };
-        PromoCodeRequest: {
-            code: string;
-            /** @enum {string} */
-            promoType: "PERCENT" | "FIXED" | "FREE_SHIPPING";
-            value?: number;
-            minOrderAmount?: number;
+        LoginResponse: {
+            accessToken?: string;
+            challengeToken?: string;
             /** Format: date-time */
-            startsAt?: string;
-            /** Format: date-time */
-            endsAt?: string;
-            /** Format: int32 */
-            maxRedemptions?: number;
-            /** Format: int32 */
-            perUserLimit?: number;
-            enabled?: boolean;
+            expiresAt?: string;
+            recoveryCodes?: string[];
+            refreshToken?: string;
+            status?: string;
         };
-        PromoCodeResponse: {
-            /** Format: int64 */
-            id?: number;
-            code?: string;
-            /** @enum {string} */
-            promoType?: "PERCENT" | "FIXED" | "FREE_SHIPPING";
-            value?: number;
-            minOrderAmount?: number;
-            /** Format: date-time */
-            startsAt?: string;
-            /** Format: date-time */
-            endsAt?: string;
-            /** Format: int32 */
-            maxRedemptions?: number;
-            /** Format: int32 */
-            perUserLimit?: number;
-            /** Format: int32 */
-            redemptionCount?: number;
-            enabled?: boolean;
-        };
-        ProductImageResponse: {
-            /** Format: int64 */
-            id?: number;
-            url?: string;
-            altText?: string;
-            /** Format: int32 */
-            sortOrder?: number;
-        };
-        ReviewStatusRequest: {
-            /** @enum {string} */
-            status: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
-        };
-        AdminReviewResponse: {
-            /** Format: int64 */
-            id?: number;
-            /** Format: int64 */
-            productId?: number;
-            productTitle?: string;
-            /** Format: int64 */
-            userId?: number;
-            userEmail?: string;
-            /** Format: int32 */
-            rating?: number;
-            body?: string;
-            /** @enum {string} */
-            status?: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
+        OrderDto: {
             /** Format: date-time */
             createdAt?: string;
+            discountAmount?: number;
+            /** Format: int64 */
+            id?: number;
+            items?: components["schemas"]["OrderItemDto"][];
+            orderNumber?: string;
+            paymentAmount?: number;
+            promoCode?: string;
+            shippingAmount?: number;
+            /** @enum {string} */
+            status?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+            subtotalAmount?: number;
             /** Format: date-time */
             updatedAt?: string;
         };
-        UpdateOrderStatusRequest: {
+        OrderItemDto: {
+            brand?: string;
+            color?: string;
+            /** Format: int64 */
+            id?: number;
+            lineTotal?: number;
+            price?: number;
+            /** Format: int64 */
+            productId?: number;
+            /** Format: int32 */
+            quantity?: number;
+            size?: string;
+            sku?: string;
+            title?: string;
+            /** Format: int64 */
+            variantId?: number;
+        };
+        OrderStatusHistoryDto: {
+            changedBy?: string;
+            /** Format: date-time */
+            createdAt?: string;
             /** @enum {string} */
-            status: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+            fromStatus?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+            /** @enum {string} */
+            toStatus?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+        };
+        PageAdminReviewResponse: {
+            content?: components["schemas"]["AdminReviewResponse"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PageOrderDto: {
+            content?: components["schemas"]["OrderDto"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PageProductListItem: {
+            content?: components["schemas"]["ProductListItem"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PageProductResponse: {
+            content?: components["schemas"]["ProductResponse"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PagePromoCodeResponse: {
+            content?: components["schemas"]["PromoCodeResponse"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PageReviewResponse: {
+            content?: components["schemas"]["ReviewResponse"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PageUserProfile: {
+            content?: components["schemas"]["UserProfile"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
+        };
+        PageWishlistEntryResponse: {
+            content?: components["schemas"]["WishlistEntryResponse"][];
+            empty?: boolean;
+            first?: boolean;
+            last?: boolean;
+            /** Format: int32 */
+            number?: number;
+            /** Format: int32 */
+            numberOfElements?: number;
+            pageable?: components["schemas"]["PageableObject"];
+            /** Format: int32 */
+            size?: number;
+            sort?: components["schemas"]["SortObject"];
+            /** Format: int64 */
+            totalElements?: number;
+            /** Format: int32 */
+            totalPages?: number;
         };
         Pageable: {
             /** Format: int32 */
@@ -1664,24 +1664,6 @@ export interface components {
             /** Format: int32 */
             size?: number;
             sort?: string[];
-        };
-        PageWishlistEntryResponse: {
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["WishlistEntryResponse"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
         };
         PageableObject: {
             /** Format: int64 */
@@ -1694,207 +1676,386 @@ export interface components {
             sort?: components["schemas"]["SortObject"];
             unpaged?: boolean;
         };
+        PaymentResponse: {
+            amount?: number;
+            clientToken?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            currency?: string;
+            externalPaymentId?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            orderId?: number;
+            paymentUrl?: string;
+            provider?: string;
+            refundOperationKey?: string;
+            /** @enum {string} */
+            refundStatus?: "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "UNKNOWN";
+            /** @enum {string} */
+            status?: "CREATED" | "PENDING" | "SUCCEEDED" | "FAILED" | "CANCELED" | "EXPIRED" | "REFUNDED";
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        Payments: {
+            available?: boolean;
+            mode?: string;
+            provider?: string;
+            testMode?: boolean;
+        };
+        ProductImageResponse: {
+            altText?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            sortOrder?: number;
+            url?: string;
+        };
+        ProductListItem: {
+            brandName?: string;
+            /** Format: int64 */
+            categoryId?: number;
+            categorySlug?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            enabled?: boolean;
+            /** @enum {string} */
+            gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
+            /** Format: int64 */
+            id?: number;
+            imageAltText?: string;
+            imageUrl?: string;
+            oldPrice?: number;
+            price?: number;
+            slug?: string;
+            title?: string;
+        };
+        ProductRatingSummaryResponse: {
+            averageRating?: number;
+            /** Format: int64 */
+            productId?: number;
+            /** Format: int64 */
+            reviewCount?: number;
+        };
+        ProductRequest: {
+            brandName?: string;
+            careInstructions?: string;
+            /** Format: int64 */
+            categoryId: number;
+            description?: string;
+            enabled?: boolean;
+            /** @enum {string} */
+            gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
+            material?: string;
+            metaDescription?: string;
+            metaTitle?: string;
+            oldPrice?: number;
+            price: number;
+            season?: string;
+            slug?: string;
+            title: string;
+        };
+        ProductResponse: {
+            /** Format: int64 */
+            brandId?: number;
+            brandName?: string;
+            careInstructions?: string;
+            /** Format: int64 */
+            categoryId?: number;
+            categoryName?: string;
+            categorySlug?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            description?: string;
+            enabled?: boolean;
+            /** @enum {string} */
+            gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
+            /** Format: int64 */
+            id?: number;
+            images?: components["schemas"]["ProductResponseImage"][];
+            material?: string;
+            metaDescription?: string;
+            metaTitle?: string;
+            oldPrice?: number;
+            price?: number;
+            season?: string;
+            slug?: string;
+            title?: string;
+            variants?: components["schemas"]["VariantResponse"][];
+        };
+        ProductResponseImage: {
+            altText?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            position?: number;
+            url?: string;
+        };
+        PromoCodeRequest: {
+            code: string;
+            enabled?: boolean;
+            /** Format: date-time */
+            endsAt?: string;
+            /** Format: int32 */
+            maxRedemptions?: number;
+            minOrderAmount?: number;
+            /** Format: int32 */
+            perUserLimit?: number;
+            /** @enum {string} */
+            promoType: "PERCENT" | "FIXED" | "FREE_SHIPPING";
+            /** Format: date-time */
+            startsAt?: string;
+            value?: number;
+        };
+        PromoCodeResponse: {
+            code?: string;
+            enabled?: boolean;
+            /** Format: date-time */
+            endsAt?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: int32 */
+            maxRedemptions?: number;
+            minOrderAmount?: number;
+            /** Format: int32 */
+            perUserLimit?: number;
+            /** @enum {string} */
+            promoType?: "PERCENT" | "FIXED" | "FREE_SHIPPING";
+            /** Format: int32 */
+            redemptionCount?: number;
+            /** Format: date-time */
+            startsAt?: string;
+            value?: number;
+        };
+        RefreshRequest: {
+            refreshToken: string;
+        };
+        RegisterRequest: {
+            /** Format: email */
+            email: string;
+            password: string;
+            passwordConfirm: string;
+            passwordConfirmed?: boolean;
+        };
+        ResetPasswordRequest: {
+            newPassword: string;
+            token: string;
+        };
+        RetryRefund: {
+            failedOperationKey: string;
+        };
+        ReviewResponse: {
+            body?: string;
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: int64 */
+            id?: number;
+            /** Format: int64 */
+            productId?: number;
+            /** Format: int32 */
+            rating?: number;
+            /** @enum {string} */
+            source?: "UNKNOWN" | "CUSTOMER_SUBMITTED" | "SYNTHETIC_DEMO";
+            /** @enum {string} */
+            status?: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
+            /** Format: date-time */
+            updatedAt?: string;
+            /** Format: int64 */
+            userId?: number;
+            username?: string;
+        };
+        ReviewStatusRequest: {
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
+        };
+        ReviewSummaryResponse: {
+            /** Format: int32 */
+            basedOnReviews?: number;
+            cons?: string[];
+            /** Format: date-time */
+            generatedAt?: string;
+            /** Format: int64 */
+            productId?: number;
+            pros?: string[];
+            sentiment?: string;
+            tldr?: string;
+        };
+        SetShippingAddressRequest: {
+            city: string;
+            country: string;
+            fullName: string;
+            line1: string;
+            line2?: string;
+            /** Format: int64 */
+            orderId: number;
+            postalCode: string;
+            state: string;
+        };
+        SetShippingMethodRequest: {
+            /** @enum {string} */
+            method: "DHL" | "LOCAL_PICKUP" | "STANDARD_POST";
+            /** Format: int64 */
+            orderId: number;
+        };
+        ShipmentDto: {
+            address?: components["schemas"]["ShippingAddressDto"];
+            /** Format: date-time */
+            createdAt?: string;
+            currency?: string;
+            /** @enum {string} */
+            method?: "DHL" | "LOCAL_PICKUP" | "STANDARD_POST";
+            /** Format: int64 */
+            orderId?: number;
+            /** @enum {string} */
+            orderStatus?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+            shippingCost?: number;
+            /** @enum {string} */
+            shippingStatus?: "PENDING" | "PREPARING" | "SHIPPED" | "DELIVERED" | "READY_FOR_PICKUP" | "PICKED_UP" | "CANCELED";
+            trackingNumber?: string;
+            /** Format: date-time */
+            updatedAt?: string;
+        };
+        ShippingAddressDto: {
+            city?: string;
+            country?: string;
+            fullName?: string;
+            /** Format: int64 */
+            id?: number;
+            line1?: string;
+            line2?: string;
+            postalCode?: string;
+            state?: string;
+        };
         SortObject: {
             empty?: boolean;
             sorted?: boolean;
             unsorted?: boolean;
         };
-        WishlistEntryResponse: {
-            /** Format: int64 */
-            productId?: number;
-            title?: string;
-            slug?: string;
-            price?: number;
-            oldPrice?: number;
-            brandName?: string;
-            available?: boolean;
-            /** Format: date-time */
-            addedAt?: string;
+        StorefrontConfig: {
+            ai?: components["schemas"]["Feature"];
+            demoMode?: boolean;
+            email?: components["schemas"]["Feature"];
+            fictionalProducts?: boolean;
+            google?: components["schemas"]["Feature"];
+            payments?: components["schemas"]["Payments"];
+            supportedLocales?: string[];
         };
-        ExportedOrder: {
-            orderNumber?: string;
-            status?: string;
-            paymentAmount?: number;
-            /** Format: date-time */
-            createdAt?: string;
+        StylistChatRequest: {
+            /** @enum {string} */
+            gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
+            history?: components["schemas"]["HistoryMessage"][];
+            maxTotalPrice?: number;
+            message: string;
         };
-        ExportedReview: {
-            /** Format: int64 */
-            productId?: number;
+        StylistChatResponse: {
+            degraded?: boolean;
+            reply?: string;
+            slots?: components["schemas"]["StylistSlot"][];
+            unavailable?: string[];
+        };
+        StylistSlot: {
+            products?: components["schemas"]["ProductListItem"][];
+            slot?: string;
+        };
+        TokenPairResponse: {
+            accessToken?: string;
+            refreshToken?: string;
+        };
+        UpdateOrderStatusRequest: {
+            /** @enum {string} */
+            status: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+        };
+        UpdateProfileRequest: {
+            firstName?: string;
+            /** @enum {string} */
+            gender?: "MALE" | "FEMALE" | "OTHER";
+            lastName?: string;
+            phone?: string;
+            preferredSize?: string;
+        };
+        UpdateReviewRequest: {
+            body: string;
             /** Format: int32 */
             rating?: number;
-            body?: string;
-            status?: string;
-            /** Format: date-time */
-            createdAt?: string;
         };
         UserDataExport: {
-            profile?: components["schemas"]["UserProfile"];
             addresses?: components["schemas"]["AddressResponse"][];
-            orders?: components["schemas"]["ExportedOrder"][];
-            reviews?: components["schemas"]["ExportedReview"][];
             /** Format: date-time */
             exportedAt?: string;
+            orders?: components["schemas"]["ExportedOrder"][];
+            profile?: components["schemas"]["UserProfile"];
+            records?: {
+                [key: string]: {
+                    [key: string]: unknown;
+                }[];
+            };
+            reviews?: components["schemas"]["ExportedReview"][];
+            scope?: string[];
         };
-        PageOrderDto: {
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["OrderDto"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
-        };
-        PageProductListItem: {
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["ProductListItem"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
-        };
-        PageReviewResponse: {
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["ReviewResponse"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
-        };
-        ProductRatingSummaryResponse: {
-            /** Format: int64 */
-            productId?: number;
-            averageRating?: number;
-            /** Format: int64 */
-            reviewCount?: number;
-        };
-        ReviewSummaryResponse: {
-            /** Format: int64 */
-            productId?: number;
-            tldr?: string;
-            pros?: string[];
-            cons?: string[];
-            sentiment?: string;
-            /** Format: int32 */
-            basedOnReviews?: number;
-            /** Format: date-time */
-            generatedAt?: string;
-        };
-        BrandResponse: {
+        UserProfile: {
+            email?: string;
+            emailVerified?: boolean;
+            enabled?: boolean;
+            firstName?: string;
+            /** @enum {string} */
+            gender?: "MALE" | "FEMALE" | "OTHER";
             /** Format: int64 */
             id?: number;
-            name?: string;
-            slug?: string;
+            lastName?: string;
+            phone?: string;
+            preferredSize?: string;
+            roles?: string[];
         };
-        PageUserProfile: {
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["UserProfile"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
+        ValidatePromoRequest: {
+            code: string;
         };
-        PageAdminReviewResponse: {
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["AdminReviewResponse"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
-        };
-        PagePromoCodeResponse: {
-            /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["PromoCodeResponse"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
-        };
-        OrderStatusHistoryDto: {
+        ValidatePromoResponse: {
+            code?: string;
+            discount?: number;
             /** @enum {string} */
-            fromStatus?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
-            /** @enum {string} */
-            toStatus?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
-            changedBy?: string;
+            promoType?: "PERCENT" | "FIXED" | "FREE_SHIPPING";
+        };
+        VariantRequest: {
+            color?: string;
+            enabled?: boolean;
+            oldPrice?: number;
+            price?: number;
+            size: string;
+            sku: string;
+            /** Format: int32 */
+            stock?: number;
+        };
+        VariantResponse: {
+            /** Format: int32 */
+            available?: number;
+            color?: string;
+            enabled?: boolean;
+            /** Format: int64 */
+            id?: number;
+            oldPrice?: number;
+            price?: number;
+            size?: string;
+            sku?: string;
+        };
+        VerifyEmailRequest: {
+            token: string;
+        };
+        VerifyRequest: {
+            challengeToken: string;
+            code?: string;
+            recoveryCode?: string;
+        };
+        WishlistEntryResponse: {
             /** Format: date-time */
-            createdAt?: string;
-        };
-        PageProductResponse: {
+            addedAt?: string;
+            available?: boolean;
+            brandName?: string;
+            oldPrice?: number;
+            price?: number;
             /** Format: int64 */
-            totalElements?: number;
-            /** Format: int32 */
-            totalPages?: number;
-            /** Format: int32 */
-            size?: number;
-            content?: components["schemas"]["ProductResponse"][];
-            /** Format: int32 */
-            number?: number;
-            pageable?: components["schemas"]["PageableObject"];
-            sort?: components["schemas"]["SortObject"];
-            first?: boolean;
-            last?: boolean;
-            /** Format: int32 */
-            numberOfElements?: number;
-            empty?: boolean;
+            productId?: number;
+            slug?: string;
+            title?: string;
         };
     };
     responses: never;
@@ -1905,7 +2066,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getProfile: {
+    backfillEmbeddings: {
         parameters: {
             query?: never;
             header?: never;
@@ -1919,37 +2080,11 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["UserProfile"];
-                };
+                content?: never;
             };
         };
     };
-    updateProfile: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateProfileRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserProfile"];
-                };
-            };
-        };
-    };
-    getConsents: {
+    recomputeRecommendations: {
         parameters: {
             query?: never;
             header?: never;
@@ -1963,13 +2098,29 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ConsentResponse"][];
-                };
+                content?: never;
             };
         };
     };
-    updateConsent: {
+    refreshReviewSummaries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    createCategory: {
         parameters: {
             query?: never;
             header?: never;
@@ -1978,7 +2129,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["ConsentRequest"];
+                "application/json": components["schemas"]["CategoryRequest"];
             };
         };
         responses: {
@@ -1988,12 +2139,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ConsentResponse"];
+                    "*/*": components["schemas"]["CategoryResponse"];
                 };
             };
         };
     };
-    updateAddress: {
+    updateCategory: {
         parameters: {
             query?: never;
             header?: never;
@@ -2004,7 +2155,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["AddressRequest"];
+                "application/json": components["schemas"]["CategoryRequest"];
             };
         };
         responses: {
@@ -2014,12 +2165,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["AddressResponse"];
+                    "*/*": components["schemas"]["CategoryResponse"];
                 };
             };
         };
     };
-    deleteAddress: {
+    deleteCategory: {
         parameters: {
             query?: never;
             header?: never;
@@ -2039,89 +2190,13 @@ export interface operations {
             };
         };
     };
-    updateReview: {
+    getProducts: {
         parameters: {
-            query?: never;
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
-            path: {
-                reviewId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateReviewRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ReviewResponse"];
-                };
-            };
-        };
-    };
-    deleteReview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                reviewId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    setQuantity: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path: {
-                variantId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AddOrUpdateItemRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CartResponse"];
-                };
-            };
-        };
-    };
-    removeItem: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path: {
-                variantId: number;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -2132,23 +2207,21 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["CartResponse"];
+                    "*/*": components["schemas"]["PageProductResponse"];
                 };
             };
         };
     };
-    updateVariant: {
+    createProduct: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                variantId: number;
-            };
+            path?: never;
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["VariantRequest"];
+                "application/json": components["schemas"]["ProductRequest"];
             };
         };
         responses: {
@@ -2158,28 +2231,8 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["VariantResponse"];
+                    "*/*": components["schemas"]["ProductResponse"];
                 };
-            };
-        };
-    };
-    deleteVariant: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                variantId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
@@ -2251,318 +2304,24 @@ export interface operations {
             };
         };
     };
-    updateCategory: {
+    uploadProductImage: {
         parameters: {
-            query?: never;
+            query?: {
+                altText?: string;
+                sortOrder?: number;
+            };
             header?: never;
             path: {
                 id: number;
             };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CategoryRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CategoryResponse"];
-                };
-            };
-        };
-    };
-    deleteCategory: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    addToWishlist: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                productId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    removeFromWishlist: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                productId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    getAddresses: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AddressResponse"][];
-                };
-            };
-        };
-    };
-    addAddress: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AddressRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AddressResponse"];
-                };
-            };
-        };
-    };
-    setDefaultAddress: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AddressResponse"];
-                };
-            };
-        };
-    };
-    setMethod: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetShippingMethodRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ShipmentDto"];
-                };
-            };
-        };
-    };
-    setAddress: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetShippingAddressRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ShipmentDto"];
-                };
-            };
-        };
-    };
-    validate: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ValidatePromoRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ValidatePromoResponse"];
-                };
-            };
-        };
-    };
-    createReview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                productId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateReviewRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ReviewResponse"];
-                };
-            };
-        };
-    };
-    createPayment: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePaymentRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PaymentResponse"];
-                };
-            };
-        };
-    };
-    handleCallback: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Payment-Signature"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": string;
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    createOrder: {
-        parameters: {
-            query?: never;
-            header?: {
-                "Idempotency-Key"?: string;
-            };
-            path?: never;
             cookie?: never;
         };
         requestBody?: {
             content: {
-                "application/json": components["schemas"]["CheckoutRequest"];
+                "application/json": {
+                    /** Format: binary */
+                    file: string;
+                };
             };
         };
         responses: {
@@ -2572,401 +2331,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["OrderDto"];
-                };
-            };
-        };
-    };
-    chat: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["StylistChatRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["StylistChatResponse"];
-                };
-            };
-        };
-    };
-    addItem: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AddOrUpdateItemRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CartResponse"];
-                };
-            };
-        };
-    };
-    verifyEmail: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VerifyEmailRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    resetPassword: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ResetPasswordRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    resendVerification: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    register: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RegisterRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TokenPairResponse"];
-                };
-            };
-        };
-    };
-    refresh: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TokenPairResponse"];
-                };
-            };
-        };
-    };
-    logout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["RefreshRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    login: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LoginRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TokenPairResponse"];
-                };
-            };
-        };
-    };
-    google: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["GoogleLoginRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["TokenPairResponse"];
-                };
-            };
-        };
-    };
-    forgotPassword: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ForgotPasswordRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    changePassword: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChangePasswordRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    list: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PagePromoCodeResponse"];
-                };
-            };
-        };
-    };
-    create: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["PromoCodeRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PromoCodeResponse"];
-                };
-            };
-        };
-    };
-    refund: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PaymentResponse"];
-                };
-            };
-        };
-    };
-    getProducts: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageProductResponse"];
-                };
-            };
-        };
-    };
-    createProduct: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ProductRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductResponse"];
+                    "*/*": components["schemas"]["ProductImageResponse"];
                 };
             };
         };
@@ -3019,422 +2384,13 @@ export interface operations {
             };
         };
     };
-    uploadProductImage: {
-        parameters: {
-            query?: {
-                altText?: string;
-                sortOrder?: number;
-            };
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": {
-                    /** Format: binary */
-                    file: string;
-                };
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductImageResponse"];
-                };
-            };
-        };
-    };
-    createCategory: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CategoryRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CategoryResponse"];
-                };
-            };
-        };
-    };
-    refreshReviewSummaries: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    recomputeRecommendations: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    backfillEmbeddings: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    cancelOrder: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["OrderDto"];
-                };
-            };
-        };
-    };
-    updateStatus: {
-        parameters: {
-            query: {
-                status: "PENDING" | "PREPARING" | "SHIPPED" | "DELIVERED" | "READY_FOR_PICKUP" | "PICKED_UP" | "CANCELED";
-                trackingNumber?: string;
-            };
-            header?: never;
-            path: {
-                orderId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ShipmentDto"];
-                };
-            };
-        };
-    };
-    updateReviewStatus: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                reviewId: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ReviewStatusRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["AdminReviewResponse"];
-                };
-            };
-        };
-    };
-    setEnabled: {
-        parameters: {
-            query: {
-                enabled: boolean;
-            };
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PromoCodeResponse"];
-                };
-            };
-        };
-    };
-    updateOrderStatus: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateOrderStatusRequest"];
-            };
-        };
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["OrderDto"];
-                };
-            };
-        };
-    };
-    getWishlist: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageWishlistEntryResponse"];
-                };
-            };
-        };
-    };
-    exportData: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserDataExport"];
-                };
-            };
-        };
-    };
-    get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                orderId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ShipmentDto"];
-                };
-            };
-        };
-    };
-    getPayment: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PaymentResponse"];
-                };
-            };
-        };
-    };
-    getOrders: {
-        parameters: {
-            query: {
-                status?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageOrderDto"];
-                };
-            };
-        };
-    };
-    getOrderById: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["OrderDto"];
-                };
-            };
-        };
-    };
-    getAllProducts: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageProductListItem"];
-                };
-            };
-        };
-    };
-    getProductReviews: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path: {
-                productId: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageReviewResponse"];
-                };
-            };
-        };
-    };
-    getProductRating: {
+    deleteProductImage: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 productId: number;
+                imageId: number;
             };
             cookie?: never;
         };
@@ -3445,22 +2401,24 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ProductRatingSummaryResponse"];
-                };
+                content?: never;
             };
         };
     };
-    getProduct_1: {
+    updateVariant: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: number;
+                variantId: number;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VariantRequest"];
+            };
+        };
         responses: {
             /** @description OK */
             200: {
@@ -3468,41 +2426,17 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["ProductResponse"];
+                    "*/*": components["schemas"]["VariantResponse"];
                 };
             };
         };
     };
-    similar: {
-        parameters: {
-            query?: {
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductListItem"][];
-                };
-            };
-        };
-    };
-    reviewSummary: {
+    deleteVariant: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                id: number;
+                variantId: number;
             };
             cookie?: never;
         };
@@ -3513,306 +2447,7 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content: {
-                    "*/*": components["schemas"]["ReviewSummaryResponse"];
-                };
-            };
-        };
-    };
-    boughtTogether: {
-        parameters: {
-            query?: {
-                limit?: number;
-            };
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductListItem"][];
-                };
-            };
-        };
-    };
-    semanticSearch: {
-        parameters: {
-            query?: {
-                q?: string;
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["ProductListItem"][];
-                };
-            };
-        };
-    };
-    searchProducts: {
-        parameters: {
-            query: {
-                q?: string;
-                categoryId?: number;
-                brandId?: number;
-                gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
-                variantSize?: string;
-                color?: string;
-                minPrice?: number;
-                maxPrice?: number;
-                inStock?: boolean;
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageProductListItem"];
-                };
-            };
-        };
-    };
-    nlSearch: {
-        parameters: {
-            query: {
-                q?: string;
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageProductListItem"];
-                };
-            };
-        };
-    };
-    listCategories: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CategoryResponse"][];
-                };
-            };
-        };
-    };
-    getBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CategoryResponse"];
-                };
-            };
-        };
-    };
-    getProductsByCategory: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path: {
-                slug: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageProductListItem"];
-                };
-            };
-        };
-    };
-    listBrands: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["BrandResponse"][];
-                };
-            };
-        };
-    };
-    getCart: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CartResponse"];
-                };
-            };
-        };
-    };
-    clear: {
-        parameters: {
-            query?: never;
-            header?: {
-                "X-Cart-Token"?: string;
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["CartResponse"];
-                };
-            };
-        };
-    };
-    getCurrentUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["UserProfile"];
-                };
-            };
-        };
-    };
-    getUsers: {
-        parameters: {
-            query: {
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageUserProfile"];
-                };
-            };
-        };
-    };
-    getReviews: {
-        parameters: {
-            query: {
-                status?: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
-                productId?: number;
-                pageable: components["schemas"]["Pageable"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["PageAdminReviewResponse"];
-                };
+                content?: never;
             };
         };
     };
@@ -3883,9 +2518,85 @@ export interface operations {
             };
         };
     };
-    deleteAccount: {
+    updateOrderStatus: {
         parameters: {
             query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrderStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrderDto"];
+                };
+            };
+        };
+    };
+    refund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PaymentResponse"];
+                };
+            };
+        };
+    };
+    retryRefund: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetryRefund"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PaymentResponse"];
+                };
+            };
+        };
+    };
+    list: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -3897,7 +2608,81 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "*/*": components["schemas"]["PagePromoCodeResponse"];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PromoCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PromoCodeResponse"];
+                };
+            };
+        };
+    };
+    setEnabled: {
+        parameters: {
+            query: {
+                enabled: boolean;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PromoCodeResponse"];
+                };
+            };
+        };
+    };
+    getReviews: {
+        parameters: {
+            query: {
+                status?: "PENDING" | "APPROVED" | "REJECTED" | "DELETED";
+                productId?: number;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageAdminReviewResponse"];
+                };
             };
         };
     };
@@ -3921,13 +2706,1529 @@ export interface operations {
             };
         };
     };
-    deleteProductImage: {
+    updateReviewStatus: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reviewId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReviewStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AdminReviewResponse"];
+                };
+            };
+        };
+    };
+    updateStatus: {
+        parameters: {
+            query: {
+                status: "PENDING" | "PREPARING" | "SHIPPED" | "DELIVERED" | "READY_FOR_PICKUP" | "PICKED_UP" | "CANCELED";
+                trackingNumber?: string;
+            };
+            header?: never;
+            path: {
+                orderId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ShipmentDto"];
+                };
+            };
+        };
+    };
+    getUsers: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageUserProfile"];
+                };
+            };
+        };
+    };
+    changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    forgotPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    google: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoogleLoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LoginResponse"];
+                };
+            };
+        };
+    };
+    login: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LoginRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LoginResponse"];
+                };
+            };
+        };
+    };
+    logout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserProfile"];
+                };
+            };
+        };
+    };
+    confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConfirmRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LoginResponse"];
+                };
+            };
+        };
+    };
+    start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChallengeRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["Enrollment"];
+                };
+            };
+        };
+    };
+    verify: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["LoginResponse"];
+                };
+            };
+        };
+    };
+    refresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TokenPairResponse"];
+                };
+            };
+        };
+    };
+    register: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["TokenPairResponse"];
+                };
+            };
+        };
+    };
+    resendVerification: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    resetPassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    verifyEmail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyEmailRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getCart: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CartResponse"];
+                };
+            };
+        };
+    };
+    clear: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CartResponse"];
+                };
+            };
+        };
+    };
+    addItem: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddOrUpdateItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CartResponse"];
+                };
+            };
+        };
+    };
+    setQuantity: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path: {
+                variantId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddOrUpdateItemRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CartResponse"];
+                };
+            };
+        };
+    };
+    removeItem: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Cart-Token"?: string;
+            };
+            path: {
+                variantId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CartResponse"];
+                };
+            };
+        };
+    };
+    listBrands: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["BrandResponse"][];
+                };
+            };
+        };
+    };
+    listCategories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CategoryResponse"][];
+                };
+            };
+        };
+    };
+    getBySlug: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["CategoryResponse"];
+                };
+            };
+        };
+    };
+    getProductsByCategory: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageProductListItem"];
+                };
+            };
+        };
+    };
+    getAllProducts: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageProductListItem"];
+                };
+            };
+        };
+    };
+    nlSearch: {
+        parameters: {
+            query: {
+                q?: string;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageProductListItem"];
+                };
+            };
+        };
+    };
+    searchProducts: {
+        parameters: {
+            query: {
+                q?: string;
+                categoryId?: number;
+                brandId?: number;
+                gender?: "MEN" | "WOMEN" | "UNISEX" | "KIDS";
+                variantSize?: string;
+                color?: string;
+                minPrice?: number;
+                maxPrice?: number;
+                inStock?: boolean;
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageProductListItem"];
+                };
+            };
+        };
+    };
+    semanticSearch: {
+        parameters: {
+            query?: {
+                q?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductListItem"][];
+                };
+            };
+        };
+    };
+    getProduct_1: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductResponse"];
+                };
+            };
+        };
+    };
+    boughtTogether: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductListItem"][];
+                };
+            };
+        };
+    };
+    reviewSummary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReviewSummaryResponse"];
+                };
+            };
+        };
+    };
+    similar: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductListItem"][];
+                };
+            };
+        };
+    };
+    getProductRating: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 productId: number;
-                imageId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ProductRatingSummaryResponse"];
+                };
+            };
+        };
+    };
+    getProductReviews: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path: {
+                productId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageReviewResponse"];
+                };
+            };
+        };
+    };
+    chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StylistChatRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["StylistChatResponse"];
+                };
+            };
+        };
+    };
+    getOrders: {
+        parameters: {
+            query: {
+                status?: "CREATED" | "PENDING_PAYMENT" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "COMPLETED" | "CANCELLED" | "REFUNDED";
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageOrderDto"];
+                };
+            };
+        };
+    };
+    createOrder: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["CheckoutRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrderDto"];
+                };
+            };
+        };
+    };
+    getOrderById: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrderDto"];
+                };
+            };
+        };
+    };
+    cancelOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["OrderDto"];
+                };
+            };
+        };
+    };
+    createPayment: {
+        parameters: {
+            query?: never;
+            header?: {
+                "Idempotency-Key"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreatePaymentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PaymentResponse"];
+                };
+            };
+        };
+    };
+    handleCallback: {
+        parameters: {
+            query?: never;
+            header?: {
+                "X-Payment-Signature"?: string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string;
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getPayment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PaymentResponse"];
+                };
+            };
+        };
+    };
+    simulateSuccess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PaymentResponse"];
+                };
+            };
+        };
+    };
+    createReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReviewRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReviewResponse"];
+                };
+            };
+        };
+    };
+    validate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ValidatePromoRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ValidatePromoResponse"];
+                };
+            };
+        };
+    };
+    updateReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reviewId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReviewRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ReviewResponse"];
+                };
+            };
+        };
+    };
+    deleteReview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reviewId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    setAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetShippingAddressRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ShipmentDto"];
+                };
+            };
+        };
+    };
+    setMethod: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetShippingMethodRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ShipmentDto"];
+                };
+            };
+        };
+    };
+    get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                orderId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ShipmentDto"];
+                };
+            };
+        };
+    };
+    configuration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["StorefrontConfig"];
+                };
+            };
+        };
+    };
+    deleteAccount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    getAddresses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AddressResponse"][];
+                };
+            };
+        };
+    };
+    addAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AddressResponse"];
+                };
+            };
+        };
+    };
+    updateAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddressRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AddressResponse"];
+                };
+            };
+        };
+    };
+    deleteAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    setDefaultAddress: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["AddressResponse"];
+                };
+            };
+        };
+    };
+    getConsents: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsentResponse"][];
+                };
+            };
+        };
+    };
+    updateConsent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ConsentResponse"];
+                };
+            };
+        };
+    };
+    exportData: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserDataExport"];
+                };
+            };
+        };
+    };
+    getProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserProfile"];
+                };
+            };
+        };
+    };
+    updateProfile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProfileRequest"];
+            };
+        };
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserProfile"];
+                };
+            };
+        };
+    };
+    getWishlist: {
+        parameters: {
+            query: {
+                pageable: components["schemas"]["Pageable"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["PageWishlistEntryResponse"];
+                };
+            };
+        };
+    };
+    addToWishlist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    removeFromWishlist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                productId: number;
             };
             cookie?: never;
         };

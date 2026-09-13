@@ -41,7 +41,8 @@ async function addFirstAvailableProduct(page: Page) {
 
 test("guest browses, registers, checks out and pays via the stub provider", async ({ page, request }) => {
   const email = `e2e-${Date.now()}@example.com`;
-  const password = "E2ePassw0rd!";
+  // New credentials need at least 15 code points (PasswordPolicy); this fixture is synthetic.
+  const password = "E2e demo passphrase 2026!";
 
   const title = await addFirstAvailableProduct(page);
 
@@ -73,12 +74,12 @@ test("guest browses, registers, checks out and pays via the stub provider", asyn
   await page.getByRole("button", { name: "Save shipping" }).click();
   await page.getByRole("link", { name: "Continue to payment" }).click();
 
-  // payment step: create the stub payment
+  // payment step: create the stub payment (labelled as a local simulation in the UI)
   await page.waitForURL(/\/checkout\/payment\?orderId=\d+/);
   const paymentCreated = page.waitForResponse(
     (response) => response.url().includes("/api/v1/payments") && response.request().method() === "POST"
   );
-  await page.getByRole("button", { name: "Pay now" }).click();
+  await page.getByRole("button", { name: "Try local payment simulation", exact: true }).click();
   const payment = (await (await paymentCreated).json()) as {
     id: number;
     status: string;

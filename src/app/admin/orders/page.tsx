@@ -1,12 +1,12 @@
 "use client";
 
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { AdminShell } from "@/features/admin/AdminShell";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { formatPrice } from "@/features/catalog/ProductCard";
 import { adminApi } from "@/lib/api/shop";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
 
 const STATUSES = [
   "CREATED",
@@ -21,9 +21,10 @@ const STATUSES = [
 ];
 
 export default function Page() {
+  const { t, errorMessage, formatPrice, formatDate, statusLabel } = useI18n();
   const [page, setPage] = useState(0);
   const [status, setStatus] = useState("");
-  const orders = useQuery({
+  const orders = useSessionQuery({
     queryKey: ["admin-orders", page, status],
     queryFn: () => adminApi.orders(page, 20, status || undefined)
   });
@@ -31,10 +32,10 @@ export default function Page() {
   const data = orders.data;
 
   return (
-    <AdminShell title="Orders">
+    <AdminShell title={t("admin.nav.orders")}>
       <div className="card toolbar">
         <label className="label">
-          Status
+          {t("admin.status")}
           <select
             className="select"
             value={status}
@@ -43,24 +44,24 @@ export default function Page() {
               setPage(0);
             }}
           >
-            <option value="">All</option>
+            <option value="">{t("admin.all")}</option>
             {STATUSES.map((value) => (
               <option key={value} value={value}>
-                {value}
+                {statusLabel(value)}
               </option>
             ))}
           </select>
         </label>
       </div>
-      {orders.error ? <p className="errorText">{(orders.error as Error).message}</p> : null}
+      {orders.error ? <p className="errorText">{errorMessage(orders.error)}</p> : null}
       <table className="table">
         <thead>
           <tr>
-            <th>Order</th>
-            <th>Status</th>
-            <th>Total</th>
-            <th>Discount</th>
-            <th>Created</th>
+            <th>{t("admin.order")}</th>
+            <th>{t("admin.status")}</th>
+            <th>{t("admin.total")}</th>
+            <th>{t("admin.discount")}</th>
+            <th>{t("admin.created")}</th>
             <th />
           </tr>
         </thead>
@@ -73,10 +74,10 @@ export default function Page() {
               </td>
               <td className="price">{formatPrice(order.paymentAmount)}</td>
               <td className="mono muted">{order.discountAmount > 0 ? `-${formatPrice(order.discountAmount)}` : "-"}</td>
-              <td>{order.createdAt ? new Date(order.createdAt).toLocaleString() : "-"}</td>
+              <td>{order.createdAt ? formatDate(order.createdAt) : "-"}</td>
               <td>
                 <Link className="button buttonSmall" href={`/admin/orders/${order.id}`}>
-                  Open
+                  {t("admin.open")}
                 </Link>
               </td>
             </tr>
@@ -86,13 +87,13 @@ export default function Page() {
       {data && data.totalPages > 1 ? (
         <div className="toolbar" style={{ justifyContent: "center" }}>
           <button className="button" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
-            Previous
+            {t("common.previous")}
           </button>
           <span className="mono muted" style={{ fontSize: "0.88rem" }}>
-            {page + 1} / {data.totalPages}
+            {t("common.page", { page: page + 1, pages: data.totalPages })}
           </span>
           <button className="button" disabled={page >= data.totalPages - 1} onClick={() => setPage((p) => p + 1)}>
-            Next
+            {t("common.next")}
           </button>
         </div>
       ) : null}

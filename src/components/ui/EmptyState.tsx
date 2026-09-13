@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 
 export function EmptyState({ title, body, children }: { title: string; body?: string; children?: ReactNode }) {
   return (
-    <div className="brutal stack" style={{ padding: "40px 32px", justifyItems: "start", gap: 10 }}>
+    <div className="brutal stack" style={{ padding: "40px 32px", justifyItems: "start", gap: 12 }}>
       <h2 className="title" style={{ margin: 0 }}>
         {title}
       </h2>

@@ -1,5 +1,7 @@
-import { clearSession, getAccessToken, getCartToken, getRefreshToken, setTokens } from "@/lib/auth/session";
+import { captureSession, clearSessionInsideLock, getAccessToken, getCartToken, getRefreshToken, isCurrentSession, setTokens, withSessionLock, type SessionSnapshot } from "@/lib/auth/session";
 import type { ApiProblem, TokenPairResponse } from "@/lib/api/types";
+
+import { browserLocale } from "@/lib/i18n/core";
 
 export const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
 
@@ -30,14 +32,24 @@ export function newIdempotencyKey() {
 }
 
 export async function apiFetch<T>(path: string, options: ApiFetchOptions = {}): Promise<T> {
+  const session = captureSession();
+  const assertSession = () => {
+    if (options.auth !== false && !isCurrentSession(session)) {
+      throw new ApiError(401, "Your session changed. Please try again.", { code: "SESSION_CHANGED" });
+    }
+  };
   const response = await rawApiFetch(path, options);
+  assertSession();
   if (response.status === 401 && options.auth !== false && options.retryOnUnauthorized !== false) {
-    const refreshed = await refreshAccessToken();
+    const refreshed = await refreshAccessToken(session);
+    assertSession();
     if (refreshed) {
       return apiFetch<T>(path, { ...options, retryOnUnauthorized: false });
     }
   }
-  return readResponse<T>(response);
+  const result = await readResponse<T>(response);
+  assertSession();
+  return result;
 }
 
 export async function apiJson<T>(path: string, body: unknown, options: ApiFetchOptions = {}) {
@@ -62,6 +74,7 @@ export async function apiForm<T>(path: string, formData: FormData, options: ApiF
 
 async function rawApiFetch(path: string, options: ApiFetchOptions) {
   const headers = new Headers(options.headers);
+  headers.set("Accept-Language", browserLocale());
   if (options.auth !== false) {
     const token = getAccessToken();
     if (token) {
@@ -87,8 +100,8 @@ async function rawApiFetch(path: string, options: ApiFetchOptions) {
   } catch (error) {
     throw new ApiError(
       0,
-      `Cannot reach shopupu API at ${apiBaseUrl}. Check that the backend is running and CORS allows this origin.`,
-      error instanceof Error ? { message: error.message } : undefined
+      "We could not connect. Please try again in a moment.",
+      { code: "NETWORK_ERROR" }
     );
   }
 }
@@ -113,45 +126,66 @@ function problemMessage(response: Response, problem: ApiProblem | null) {
   return problem?.detail ?? problem?.message ?? response.statusText;
 }
 
-let refreshPromise: Promise<boolean> | null = null;
+let refreshFlight: { session: SessionSnapshot; promise: Promise<boolean> } | null = null;
 
-async function refreshAccessToken() {
+async function refreshAccessToken(session: SessionSnapshot) {
   // single-flight: parallel 401s share one refresh call (rotation-safe)
-  if (!refreshPromise) {
-    refreshPromise = doRefresh().finally(() => {
-      refreshPromise = null;
-    });
-  }
-  return refreshPromise;
+  if (refreshFlight?.session.version === session.version && refreshFlight.session.marker === session.marker) return refreshFlight.promise;
+  // The same lock protects login/logout publication and token rotation in every tab.
+  const promise = withSessionLock(() => doRefresh(session)).finally(() => {
+    if (refreshFlight?.promise === promise) refreshFlight = null;
+  });
+  refreshFlight = { session, promise };
+  return promise;
 }
 
-async function doRefresh() {
-  const refreshToken = getRefreshToken();
+async function doRefresh(session: SessionSnapshot) {
+  if (!isCurrentSession(session)) return false;
+  const refreshToken = getRefreshToken({ underLock: true });
   if (!refreshToken) {
-    clearSession();
+    clearSessionInsideLock(session);
     return false;
   }
 
+  let response: Response;
   try {
-    const response = await fetch(`${apiBaseUrl}/api/v1/auth/refresh`, {
+    response = await fetch(`${apiBaseUrl}/api/v1/auth/refresh`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify({ refreshToken })
+      body: JSON.stringify({ refreshToken }),
+      signal: AbortSignal.timeout(15_000)
     });
-    if (!response.ok) {
-      clearSession();
-      return false;
-    }
-    const tokens = (await response.json()) as TokenPairResponse;
-    setTokens(tokens);
-    return true;
   } catch {
-    clearSession();
+    // Transport failure (offline, timeout, navigation abort): the outcome is unknown, so the stored
+    // session stays for the next attempt. Wiping it here would sign every tab out on a network blip.
+    throw new ApiError(0, "We could not connect. Please try again in a moment.", { code: "NETWORK_ERROR" });
+  }
+  if (!isCurrentSession(session)) return false;
+  if (DEFINITIVE_REFRESH_REJECTIONS.has(response.status)) {
+    clearSessionInsideLock(session);
     return false;
   }
+  if (!response.ok) {
+    // 5xx/429 say nothing about the token itself; surface the failure without ending the session.
+    const text = await response.text();
+    const problem = (text ? safeJson(text) : null) as ApiProblem | null;
+    throw new ApiError(response.status, problemMessage(response, problem), problem ?? undefined);
+  }
+  let tokens: TokenPairResponse;
+  try {
+    tokens = (await response.json()) as TokenPairResponse;
+  } catch {
+    throw new ApiError(0, "We could not connect. Please try again in a moment.", { code: "NETWORK_ERROR" });
+  }
+  if (!isCurrentSession(session)) return false;
+  setTokens(tokens);
+  return true;
 }
+
+/** Only the server's verdict on the token ends the stored session; everything else is retried later. */
+const DEFINITIVE_REFRESH_REJECTIONS = new Set([400, 401, 403]);
 
 function safeJson(text: string) {
   try {

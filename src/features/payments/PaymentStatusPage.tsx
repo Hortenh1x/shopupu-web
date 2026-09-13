@@ -1,14 +1,18 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Protected } from "@/components/layout/Protected";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { formatPrice } from "@/features/catalog/ProductCard";
-import { paymentApi } from "@/lib/api/shop";
+import { paymentApi, storefrontApi } from "@/lib/api/shop";
+import { useAuth } from "@/lib/auth/AuthProvider";
 import type { PaymentStatus } from "@/lib/api/types";
-import { isSafeHttpUrl } from "@/lib/url";
+import { isStripeCheckoutUrl } from "@/lib/url";
 
 const failedStatuses: PaymentStatus[] = ["FAILED", "CANCELED", "EXPIRED"];
 
@@ -20,13 +24,26 @@ function statusClass(status: PaymentStatus) {
 }
 
 export function PaymentStatusPage({ paymentId }: { paymentId: number }) {
-  const payment = useQuery({
+  const { t, errorMessage, formatPrice, statusLabel } = useI18n();
+  const auth = useAuth();
+  const queryClient = useQueryClient();
+  const config = useQuery({ queryKey: ["storefront-config"], queryFn: storefrontApi.config });
+  const payment = useSessionQuery({
     queryKey: ["payment", paymentId],
     queryFn: () => paymentApi.get(paymentId),
+    enabled: auth.isReady && auth.isAuthenticated,
     refetchInterval: (query) => {
       const status = query.state.data?.status;
       // poll while the payment can still change
       return !status || status === "CREATED" || status === "PENDING" ? 3000 : false;
+    }
+  });
+  const simulation = useSessionMutation({
+    mutationFn: () => paymentApi.simulateSuccess(paymentId),
+    onSuccess: (result) => {
+      queryClient.setQueryData(["payment", paymentId], result);
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["order", result.orderId] });
     }
   });
 
@@ -36,72 +53,80 @@ export function PaymentStatusPage({ paymentId }: { paymentId: number }) {
         {payment.isLoading ? (
           <Skeleton lines={4} />
         ) : !payment.data ? (
-          <EmptyState title="Payment not found" body={(payment.error as Error | null)?.message}>
+          <EmptyState title={t("commerce.paymentNotFound")} body={payment.error ? errorMessage(payment.error) : undefined}>
             <Link className="button" href="/orders">
-              Orders
+              {t("commerce.orders")}
             </Link>
           </EmptyState>
         ) : (
-          <section className="brutal stack" style={{ padding: "40px 32px", justifyItems: "start", gap: 14 }}>
+          <section className="brutal stack" style={{ padding: "40px 32px", justifyItems: "start", gap: 16 }}>
             {payment.data.status === "SUCCEEDED" ? (
               <>
                 <h1 className="title">
-                  Payment <span className="mark">succeeded</span>.
+                  {t("commerce.payment")} <span className="mark">{t("commerce.succeededWord")}</span>.
                 </h1>
                 <p className="subhead" style={{ margin: 0 }}>
-                  The order is paid and moves on to processing.
+                  {t("commerce.testPaymentSuccess")}
                 </p>
               </>
             ) : failedStatuses.includes(payment.data.status) ? (
               <>
-                <h1 className="title">Payment {payment.data.status.toLowerCase()}.</h1>
+                <h1 className="title">{t("commerce.paymentStatusTitle", { status: statusLabel(payment.data.status) })}</h1>
                 <p className="subhead" style={{ margin: 0 }}>
-                  The payment did not go through. You can retry from the order.
+                  {t("commerce.paymentFailedBody")}
                 </p>
               </>
             ) : payment.data.status === "REFUNDED" ? (
               <>
-                <h1 className="title">Payment refunded.</h1>
+                <h1 className="title">{t("commerce.paymentRefunded")}</h1>
                 <p className="subhead" style={{ margin: 0 }}>
-                  The amount was returned to the original payment method.
+                  {t("commerce.refundComplete")}
                 </p>
               </>
             ) : (
               <>
-                <h1 className="title">Waiting for confirmation.</h1>
+                <h1 className="title">{t("commerce.waitConfirmation")}</h1>
                 <p className="subhead" style={{ margin: 0 }}>
-                  The payment status refreshes every 3 seconds.
+                  {t("commerce.pollPayment")}
                 </p>
               </>
             )}
-            <span className={statusClass(payment.data.status)}>{payment.data.status.toLowerCase()}</span>
+            <span className={statusClass(payment.data.status)}>{statusLabel(payment.data.status)}</span>
+            <p className="muted">{payment.data.provider === "stub" ? t("commerce.localProvider") : payment.data.provider === "stripe" ? t("commerce.stripeProvider") : t("commerce.paymentRecord")}</p>
+            {payment.data.provider === "stub" && config.data?.payments.mode === "LOCAL_SIMULATION"
+              && ["CREATED", "PENDING"].includes(payment.data.status) ? (
+                <button className="button buttonDark" disabled={simulation.isPending} onClick={() => simulation.mutate()}>
+                  {simulation.isPending ? t("commerce.simulating") : t("commerce.simulateSuccess")}
+                </button>
+              ) : null}
+            {simulation.error ? <p className="errorText">{errorMessage(simulation.error)}</p> : null}
             <p className="mono" style={{ margin: 0 }}>
-              {formatPrice(payment.data.amount)} {payment.data.currency}
+              {formatPrice(payment.data.amount, payment.data.currency)}
             </p>
             {payment.data.externalPaymentId ? (
               <p className="mono muted" style={{ margin: 0, fontSize: "0.82rem" }}>
-                External payment id: {payment.data.externalPaymentId}
+                {t("commerce.externalPayment", { id: payment.data.externalPaymentId })}
               </p>
             ) : null}
             <div className="toolbar">
               {payment.data.status === "SUCCEEDED" ? (
                 <Link className="button buttonDark" href={`/orders/${payment.data.orderId}`}>
-                  Open order
+                  {t("commerce.openOrder")}
                 </Link>
               ) : null}
               {failedStatuses.includes(payment.data.status) ? (
                 <Link className="button buttonDark" href={`/checkout/payment?orderId=${payment.data.orderId}`}>
-                  Retry payment
+                  {t("commerce.retryPayment")}
                 </Link>
               ) : null}
               {(payment.data.status === "CREATED" || payment.data.status === "PENDING") &&
-              isSafeHttpUrl(payment.data.paymentUrl) ? (
+              isStripeCheckoutUrl(payment.data.paymentUrl) ? (
                 <a className="button buttonDark" href={payment.data.paymentUrl} rel="noopener noreferrer">
-                  Open bank app
+                  {t("commerce.stripeCheckout")}
                 </a>
               ) : null}
               <Link className="button" href={`/orders/${payment.data.orderId}`}>
-                Order
+                {t("commerce.order")}
               </Link>
             </div>
           </section>

@@ -40,11 +40,12 @@ Rules: no pure #000/#fff anywhere; neutrals are warm-tinted. Tangerine is Commit
 ## Signature elements
 
 - **Highlight mark**: one word in a display headline wrapped in `.mark` — accent-yellow box (`#F2C545`), slight padding, no rotation. Max one per headline.
-- **Tangerine panel**: large-radius (24-28px) drenched `#E0521A` section with cream text and dark pill CTAs (home hero).
 - **Ink panel**: dark `#1A0E08` rounded panel with cream text (order summary, footer band).
-- **Marquee strip**: thin ink bar with mono cream/gold items (free shipping, new drops) on the home page; `prefers-reduced-motion` pauses it.
-- **Pill buttons**: fully rounded. Primary = ink bg / cream text; secondary = 1px warm border on surface; accent = gold bg / ink text; danger = outline red. Active state scales to 0.97.
-- **Chips**: pill toggles for sizes/colors/filters; selected chip = ink bg cream text.
+- **Pill buttons**: fully rounded. Primary = ink bg / cream text; secondary = 1px warm border on surface; accent = gold bg / ink text; danger = outline red. Active state scales to 0.97 on pointer-down.
+- **Chips**: pill toggles for sizes/colors/filters; selected chip = ink bg cream text. Colour chips carry a 12px swatch dot when the name is a known colour.
+- **Floating material** (stylist launcher): translucent cream (`--surface` 84%) + `backdrop-filter`, a bright inset top edge and a two-layer shadow so it separates from cream, ink and photos alike. Never the plain ink button — it vanishes over ink panels.
+
+(The home hero "tangerine panel" and the marquee strip were removed in the portfolio reframe; their CSS is gone too. `.headline` stays as the top step of the type scale.)
 
 ## Components
 
@@ -59,11 +60,29 @@ Rules: no pure #000/#fff anywhere; neutrals are warm-tinted. Tangerine is Commit
 
 - Transitions only on `transform`, `opacity`, `background-color`, `border-color`, `box-shadow`; never `all`.
 - Durations 120-250ms, `cubic-bezier(0.23, 1, 0.32, 1)` (strong ease-out).
-- Product-card hover: translateY(-3px) + shadow, gated behind `(hover: hover)`.
+- Feedback on pointer-down, never only on release: buttons/chips/nav links/product cards all have an `:active` scale.
+- Product-card hover: translateY(-3px) + shadow, gated behind `(hover: hover) and (pointer: fine)`.
 - Entrances via `@starting-style` fade/rise where cheap; no page-load choreography on task screens.
+- **Surfaces originate from their trigger and leave the same way.** The stylist panel scales/rises out of the launcher (`transform-origin: 100% 100%`) and exits along the same path via `transition-behavior: allow-discrete` on `display`; on phones it is a bottom sheet that rises from the bottom edge.
+- **Gesture-driven motion uses springs, not durations.** The sheet's drag-to-dismiss (`src/lib/motion/spring.ts`, `useSheetDismiss`) tracks the finger 1:1 from the grab point, rubber-bands above its rest position, projects the release velocity (`decelerationRate 0.998`) to choose snap-back vs dismiss, and hands that velocity to a spring (`response 0.35s`, damping 0.85 on return, 1.0 on dismiss). A grab mid-spring takes over from the on-screen value.
+- **Data does not jump.** Cart quantity and removal update the cache optimistically (taps 1:1, the write is debounced 350ms); catalog filters apply on change with `keepPreviousData`, the old grid dims instead of collapsing into skeletons.
+- Sticky header: no permanent divider — a scroll-edge shadow appears only once content passes underneath (`data-scrolled` from an IntersectionObserver sentinel).
+- `prefers-reduced-motion`: springs and slides become cross-fades; feedback (colour, opacity, the 0.97 press) stays. `prefers-reduced-transparency` makes the header/launcher solid `--surface`; `prefers-contrast: more` swaps hairlines for ink borders.
+
+## Forgiveness
+
+- Reversible slips get **undo**, not a dialog: removing a cart line or wishlist entry shows an inline "Removed “X” · Undo" notice for 6s.
+- Irreversible actions (cancel order, delete product/category/review/address/image) use the **two-step inline confirm** (`ConfirmButton`): the first click arms the control in place next to a "Keep" escape; Escape/blur/6s disarms. No modals.
+
+## Touch
+
+- Minimum target 44px on `(pointer: coarse)` (`--tap`): buttons, chips, nav links, quantity steppers, the launcher.
+- Mobile header: the utility row (language, sign in/register) scrolls away; only brand + nav stay pinned (~58px of chrome, not two rows).
+- The stylist input is not auto-focused on touch (no keyboard over the quick prompts); the sheet tracks `visualViewport` so it stays above the keyboard.
 
 ## Layout
 
+- Spacing is a 4px scale (`--space-1` 4 … `--space-8` 32); inline gaps use those steps (4/8/12/16/20/24), nothing in between.
 - Page container: min(1200px, 100vw - 48px), generous vertical rhythm (sections 56-96px apart on brand moments, 24-40px on task screens).
 - Asymmetry on brand moments: left-aligned display headline with offset right-column support text (reference's "Four strategies / One discipline" pattern).
 - Product grid: `repeat(auto-fill, minmax(240px, 1fr))`.

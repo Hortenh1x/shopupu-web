@@ -1,20 +1,24 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { AdminRefundPanel } from "@/features/admin/AdminRefundPanel";
 import { AdminShell } from "@/features/admin/AdminShell";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 import { adminApi, shippingApi } from "@/lib/api/shop";
 import type { OrderStatus } from "@/lib/api/types";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
 
 const NEXT_STATUSES: Record<string, OrderStatus[]> = {
-  CREATED: ["PENDING_PAYMENT", "PAID", "CANCELLED"],
-  PENDING_PAYMENT: ["PAID", "CREATED", "CANCELLED"],
-  PAID: ["PROCESSING", "SHIPPED", "REFUNDED"],
-  PROCESSING: ["SHIPPED", "REFUNDED"],
+  CREATED: ["CANCELLED"],
+  PENDING_PAYMENT: ["CANCELLED"],
+  PAID: ["PROCESSING", "SHIPPED"],
+  PROCESSING: ["SHIPPED"],
   SHIPPED: ["DELIVERED", "COMPLETED"],
-  DELIVERED: ["COMPLETED", "REFUNDED"],
-  COMPLETED: ["REFUNDED"],
+  DELIVERED: ["COMPLETED"],
+  COMPLETED: [],
   CANCELLED: [],
   REFUNDED: []
 };
@@ -22,10 +26,11 @@ const NEXT_STATUSES: Record<string, OrderStatus[]> = {
 const SHIPPING_STATUSES = ["PENDING", "PREPARING", "SHIPPED", "DELIVERED", "READY_FOR_PICKUP", "PICKED_UP", "CANCELED"];
 
 export function AdminOrderDetails({ orderId }: { orderId: number }) {
+  const { t, errorMessage, formatPrice, formatDate, statusLabel, shippingLabel } = useI18n();
   const queryClient = useQueryClient();
-  const order = useQuery({ queryKey: ["admin-order", orderId], queryFn: () => adminApi.order(orderId) });
-  const history = useQuery({ queryKey: ["admin-order-history", orderId], queryFn: () => adminApi.orderHistory(orderId) });
-  const shipment = useQuery({
+  const order = useSessionQuery({ queryKey: ["admin-order", orderId], queryFn: () => adminApi.order(orderId) });
+  const history = useSessionQuery({ queryKey: ["admin-order-history", orderId], queryFn: () => adminApi.orderHistory(orderId) });
+  const shipment = useSessionQuery({
     queryKey: ["admin-shipment", orderId],
     queryFn: () => shippingApi.get(orderId),
     retry: false
@@ -33,7 +38,6 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
 
   const [shippingStatus, setShippingStatus] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
-  const [refundPaymentId, setRefundPaymentId] = useState("");
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["admin-order", orderId] });
@@ -41,16 +45,12 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
     queryClient.invalidateQueries({ queryKey: ["admin-shipment", orderId] });
   };
 
-  const updateStatus = useMutation({
+  const updateStatus = useSessionMutation({
     mutationFn: (status: string) => adminApi.updateOrderStatus(orderId, status),
     onSuccess: invalidate
   });
-  const updateShipping = useMutation({
+  const updateShipping = useSessionMutation({
     mutationFn: () => adminApi.updateShippingStatus(orderId, shippingStatus, trackingNumber || undefined),
-    onSuccess: invalidate
-  });
-  const refund = useMutation({
-    mutationFn: () => adminApi.refundPayment(Number(refundPaymentId)),
     onSuccess: invalidate
   });
 
@@ -58,23 +58,23 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
   const nextStatuses = data ? (NEXT_STATUSES[data.status] ?? []) : [];
 
   return (
-    <AdminShell title={data ? `Order ${data.orderNumber}` : `Order #${orderId}`}>
-      {order.error ? <p className="errorText">{(order.error as Error).message}</p> : null}
+    <AdminShell title={data ? t("admin.orderTitle", { number: data.orderNumber }) : t("admin.orderIdTitle", { id: orderId })}>
+      {order.error ? <p className="errorText">{errorMessage(order.error)}</p> : null}
       {data ? (
         <div className="stack">
           <div className="card stack">
             <div className="toolbar">
               <StatusBadge value={data.status} />
-              <span className="muted">{data.createdAt ? new Date(data.createdAt).toLocaleString() : ""}</span>
+              <span className="muted">{data.createdAt ? formatDate(data.createdAt) : ""}</span>
             </div>
             <p>
-              Subtotal {Number(data.subtotalAmount).toFixed(2)} / shipping {Number(data.shippingAmount).toFixed(2)} /
-              discount {Number(data.discountAmount).toFixed(2)}
-              {data.promoCode ? ` (${data.promoCode})` : ""} / <strong>total {Number(data.paymentAmount).toFixed(2)} EUR</strong>
+              {t("admin.subtotal")} {formatPrice(data.subtotalAmount)} / {t("admin.shippingCost")} {formatPrice(data.shippingAmount)} /{" "}
+              {t("admin.discountLabel")} {formatPrice(data.discountAmount)}
+              {data.promoCode ? ` (${data.promoCode})` : ""} / <strong>{t("admin.totalLabel")} {formatPrice(data.paymentAmount)}</strong>
             </p>
             {nextStatuses.length ? (
               <div className="toolbar" style={{ flexWrap: "wrap" }}>
-                <span className="muted">Move to:</span>
+                <span className="muted">{t("admin.moveTo")}</span>
                 {nextStatuses.map((status) => (
                   <button
                     key={status}
@@ -82,30 +82,30 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
                     disabled={updateStatus.isPending}
                     onClick={() => updateStatus.mutate(status)}
                   >
-                    {status}
+                    {statusLabel(status)}
                   </button>
                 ))}
               </div>
             ) : (
-              <p className="muted">Terminal status - no transitions available.</p>
+              <p className="muted">{t("admin.noTransitions")}</p>
             )}
-            {updateStatus.error ? <p className="errorText">{(updateStatus.error as Error).message}</p> : null}
+            {updateStatus.error ? <p className="errorText">{errorMessage(updateStatus.error)}</p> : null}
           </div>
 
           <div className="card stack">
             <h2 className="subtitle" style={{ margin: 0 }}>
-              Items
+              {t("admin.items")}
             </h2>
             <table className="table">
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>SKU</th>
-                  <th>Size</th>
-                  <th>Color</th>
-                  <th>Brand</th>
-                  <th>Qty</th>
-                  <th>Total</th>
+                  <th>{t("admin.field.title")}</th>
+                  <th>{t("admin.sku")}</th>
+                  <th>{t("admin.size")}</th>
+                  <th>{t("admin.color")}</th>
+                  <th>{t("admin.brand")}</th>
+                  <th>{t("admin.qty")}</th>
+                  <th>{t("admin.total")}</th>
                 </tr>
               </thead>
               <tbody>
@@ -117,9 +117,9 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
                     <td>{item.color ?? "-"}</td>
                     <td>{item.brand ?? "-"}</td>
                     <td>
-                      {item.quantity} x {Number(item.price).toFixed(2)}
+                      {item.quantity} x {formatPrice(item.price)}
                     </td>
-                    <td>{Number(item.lineTotal).toFixed(2)}</td>
+                    <td>{formatPrice(item.lineTotal)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -129,30 +129,30 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
           <div className="split">
             <div className="card stack">
               <h2 className="subtitle" style={{ margin: 0 }}>
-                Shipping
+                {t("admin.shipping")}
               </h2>
               {shipment.data?.method ? (
                 <p>
-                  {shipment.data.method} / {shipment.data.shippingStatus}
+                  {shippingLabel(shipment.data.method)} / {statusLabel(shipment.data.shippingStatus ?? "PENDING")}
                   {shipment.data.trackingNumber ? ` / ${shipment.data.trackingNumber}` : ""}
                 </p>
               ) : (
-                <p className="muted">Shipment not configured by the customer yet.</p>
+                <p className="muted">{t("admin.shipmentNotConfigured")}</p>
               )}
               <div className="toolbar" style={{ flexWrap: "wrap", alignItems: "flex-end" }}>
                 <label className="label">
-                  Status
+                  {t("admin.status")}
                   <select className="select" value={shippingStatus} onChange={(e) => setShippingStatus(e.target.value)}>
-                    <option value="">Select</option>
+                    <option value="">{t("admin.select")}</option>
                     {SHIPPING_STATUSES.map((status) => (
                       <option key={status} value={status}>
-                        {status}
+                        {statusLabel(status)}
                       </option>
                     ))}
                   </select>
                 </label>
                 <label className="label">
-                  Tracking number
+                  {t("admin.trackingNumber")}
                   <input className="input" value={trackingNumber} onChange={(e) => setTrackingNumber(e.target.value)} />
                 </label>
                 <button
@@ -160,53 +160,24 @@ export function AdminOrderDetails({ orderId }: { orderId: number }) {
                   disabled={!shippingStatus || updateShipping.isPending}
                   onClick={() => updateShipping.mutate()}
                 >
-                  Update shipping
+                  {t("admin.updateShipping")}
                 </button>
               </div>
-              {updateShipping.error ? <p className="errorText">{(updateShipping.error as Error).message}</p> : null}
+              {updateShipping.error ? <p className="errorText">{errorMessage(updateShipping.error)}</p> : null}
             </div>
 
-            <div className="card stack">
-              <h2 className="subtitle" style={{ margin: 0 }}>
-                Refund
-              </h2>
-              <p className="muted">
-                Refunds go through the payment provider, mark the order REFUNDED and return goods to stock. Enter the
-                payment id (visible to the customer on the payment page).
-              </p>
-              <div className="toolbar" style={{ alignItems: "flex-end" }}>
-                <label className="label">
-                  Payment id
-                  <input
-                    className="input"
-                    type="number"
-                    value={refundPaymentId}
-                    onChange={(e) => setRefundPaymentId(e.target.value)}
-                    style={{ width: 120 }}
-                  />
-                </label>
-                <button
-                  className="button buttonRed"
-                  disabled={!refundPaymentId || refund.isPending}
-                  onClick={() => refund.mutate()}
-                >
-                  Refund payment
-                </button>
-              </div>
-              {refund.isSuccess ? <p className="status statusOk">refund executed</p> : null}
-              {refund.error ? <p className="errorText">{(refund.error as Error).message}</p> : null}
-            </div>
+            <AdminRefundPanel orderId={orderId} />
           </div>
 
           <div className="card stack">
             <h2 className="subtitle" style={{ margin: 0 }}>
-              Status history
+              {t("admin.statusHistory")}
             </h2>
-            {!history.data?.length ? <p className="muted">No history entries.</p> : null}
+            {!history.data?.length ? <p className="muted">{t("admin.noHistory")}</p> : null}
             {history.data?.map((entry, index) => (
               <p key={index} className="muted">
-                {new Date(entry.createdAt).toLocaleString()}: {entry.fromStatus ?? "-"} → <strong>{entry.toStatus}</strong>{" "}
-                by {entry.changedBy}
+                {formatDate(entry.createdAt)}: {entry.fromStatus ? statusLabel(entry.fromStatus) : "-"} →{" "}
+                <strong>{statusLabel(entry.toStatus)}</strong> {t("admin.by")} {entry.changedBy}
               </p>
             ))}
           </div>

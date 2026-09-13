@@ -1,17 +1,20 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { EmptyState } from "@/components/ui/EmptyState";
 
-export function Protected({ adminOnly = false, children }: { adminOnly?: boolean; children: ReactNode }) {
+export function Protected({ adminOnly = false, requiredRole, children }: { adminOnly?: boolean; requiredRole?: "ADMIN"; children: ReactNode }) {
+  const { t } = useI18n();
   const auth = useAuth();
 
   if (!auth.isReady) {
     return (
       <main className="page">
-        <EmptyState title="Checking session" body="Loading account state." />
+        <EmptyState title={t("protected.checking")} body={t("protected.loading")} />
       </main>
     );
   }
@@ -19,19 +22,19 @@ export function Protected({ adminOnly = false, children }: { adminOnly?: boolean
   if (!auth.isAuthenticated) {
     return (
       <main className="page">
-        <EmptyState title="Sign in required" body="This page is available only after signing in.">
+        <EmptyState title={t("protected.signIn")} body={t("protected.body")}>
           <Link className="button buttonDark" href="/login">
-            Sign in
+            {t("nav.signIn")}
           </Link>
         </EmptyState>
       </main>
     );
   }
 
-  if (adminOnly && !auth.isAdmin) {
+  if ((adminOnly && !auth.isAdmin) || (requiredRole && !auth.user?.roles.includes(requiredRole))) {
     return (
       <main className="page">
-        <EmptyState title="No access" body="Admin privileges are required for this area." />
+        <EmptyState title={t("protected.denied")} body={t("protected.admin")} />
       </main>
     );
   }

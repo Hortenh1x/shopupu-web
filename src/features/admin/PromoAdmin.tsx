@@ -1,9 +1,14 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { adminApi } from "@/lib/api/shop";
 import type { PromoCodeInput, PromoType } from "@/lib/api/types";
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+const PROMO_TYPES = ["PERCENT", "FIXED", "FREE_SHIPPING"] as const;
 
 type Draft = {
   code: string;
@@ -42,20 +47,21 @@ function toInput(draft: Draft): PromoCodeInput {
 }
 
 export function PromoAdmin() {
+  const { t, errorMessage, formatPrice, formatDate } = useI18n();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(0);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
-  const promos = useQuery({ queryKey: ["admin-promos", page], queryFn: () => adminApi.promos(page) });
+  const promos = useSessionQuery({ queryKey: ["admin-promos", page], queryFn: () => adminApi.promos(page) });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ["admin-promos"] });
-  const create = useMutation({
+  const create = useSessionMutation({
     mutationFn: () => adminApi.createPromo(toInput(draft)),
     onSuccess: () => {
       setDraft(emptyDraft);
       invalidate();
     }
   });
-  const toggle = useMutation({
+  const toggle = useSessionMutation({
     mutationFn: ({ id, enabled }: { id: number; enabled: boolean }) => adminApi.setPromoEnabled(id, enabled),
     onSuccess: invalidate
   });
@@ -73,7 +79,7 @@ export function PromoAdmin() {
         }}
       >
         <label className="label">
-          Code
+          {t("admin.code")}
           <input
             className="input"
             required
@@ -84,19 +90,21 @@ export function PromoAdmin() {
           />
         </label>
         <label className="label">
-          Type
+          {t("admin.type")}
           <select
             className="select"
             value={draft.promoType}
             onChange={(e) => setDraft((d) => ({ ...d, promoType: e.target.value as PromoType }))}
           >
-            <option value="PERCENT">Percent %</option>
-            <option value="FIXED">Fixed amount</option>
-            <option value="FREE_SHIPPING">Free shipping</option>
+            {PROMO_TYPES.map((type) => (
+              <option key={type} value={type}>
+                {t(`admin.promoType.${type}`)}
+              </option>
+            ))}
           </select>
         </label>
         <label className="label">
-          Value
+          {t("admin.value")}
           <input
             className="input"
             inputMode="decimal"
@@ -107,7 +115,7 @@ export function PromoAdmin() {
           />
         </label>
         <label className="label">
-          Min order
+          {t("admin.minOrder")}
           <input
             className="input"
             inputMode="decimal"
@@ -117,7 +125,7 @@ export function PromoAdmin() {
           />
         </label>
         <label className="label">
-          Starts
+          {t("admin.starts")}
           <input
             className="input"
             type="datetime-local"
@@ -126,7 +134,7 @@ export function PromoAdmin() {
           />
         </label>
         <label className="label">
-          Ends
+          {t("admin.ends")}
           <input
             className="input"
             type="datetime-local"
@@ -135,7 +143,7 @@ export function PromoAdmin() {
           />
         </label>
         <label className="label">
-          Max uses
+          {t("admin.maxUses")}
           <input
             className="input"
             type="number"
@@ -147,7 +155,7 @@ export function PromoAdmin() {
           />
         </label>
         <label className="label">
-          Per user
+          {t("admin.perUser")}
           <input
             className="input"
             type="number"
@@ -158,23 +166,23 @@ export function PromoAdmin() {
           />
         </label>
         <button className="button buttonDark" disabled={create.isPending}>
-          Create promo
+          {t("admin.createPromo")}
         </button>
       </form>
-      {create.error ? <p className="errorText">{(create.error as Error).message}</p> : null}
-      {promos.error ? <p className="errorText">{(promos.error as Error).message}</p> : null}
+      {create.error ? <p className="errorText">{errorMessage(create.error)}</p> : null}
+      {promos.error ? <p className="errorText">{errorMessage(promos.error)}</p> : null}
 
       <table className="table">
         <thead>
           <tr>
-            <th>Code</th>
-            <th>Type</th>
-            <th>Value</th>
-            <th>Min order</th>
-            <th>Window</th>
-            <th>Uses</th>
-            <th>Per user</th>
-            <th>Status</th>
+            <th>{t("admin.code")}</th>
+            <th>{t("admin.type")}</th>
+            <th>{t("admin.value")}</th>
+            <th>{t("admin.minOrder")}</th>
+            <th>{t("admin.window")}</th>
+            <th>{t("admin.uses")}</th>
+            <th>{t("admin.perUser")}</th>
+            <th>{t("admin.status")}</th>
             <th />
           </tr>
         </thead>
@@ -184,26 +192,26 @@ export function PromoAdmin() {
               <td>
                 <strong>{promo.code}</strong>
               </td>
-              <td>{promo.promoType}</td>
-              <td>{promo.promoType === "FREE_SHIPPING" ? "-" : Number(promo.value).toFixed(2)}</td>
-              <td>{promo.minOrderAmount != null ? Number(promo.minOrderAmount).toFixed(2) : "-"}</td>
+              <td>{t(`admin.promoType.${promo.promoType}`)}</td>
+              <td>{promo.promoType === "FREE_SHIPPING" ? "-" : promo.promoType === "PERCENT" ? `${Number(promo.value)} %` : formatPrice(promo.value)}</td>
+              <td>{promo.minOrderAmount != null ? formatPrice(promo.minOrderAmount) : "-"}</td>
               <td className="muted">
-                {promo.startsAt ? new Date(promo.startsAt).toLocaleDateString() : "..."} -{" "}
-                {promo.endsAt ? new Date(promo.endsAt).toLocaleDateString() : "..."}
+                {promo.startsAt ? formatDate(promo.startsAt, { dateStyle: "medium" }) : "..."} -{" "}
+                {promo.endsAt ? formatDate(promo.endsAt, { dateStyle: "medium" }) : "..."}
               </td>
               <td>
                 {promo.redemptionCount}
                 {promo.maxRedemptions != null ? ` / ${promo.maxRedemptions}` : ""}
               </td>
               <td>{promo.perUserLimit}</td>
-              <td>{promo.enabled ? "enabled" : "disabled"}</td>
+              <td>{promo.enabled ? t("common.enabled") : t("common.disabled")}</td>
               <td>
                 <button
                   className={promo.enabled ? "button buttonRed" : "button buttonGreen"}
                   disabled={toggle.isPending}
                   onClick={() => toggle.mutate({ id: promo.id, enabled: !promo.enabled })}
                 >
-                  {promo.enabled ? "Disable" : "Enable"}
+                  {promo.enabled ? t("admin.disable") : t("admin.enable")}
                 </button>
               </td>
             </tr>
@@ -211,7 +219,7 @@ export function PromoAdmin() {
           {!data?.content?.length ? (
             <tr>
               <td colSpan={9} className="muted">
-                No promo codes yet.
+                {t("admin.noPromos")}
               </td>
             </tr>
           ) : null}
@@ -220,11 +228,11 @@ export function PromoAdmin() {
       {data && data.totalPages > 1 ? (
         <div className="toolbar" style={{ justifyContent: "center" }}>
           <button className="button" disabled={page <= 0} onClick={() => setPage((p) => p - 1)}>
-            Previous
+            {t("common.previous")}
           </button>
-          <span className="mono muted" style={{ fontSize: "0.88rem" }}>{page + 1} / {data.totalPages}</span>
+          <span className="mono muted" style={{ fontSize: "0.88rem" }}>{t("common.page", { page: page + 1, pages: data.totalPages })}</span>
           <button className="button" disabled={page >= data.totalPages - 1} onClick={() => setPage((p) => p + 1)}>
-            Next
+            {t("common.next")}
           </button>
         </div>
       ) : null}

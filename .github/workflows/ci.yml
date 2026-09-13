@@ -24,11 +24,22 @@ jobs:
 
       - run: npm test
 
+      - name: Check dependency advisories
+        run: npm audit --audit-level=moderate
+
       - run: npm run build
         env:
           # keep the CI artifact pointed at a local backend; the deploy image
           # bakes its real base URL via Docker build args instead
           NEXT_PUBLIC_API_BASE_URL: http://localhost:8080
+
+      - name: Build the release image with the tested revision
+        run: docker build --build-arg VCS_REF="$GITHUB_SHA" --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8080 -t shopupu-web:ci .
+
+      - name: Verify runtime Node and revision label
+        run: |
+          docker run --rm --entrypoint node shopupu-web:ci --version
+          test "$(docker inspect --format '{{ index .Config.Labels "org.opencontainers.image.revision" }}' shopupu-web:ci)" = "$GITHUB_SHA"
 
   # The Playwright smoke needs the Java backend + seeded Postgres, so it stays
   # a local/manual job: `npm run build && npm run e2e` with the backend up.

@@ -48,6 +48,12 @@ then fix `types.ts` until typecheck is green.
 - `src/lib/auth` — session storage + `AuthProvider` context
 - `src/components` — shared UI; styling comes from `src/app/globals.css` classes
   (tangerine editorial system, see DESIGN.md) — no CSS-in-JS, no Tailwind
+- Destructive actions: irreversible ones (cancel order, admin/address/review delete) go through
+  `components/ui/ConfirmButton` (two-step inline, no modals); reversible slips (cart/wishlist
+  remove) update the cache optimistically and show an inline "Removed · Undo" notice instead.
+- `src/lib/motion` — spring/momentum helpers; the only gesture surface is the mobile stylist
+  sheet (`features/stylist/useSheetDismiss`). Everything else animates with CSS transitions on
+  `transform`/`opacity` (see DESIGN.md → Motion).
 
 ## Local backends on this machine
 

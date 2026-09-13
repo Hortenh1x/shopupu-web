@@ -25,7 +25,7 @@
   --tint-primary: color-mix(in oklab, var(--primary) 9%, var(--surface));
   --tint-accent: color-mix(in oklab, var(--accent) 26%, var(--surface));
 
-  --ok: oklch(52% 0.09 145);
+  --ok: oklch(46% 0.09 145);
   --ok-tint: color-mix(in oklab, var(--ok) 12%, var(--surface));
   --danger: oklch(50% 0.15 30);
   --danger-tint: color-mix(in oklab, var(--danger) 10%, var(--surface));
@@ -43,6 +43,18 @@
   --radius-card: 16px;
   --radius-panel: 26px;
   --radius-control: 12px;
+
+  /* 4px spacing scale; inline gaps/paddings in components use these steps */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+
+  /* minimum comfortable touch target (Apple HIG 44pt) */
+  --tap: 44px;
 }
 
 * {
@@ -110,11 +122,14 @@ select {
 .page {
   width: min(1200px, calc(100vw - 40px));
   margin: 0 auto;
-  padding: 32px 0 88px;
+  /* bottom padding keeps the last row clear of the floating stylist launcher */
+  padding: 32px 0 96px;
 }
 
 .section {
   margin: 44px 0 0;
+  /* anchored scrolls land below the sticky header */
+  scroll-margin-top: 96px;
 }
 
 .stack {
@@ -133,6 +148,12 @@ select {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
   gap: 20px;
+  transition: opacity 160ms var(--ease-out);
+}
+
+/* previous results stay in place, dimmed, while the next page/filter loads */
+.grid[data-busy="true"] {
+  opacity: 0.55;
 }
 
 .toolbar {
@@ -263,18 +284,6 @@ select {
   box-shadow: var(--shadow-card);
 }
 
-.panelTangerine {
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(120% 160% at 85% -20%, color-mix(in oklab, var(--accent) 22%, transparent), transparent 60%),
-    var(--primary);
-  color: var(--cream-on-dark);
-  border-radius: var(--radius-panel);
-  box-shadow: var(--shadow-panel);
-}
-
-.panelTangerine .muted,
 .panelInk .muted {
   color: color-mix(in oklab, var(--cream-on-dark) 76%, transparent);
 }
@@ -391,26 +400,55 @@ select {
   font-size: 0.85rem;
 }
 
-/* buttons placed on tangerine/ink panels */
-.panelTangerine .button,
+/* buttons placed on ink panels */
 .panelInk .button {
   background: transparent;
   border-color: color-mix(in oklab, var(--cream-on-dark) 45%, transparent);
   color: var(--cream-on-dark);
 }
 
-.panelTangerine .buttonDark,
 .panelInk .buttonDark {
   background: var(--ink);
   border-color: var(--ink);
   color: var(--cream-on-dark);
 }
 
-.panelInk .buttonAccent,
-.panelTangerine .buttonAccent {
+.panelInk .buttonAccent {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--ink);
+}
+
+/* two-step inline confirm for irreversible actions (order cancel, admin delete) */
+.confirmRow {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+/* "Removed X · Undo" — forgiveness for slips instead of a confirm dialog */
+.undoNotice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in oklab, var(--accent) 60%, var(--line-strong));
+  border-radius: var(--radius-control);
+  background: var(--tint-accent);
+  font-size: 0.92rem;
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 180ms var(--ease-out),
+    transform 180ms var(--ease-out);
+
+  @starting-style {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
 }
 
 /* === Forms ================================================================= */
@@ -462,7 +500,7 @@ select {
 
 .label {
   display: grid;
-  gap: 7px;
+  gap: 8px;
   font-family: var(--font-data);
   font-size: 0.72rem;
   font-weight: 600;
@@ -484,7 +522,7 @@ select {
 .checkboxRow {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 500;
@@ -522,7 +560,7 @@ select {
 .chip {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-height: 34px;
   padding: 5px 14px;
   border: 1px solid var(--line-strong);
@@ -561,12 +599,21 @@ select {
   cursor: not-allowed;
 }
 
+/* colour dot inside a colour chip — the control shows what it maps to */
+.chipSwatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--ink) 25%, transparent);
+  flex-shrink: 0;
+}
+
 /* === Status badges ========================================================= */
 
 .status {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   width: fit-content;
   border: 1px solid var(--line-strong);
   border-radius: 999px;
@@ -706,6 +753,12 @@ select {
   }
 }
 
+/* pressed on pointer-down, before navigation starts */
+.productCard:active {
+  transform: scale(0.985);
+  transition-duration: 80ms;
+}
+
 .productMedia {
   position: relative;
   aspect-ratio: 4 / 5;
@@ -720,6 +773,18 @@ select {
   display: block;
 }
 
+/* gallery images are stacked so switching cross-fades instead of swapping */
+.productMedia .mediaLayer {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 180ms var(--ease-out);
+}
+
+.productMedia .mediaLayer[data-active="true"] {
+  opacity: 1;
+}
+
 .productMedia .placeholder {
   position: absolute;
   inset: 0;
@@ -730,7 +795,7 @@ select {
 
 .productBody {
   display: grid;
-  gap: 6px;
+  gap: 8px;
   padding: 14px 16px 16px;
 }
 
@@ -788,25 +853,52 @@ select {
 /* === Header ================================================================ */
 
 .siteHeader {
+  --header-utility-h: 0px;
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid var(--line);
   background: color-mix(in oklab, var(--bg) 88%, transparent);
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px) saturate(140%);
+  /* scroll-edge effect: the edge exists only once content passes underneath */
+  box-shadow:
+    0 1px 0 transparent,
+    0 12px 24px -20px transparent;
+  transition: box-shadow 200ms var(--ease-out);
+}
+
+.siteHeader[data-scrolled="true"] {
+  box-shadow:
+    0 1px 0 var(--line),
+    0 12px 24px -20px oklch(17.9% 0.024 48 / 0.35);
 }
 
 .headerInner {
   width: min(1200px, calc(100vw - 40px));
   margin: 0 auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "brand nav actions";
   align-items: center;
-  justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
   padding: 14px 0;
 }
 
+.headerActions {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 8px;
+}
+
+.languagePicker {
+  width: auto;
+  min-width: 5rem;
+  flex: 0 0 auto;
+}
+
 .wordmark {
+  grid-area: brand;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -823,6 +915,8 @@ select {
 }
 
 .nav {
+  grid-area: nav;
+  justify-self: center;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
@@ -837,7 +931,7 @@ select {
 .navButton {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -848,7 +942,8 @@ select {
   cursor: pointer;
   transition:
     background-color 140ms var(--ease-out),
-    color 140ms var(--ease-out);
+    color 140ms var(--ease-out),
+    transform 120ms var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -857,6 +952,11 @@ select {
     color: var(--ink);
     background: color-mix(in oklab, var(--bg) 70%, var(--surface));
   }
+}
+
+.nav a:active,
+.navButton:active {
+  transform: scale(0.96);
 }
 
 .nav a[data-active="true"] {
@@ -887,6 +987,37 @@ select {
   color: var(--cream-on-dark);
 }
 
+.siteFooter .muted {
+  color: color-mix(in oklab, var(--cream-on-dark) 78%, var(--ink));
+}
+
+.demoNotice {
+  background: var(--tint-accent);
+  color: var(--ink);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.demoNoticeInner {
+  width: min(1200px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 12px 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.demoNoticeInner span {
+  flex: 1 1 36ch;
+}
+
+.demoNoticeInner a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .footerInner {
   width: min(1200px, calc(100vw - 40px));
   margin: 0 auto;
@@ -903,7 +1034,7 @@ select {
 
 .footerCols nav {
   display: grid;
-  gap: 10px;
+  gap: 12px;
   align-content: start;
   font-size: 0.95rem;
 }
@@ -933,48 +1064,210 @@ select {
   color: color-mix(in oklab, var(--cream-on-dark) 55%, transparent);
 }
 
-/* === Marquee strip ========================================================= */
+/* === Stylist launcher & panel ============================================= */
 
-.marquee {
-  overflow: hidden;
-  background: var(--ink);
-  color: var(--cream-on-dark);
-  border-radius: 999px;
-  padding: 9px 0;
-  margin-top: 14px;
-}
-
-.marqueeTrack {
-  display: flex;
-  gap: 0;
-  width: max-content;
-  animation: marquee 30s linear infinite;
-}
-
-.marqueeTrack > span {
+/*
+ * The launcher floats over cream, ink panels and product photos alike, so it
+ * carries its own material instead of borrowing the ink button: translucent
+ * cream with a blur, a bright top edge (light on the surface) and a shadow
+ * that separates it from dark and light grounds.
+ */
+.stylistLauncher {
+  position: fixed;
+  right: 20px;
+  bottom: 24px;
+  z-index: 60;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 0 22px;
-  font-family: var(--font-data);
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  justify-content: center;
+  min-height: 46px;
+  padding: 10px 18px;
+  border: 1px solid color-mix(in oklab, var(--ink) 18%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--surface) 84%, transparent);
+  backdrop-filter: blur(14px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--cream-on-dark) 70%, transparent),
+    0 1px 2px oklch(17.9% 0.024 48 / 0.12),
+    0 12px 28px -12px oklch(17.9% 0.024 48 / 0.5);
+  color: var(--ink);
+  font-weight: 650;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    transform 120ms var(--ease-out),
+    opacity 160ms var(--ease-out),
+    background-color 160ms var(--ease-out);
+}
+
+.stylistLauncher .spark {
+  color: var(--primary);
+  display: inline-flex;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .stylistLauncher:hover {
+    background: var(--surface);
+  }
+}
+
+.stylistLauncher:active {
+  transform: scale(0.96);
+}
+
+/* both labels occupy the same cell so the button never changes width */
+.labelSwap {
+  display: inline-grid;
+}
+
+.labelSwap > span {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   white-space: nowrap;
 }
 
-.marqueeTrack .spark {
-  color: var(--accent);
+.labelSwap > span[data-active="false"] {
+  visibility: hidden;
 }
 
-@keyframes marquee {
-  from {
-    transform: translateX(0);
+.stylistPanel {
+  position: fixed;
+  right: 20px;
+  /* --vv-offset lifts the panel above the on-screen keyboard (visualViewport) */
+  bottom: calc(86px + var(--vv-offset, 0px));
+  z-index: 60;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: min(var(--panel-w, 390px), calc(100vw - 32px));
+  max-height: min(var(--panel-h, 560px), calc(var(--vv-height, 100vh) - 120px));
+  padding: 0;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel);
+  /* materialises out of the launcher and returns the same way */
+  transform-origin: 100% 100%;
+  transition:
+    opacity 200ms var(--ease-out),
+    transform 260ms var(--ease-out),
+    display 260ms allow-discrete;
+}
+
+.stylistPanel[data-resized="true"] {
+  height: min(var(--panel-h, 560px), calc(var(--vv-height, 100vh) - 120px));
+  max-height: none;
+}
+
+.stylistPanel[data-open="false"] {
+  display: none;
+  opacity: 0;
+  transform: scale(0.96) translateY(8px);
+}
+
+@starting-style {
+  .stylistPanel[data-open="true"] {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
   }
-  to {
-    transform: translateX(-50%);
-  }
+}
+
+/* while a finger drives the sheet, no transition may lag behind it */
+.stylistPanel[data-dragging="true"] {
+  transition: none;
+}
+
+.stylistHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.stylistHead .stylistClose {
+  margin-left: auto;
+  align-self: center;
+}
+
+.stylistResize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 22px;
+  height: 22px;
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 1;
+}
+
+/* grab handle of the mobile sheet; hidden on the floating desktop card */
+.sheetGrip {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 28px;
+  touch-action: none;
+  cursor: grab;
+  z-index: 2;
+}
+
+.sheetGrip::before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  width: 40px;
+  height: 4px;
+  margin-left: -20px;
+  border-radius: 999px;
+  background: var(--line-strong);
+}
+
+.stylistPrefs summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-data);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-mute);
+}
+
+.stylistPrefs summary::-webkit-details-marker {
+  display: none;
+}
+
+.stylistPrefs summary::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 160ms var(--ease-out);
+}
+
+.stylistPrefs[open] summary::before {
+  transform: rotate(45deg);
+}
+
+.stylistPrefs .prefsValue {
+  color: var(--ink-soft);
+  letter-spacing: normal;
+  text-transform: none;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 /* === Skeletons ============================================================= */
@@ -1010,11 +1303,20 @@ select {
 
 .aiSummary {
   display: grid;
-  gap: 14px;
+  gap: 16px;
   background: var(--tint-accent);
   border: 1px solid color-mix(in oklab, var(--accent) 55%, var(--line-strong));
   border-radius: var(--radius-card);
   padding: 20px;
+}
+
+/* the summary supports the product; it must not outrank the product title */
+.aiSummary .tldr {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 1rem;
+  line-height: 1.55;
+  font-weight: 500;
 }
 
 .aiSummary ul {
@@ -1022,12 +1324,12 @@ select {
   padding: 0;
   list-style: none;
   display: grid;
-  gap: 6px;
+  gap: 8px;
 }
 
 .aiSummary li {
   display: flex;
-  gap: 9px;
+  gap: 8px;
   align-items: baseline;
   font-size: 0.95rem;
 }
@@ -1083,19 +1385,8 @@ select {
   }
 }
 
-/* === Entrance ============================================================== */
-
-.riseIn {
-  opacity: 1;
-  transform: translateY(0);
-  transition:
-    opacity 240ms var(--ease-out),
-    transform 240ms var(--ease-out);
-
-  @starting-style {
-    opacity: 0;
-    transform: translateY(8px);
-  }
+.adminTabs a:active {
+  transform: scale(0.96);
 }
 
 /* === Responsive ============================================================ */
@@ -1123,13 +1414,56 @@ select {
 @media (max-width: 767px) {
   .page {
     width: calc(100vw - 32px);
-    padding: 20px 0 64px;
+    padding: 20px 0 96px;
+  }
+
+  /*
+   * Mobile header: the utility row (language, sign in / register) sits on top
+   * and scrolls away; only the brand + nav row stays pinned, so the chrome
+   * costs ~58px instead of two full rows.
+   */
+  .siteHeader {
+    --header-utility-h: 44px;
+    top: calc(-1 * var(--header-utility-h));
   }
 
   .headerInner {
     width: calc(100vw - 32px);
-    flex-wrap: wrap;
-    padding: 12px 0;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "actions actions"
+      "brand nav";
+    gap: 0 12px;
+    padding: 0 0 8px;
+  }
+
+  .headerActions {
+    justify-self: stretch;
+    justify-content: flex-end;
+    height: var(--header-utility-h);
+  }
+
+  .wordmark {
+    font-size: 1.3rem;
+  }
+
+  .nav {
+    justify-self: end;
+    max-width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav a,
+  .navButton {
+    padding: 6px 12px;
+    font-size: 0.88rem;
+    white-space: nowrap;
   }
 
   .footerInner {
@@ -1160,23 +1494,151 @@ select {
 
   .table td {
     border-bottom: 0;
-    padding: 6px 14px;
+    padding: 8px 14px;
+  }
+
+  /* the stylist becomes a bottom sheet: full width, rises from the bottom edge */
+  .stylistPanel {
+    left: 0;
+    right: 0;
+    bottom: var(--vv-offset, 0px);
+    width: auto;
+    height: auto;
+    max-height: min(82vh, calc(var(--vv-height, 100vh) - 24px));
+    border-radius: 22px 22px 0 0;
+    border-bottom: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+    transform-origin: 50% 100%;
+  }
+
+  .stylistPanel[data-resized="true"] {
+    height: auto;
+    max-height: min(82vh, calc(var(--vv-height, 100vh) - 24px));
+  }
+
+  .stylistPanel[data-open="false"] {
+    transform: translateY(24px);
+  }
+
+  @starting-style {
+    .stylistPanel[data-open="true"] {
+      transform: translateY(24px);
+    }
+  }
+
+  .stylistHead {
+    padding-top: 26px;
+  }
+
+  .sheetGrip {
+    display: block;
+  }
+
+  .stylistResize {
+    display: none;
+  }
+
+  /* the sheet covers the launcher; the sheet's own close + drag take over */
+  .stylistLauncher[aria-expanded="true"] {
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
-/* === Reduced motion ======================================================== */
+/* === Touch ================================================================= */
 
-@media (prefers-reduced-motion: reduce) {
-  .marqueeTrack {
-    animation: none;
+@media (pointer: coarse) {
+  .button,
+  .buttonSmall,
+  .chip,
+  .nav a,
+  .navButton,
+  .adminTabs a,
+  .stylistLauncher {
+    min-height: var(--tap);
   }
 
+  .qty button {
+    width: var(--tap);
+    height: var(--tap);
+  }
+
+  .stylistResize {
+    display: none;
+  }
+}
+
+/* === Reduced motion / transparency / contrast ============================== */
+
+@media (prefers-reduced-motion: reduce) {
   .skeletonBlock::after {
     animation: none;
   }
 
   .productCard,
-  .riseIn {
+  .grid,
+  .undoNotice,
+  .siteHeader,
+  .stylistLauncher,
+  .mediaLayer,
+  .stylistPrefs summary::before {
     transition: none;
+  }
+
+  /* the panel still arrives, as a cross-fade rather than a slide */
+  .stylistPanel {
+    transition:
+      opacity 160ms ease,
+      display 160ms allow-discrete;
+  }
+
+  .stylistPanel[data-open="false"] {
+    transform: none;
+  }
+
+  @starting-style {
+    .stylistPanel[data-open="true"] {
+      transform: none;
+    }
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .siteHeader,
+  .stylistLauncher {
+    background: var(--surface);
+    backdrop-filter: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .siteHeader {
+    background: var(--surface);
+    backdrop-filter: none;
+    box-shadow: 0 1px 0 var(--ink);
+  }
+
+  .card,
+  .productCard,
+  .button,
+  .chip,
+  .input,
+  .textarea,
+  .select,
+  .table,
+  .stylistLauncher,
+  .stylistPanel,
+  .nav {
+    border-color: var(--ink);
+  }
+
+  .stylistLauncher {
+    background: var(--surface);
+    backdrop-filter: none;
+  }
+
+  .muted,
+  .kicker {
+    color: var(--ink-soft);
   }
 }

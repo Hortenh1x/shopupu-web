@@ -1,26 +1,31 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+import { useSessionQuery } from "@/lib/auth/useSessionQuery";
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Protected } from "@/components/layout/Protected";
+import { ConfirmButton } from "@/components/ui/ConfirmButton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { StatusBadge } from "@/components/ui/StatusBadge";
-import { formatPrice } from "@/features/catalog/ProductCard";
 import { orderApi, shippingApi } from "@/lib/api/shop";
 
 const CANCELLABLE = new Set(["CREATED", "PENDING_PAYMENT"]);
 const PAYABLE = new Set(["CREATED", "PENDING_PAYMENT"]);
 
 export function OrderDetailsPage({ orderId }: { orderId: number }) {
+  const { t, errorMessage, formatPrice, formatNumber, formatDate, shippingLabel } = useI18n();
   const queryClient = useQueryClient();
-  const order = useQuery({ queryKey: ["order", orderId], queryFn: () => orderApi.get(orderId) });
-  const shipment = useQuery({
+  const order = useSessionQuery({ queryKey: ["order", orderId], queryFn: () => orderApi.get(orderId) });
+  const shipment = useSessionQuery({
     queryKey: ["shipment", orderId],
     queryFn: () => shippingApi.get(orderId),
     retry: false
   });
-  const cancel = useMutation({
+  const cancel = useSessionMutation({
     mutationFn: () => orderApi.cancel(orderId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["order", orderId] })
   });
@@ -36,9 +41,9 @@ export function OrderDetailsPage({ orderId }: { orderId: number }) {
   if (!order.data) {
     return (
       <main className="page">
-        <EmptyState title="Order not found" body="It may belong to another account.">
+        <EmptyState title={t("commerce.orderNotFound")} body={t("commerce.otherAccount")}>
           <Link className="button buttonDark" href="/orders">
-            Back to orders
+            {t("commerce.backOrders")}
           </Link>
         </EmptyState>
       </main>
@@ -52,30 +57,30 @@ export function OrderDetailsPage({ orderId }: { orderId: number }) {
       <main className="page">
         <section className="split">
           <div className="stack" style={{ gap: 20 }}>
-            <div className="stack" style={{ gap: 6 }}>
-              <span className="kicker">Order</span>
+            <div className="stack" style={{ gap: 8 }}>
+              <span className="kicker">{t("commerce.order")}</span>
               <h1 className="title mono" style={{ letterSpacing: "-0.01em" }}>
                 {data.orderNumber}
               </h1>
               <p className="muted" style={{ margin: 0, fontSize: "0.9rem" }}>
-                Placed {data.createdAt ? new Date(data.createdAt).toLocaleString() : "-"}
-                {data.updatedAt ? ` · updated ${new Date(data.updatedAt).toLocaleString()}` : ""}
+                {t("commerce.placed", { date: data.createdAt ? formatDate(data.createdAt, { dateStyle: "medium", timeStyle: "short" }) : "-" })}
+                {data.updatedAt ? t("commerce.updated", { date: formatDate(data.updatedAt, { dateStyle: "medium", timeStyle: "short" }) }) : ""}
               </p>
             </div>
             <table className="table">
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th>Qty</th>
-                  <th>Unit</th>
-                  <th>Total</th>
+                  <th>{t("commerce.item")}</th>
+                  <th>{t("commerce.qty")}</th>
+                  <th>{t("commerce.unit")}</th>
+                  <th>{t("commerce.total")}</th>
                 </tr>
               </thead>
               <tbody>
                 {data.items.map((item) => (
                   <tr key={item.id}>
                     <td>
-                      <div className="stack" style={{ gap: 3 }}>
+                      <div className="stack" style={{ gap: 4 }}>
                         <Link href={`/products/${item.productId}`} style={{ fontWeight: 600 }}>
                           {item.title}
                         </Link>
@@ -84,7 +89,7 @@ export function OrderDetailsPage({ orderId }: { orderId: number }) {
                         </span>
                       </div>
                     </td>
-                    <td className="mono">{item.quantity}</td>
+                    <td className="mono">{formatNumber(item.quantity)}</td>
                     <td className="price">{formatPrice(item.price)}</td>
                     <td className="price">{formatPrice(item.lineTotal)}</td>
                   </tr>
@@ -92,18 +97,18 @@ export function OrderDetailsPage({ orderId }: { orderId: number }) {
               </tbody>
             </table>
 
-            <div className="card stack" style={{ gap: 10 }}>
+            <div className="card stack" style={{ gap: 12 }}>
               <h2 className="subtitle" style={{ margin: 0 }}>
-                Shipping.
+                {t("commerce.shippingTitle")}
               </h2>
               {shipment.data?.method ? (
                 <>
-                  <div className="toolbar" style={{ gap: 10 }}>
+                  <div className="toolbar" style={{ gap: 12 }}>
                     <StatusBadge value={shipment.data.shippingStatus ?? "PENDING"} />
-                    <span className="muted">{shipment.data.method.replaceAll("_", " ").toLowerCase()}</span>
+                    <span className="muted">{shippingLabel(shipment.data.method)}</span>
                     {shipment.data.trackingNumber ? (
                       <span className="mono" style={{ fontSize: "0.85rem" }}>
-                        tracking: {shipment.data.trackingNumber}
+                        {t("commerce.tracking", { number: shipment.data.trackingNumber })}
                       </span>
                     ) : null}
                   </div>
@@ -124,7 +129,7 @@ export function OrderDetailsPage({ orderId }: { orderId: number }) {
                 </>
               ) : (
                 <p className="muted" style={{ margin: 0 }}>
-                  Shipping is not configured yet.
+                  {t("commerce.shippingNotConfigured")}
                 </p>
               )}
             </div>
@@ -134,22 +139,22 @@ export function OrderDetailsPage({ orderId }: { orderId: number }) {
             <StatusBadge value={data.status} />
             <div className="stack" style={{ gap: 8 }}>
               <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                <span className="muted">Subtotal</span>
+                <span className="muted">{t("commerce.subtotal")}</span>
                 <span className="price">{formatPrice(data.subtotalAmount)}</span>
               </div>
               <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                <span className="muted">Shipping</span>
+                <span className="muted">{t("commerce.shipping")}</span>
                 <span className="price">{formatPrice(data.shippingAmount)}</span>
               </div>
               {data.discountAmount > 0 ? (
                 <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                  <span className="muted">Discount{data.promoCode ? ` (${data.promoCode})` : ""}</span>
+                  <span className="muted">{t("commerce.discount")}{data.promoCode ? ` (${data.promoCode})` : ""}</span>
                   <span className="price">&minus;{formatPrice(data.discountAmount)}</span>
                 </div>
               ) : null}
               <hr className="divider" />
               <div className="toolbar" style={{ justifyContent: "space-between" }}>
-                <span style={{ fontWeight: 600 }}>Total</span>
+                <span style={{ fontWeight: 600 }}>{t("commerce.total")}</span>
                 <span className="price" style={{ fontSize: "1.6rem" }}>
                   {formatPrice(data.paymentAmount)}
                 </span>
@@ -157,15 +162,19 @@ export function OrderDetailsPage({ orderId }: { orderId: number }) {
             </div>
             {PAYABLE.has(data.status) ? (
               <Link className="button buttonDark" href={`/checkout/shipping?orderId=${data.id}`}>
-                {data.shippingAmount > 0 || shipment.data?.method ? "Continue to payment" : "Set up shipping & pay"}
+                {data.shippingAmount > 0 || shipment.data?.method ? t("commerce.continuePayment") : t("commerce.setupAndPay")}
               </Link>
             ) : null}
             {CANCELLABLE.has(data.status) ? (
-              <button className="button buttonRed" disabled={cancel.isPending} onClick={() => cancel.mutate()}>
-                {cancel.isPending ? "Cancelling..." : "Cancel order"}
-              </button>
+              <ConfirmButton
+                label={cancel.isPending ? t("commerce.cancelling") : t("commerce.cancelOrder")}
+                confirmLabel={t("commerce.cancelConfirm")}
+                keepLabel={t("commerce.keepOrder")}
+                disabled={cancel.isPending}
+                onConfirm={() => cancel.mutate()}
+              />
             ) : null}
-            {cancel.error ? <p className="errorText" style={{ margin: 0 }}>{(cancel.error as Error).message}</p> : null}
+            {cancel.error ? <p className="errorText" style={{ margin: 0 }}>{errorMessage(cancel.error)}</p> : null}
           </aside>
         </section>
       </main>

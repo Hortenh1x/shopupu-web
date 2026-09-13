@@ -1,15 +1,18 @@
 "use client";
 
+import { useI18n } from "@/lib/i18n/LocaleProvider";
+
+import { useSessionMutation } from "@/lib/auth/useSessionMutation";
 import Link from "next/link";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RatingStars } from "@/components/ui/RatingStars";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { ProductCard, formatPrice } from "@/features/catalog/ProductCard";
+import { ProductCard } from "@/features/catalog/ProductCard";
 import { ReviewPanel } from "@/features/reviews/ReviewPanel";
 import { aiApi, cartApi, catalogApi, userApi } from "@/lib/api/shop";
-import type { ProductListItem, Variant } from "@/lib/api/types";
+import type { Product, ProductListItem, Variant } from "@/lib/api/types";
 import { useAuth } from "@/lib/auth/AuthProvider";
 
 const SIZE_ORDER = ["XXS", "XS", "S", "M", "L", "XL", "XXL", "3XL"];
@@ -19,10 +22,11 @@ function sizeRank(size: string) {
   return index === -1 ? SIZE_ORDER.length + size.charCodeAt(0) : index;
 }
 
-export function ProductDetails({ productId }: { productId: number }) {
+export function ProductDetails({ productId, initialProduct }: { productId: number; initialProduct?: Product }) {
+  const { t, formatPrice, formatNumber, genderLabel, errorMessage } = useI18n();
   const auth = useAuth();
   const queryClient = useQueryClient();
-  const product = useQuery({ queryKey: ["product", productId], queryFn: () => catalogApi.product(productId) });
+  const product = useQuery({ queryKey: ["product", productId], queryFn: () => catalogApi.product(productId), initialData: initialProduct });
   const rating = useQuery({ queryKey: ["rating", productId], queryFn: () => catalogApi.rating(productId) });
 
   const variants = useMemo(
@@ -53,11 +57,13 @@ export function ProductDetails({ productId }: { productId: number }) {
     null;
   const available = selected?.available ?? 0;
 
-  const addToCart = useMutation({
+  const addToCart = useSessionMutation({
     mutationFn: () => cartApi.add(selected!.id, quantity),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cart"] })
+    // the reply is the whole cart: writing it to the shared entry updates the
+    // header badge at once, even for a guest whose cart token was just created
+    onSuccess: (updated) => queryClient.setQueryData(["cart", auth.user?.id ?? "guest"], updated)
   });
-  const wishlist = useMutation({
+  const wishlist = useSessionMutation({
     mutationFn: () => userApi.addToWishlist(productId)
   });
 
@@ -75,9 +81,10 @@ export function ProductDetails({ productId }: { productId: number }) {
   if (product.error || !product.data) {
     return (
       <main className="page">
-        <EmptyState title="Product not found" body="The product is unavailable or disabled.">
+        <EmptyState title={t("product.loadTitle")} body={t("product.loadBody")}>
+          <button className="button" onClick={() => product.refetch()}>{t("common.retry")}</button>
           <Link className="button buttonDark" href="/catalog">
-            Back to catalog
+            {t("nav.backCatalog")}
           </Link>
         </EmptyState>
       </main>
@@ -87,10 +94,18 @@ export function ProductDetails({ productId }: { productId: number }) {
   const current = product.data;
   const images = current.images ?? [];
   const image = images[activeImage] ?? images[0];
+
+  function chooseColor(next: string) {
+    setSelectedColor(next);
+    setQuantity(1);
+    // a gallery captioned per colour follows the chip; single-image products keep the photo
+    const captioned = images.findIndex((img) => next && img.altText?.toLowerCase().includes(next.toLowerCase()));
+    if (captioned >= 0) setActiveImage(captioned);
+  }
   const displayPrice = selected?.price ?? current.price;
   const displayOldPrice = selected?.oldPrice ?? current.oldPrice;
   const onSale = displayOldPrice != null && Number(displayOldPrice) > Number(displayPrice);
-  const meta = [current.gender ? current.gender.toLowerCase() : null, current.season, current.material]
+  const meta = [current.gender ? genderLabel(current.gender) : null, current.season, current.material]
     .filter(Boolean)
     .join(" · ");
 
@@ -100,7 +115,15 @@ export function ProductDetails({ productId }: { productId: number }) {
         <div className="stack" style={{ gap: 12 }}>
           <div className="productMedia" style={{ borderRadius: "var(--radius-panel)", border: "1px solid var(--line)" }}>
             {image?.url ? (
-              <img src={image.url} alt={image.altText ?? current.title} />
+              images.map((img, index) => (
+                <div key={img.id} className="mediaLayer" data-active={img.id === image.id} aria-hidden={img.id !== image.id}>
+                  <img
+                    src={img.url}
+                    alt={img.id === image.id ? (img.altText ?? current.title) : ""}
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+                </div>
+              ))
             ) : (
               <span className="placeholder" aria-hidden="true">
                 <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
@@ -108,7 +131,7 @@ export function ProductDetails({ productId }: { productId: number }) {
                 </svg>
               </span>
             )}
-            {onSale ? <span className="badgeSale">Sale</span> : null}
+            {onSale ? <span className="badgeSale">{t("product.sale")}</span> : null}
           </div>
           {images.length > 1 ? (
             <div className="toolbar" style={{ gap: 8 }}>
@@ -116,7 +139,7 @@ export function ProductDetails({ productId }: { productId: number }) {
                 <button
                   key={img.id}
                   onClick={() => setActiveImage(index)}
-                  aria-label={img.altText ?? `Image ${index + 1}`}
+                  aria-label={img.altText ?? t("product.image", { number: index + 1 })}
                   aria-current={index === activeImage}
                   style={{
                     width: 64,
@@ -140,17 +163,17 @@ export function ProductDetails({ productId }: { productId: number }) {
           ) : null}
         </div>
 
-        <aside className="card stack" style={{ position: "sticky", top: 84, padding: 24, gap: 14 }}>
+        <aside className="card stack" style={{ position: "sticky", top: 84, padding: 24, gap: 16 }}>
           <span className="kicker">
-            {[current.brandName, current.categoryName].filter(Boolean).join(" · ") || "catalog"}
+            {[current.brandName, current.categoryName].filter(Boolean).join(" · ") || t("nav.catalog")}
           </span>
           <h1 className="title">{current.title}</h1>
+          <p className="status statusWarn">{t("product.fictional")}</p>
           {rating.data && rating.data.reviewCount > 0 ? (
             <span className="toolbar" style={{ gap: 8 }}>
               <RatingStars value={Number(rating.data.averageRating)} />
               <span className="mono muted" style={{ fontSize: "0.85rem" }}>
-                {Number(rating.data.averageRating).toFixed(1)} · {rating.data.reviewCount} review
-                {rating.data.reviewCount === 1 ? "" : "s"}
+                {t(rating.data.reviewCount === 1 ? "product.reviewsOne" : "product.reviewsMany", { rating: formatNumber(Number(rating.data.averageRating), { minimumFractionDigits: 1, maximumFractionDigits: 1 }), count: formatNumber(rating.data.reviewCount) })}
               </span>
             </span>
           ) : null}
@@ -174,7 +197,7 @@ export function ProductDetails({ productId }: { productId: number }) {
           {variants.length ? (
             <>
               <div className="stack" style={{ gap: 8 }}>
-                <span className="kicker">Size</span>
+                <span className="kicker">{t("catalog.size")}</span>
                 <div className="chipRow">
                   {sizes.map((s) => (
                     <button
@@ -197,11 +220,12 @@ export function ProductDetails({ productId }: { productId: number }) {
 
               {colors.length > 1 || (colors.length === 1 && colors[0] !== "") ? (
                 <div className="stack" style={{ gap: 8 }}>
-                  <span className="kicker">Color</span>
+                  <span className="kicker">{t("catalog.color")}</span>
                   <div className="chipRow">
                     {colors.map((c) => {
                       const variant = variants.find((v) => v.size === size && (v.color ?? "") === c);
                       const out = (variant?.available ?? 0) <= 0;
+                      const swatch = swatchColor(c);
                       return (
                         <button
                           key={c || "one-color"}
@@ -209,12 +233,10 @@ export function ProductDetails({ productId }: { productId: number }) {
                           className="chip"
                           data-selected={c === color}
                           disabled={out}
-                          onClick={() => {
-                            setSelectedColor(c);
-                            setQuantity(1);
-                          }}
+                          onClick={() => chooseColor(c)}
                         >
-                          {c || "one color"}
+                          {swatch ? <span className="chipSwatch" style={{ background: swatch }} aria-hidden /> : null}
+                          {c || t("product.oneColor")}
                         </button>
                       );
                     })}
@@ -225,14 +247,14 @@ export function ProductDetails({ productId }: { productId: number }) {
               <p className="mono muted" style={{ margin: 0, fontSize: "0.82rem" }}>
                 {selected ? `SKU ${selected.sku}` : ""}
                 {selected ? " · " : ""}
-                {available > 0 ? `${available} in stock` : "out of stock"}
+                {available > 0 ? t("product.inStock", { count: formatNumber(available) }) : t("product.outOfStock")}
               </p>
 
               <div className="toolbar" style={{ gap: 12 }}>
                 <div className="qty">
                   <button
                     type="button"
-                    aria-label="Decrease quantity"
+                    aria-label={t("product.decrease")}
                     disabled={quantity <= 1}
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   >
@@ -241,7 +263,7 @@ export function ProductDetails({ productId }: { productId: number }) {
                   <span>{quantity}</span>
                   <button
                     type="button"
-                    aria-label="Increase quantity"
+                    aria-label={t("product.increase")}
                     disabled={quantity >= available}
                     onClick={() => setQuantity((q) => Math.min(available, q + 1))}
                   >
@@ -254,22 +276,22 @@ export function ProductDetails({ productId }: { productId: number }) {
                   disabled={addToCart.isPending || !selected || available <= 0}
                   onClick={() => addToCart.mutate()}
                 >
-                  {addToCart.isPending ? "Adding..." : "Add to cart"}
+                  {addToCart.isPending ? t("product.adding") : t("product.addCart")}
                 </button>
               </div>
               {addToCart.isSuccess ? (
                 <p className="statusOk status" style={{ margin: 0 }}>
-                  Added to cart ·{" "}
+                  {t("product.added")} ·{" "}
                   <Link href="/cart" style={{ textDecoration: "underline" }}>
-                    view cart
+                    {t("product.viewCart")}
                   </Link>
                 </p>
               ) : null}
-              {addToCart.error ? <p className="errorText">{(addToCart.error as Error).message}</p> : null}
+              {addToCart.error ? <p className="errorText">{errorMessage(addToCart.error)}</p> : null}
             </>
           ) : (
             <p className="muted" style={{ margin: 0 }}>
-              No variants available for this product yet.
+              {t("product.noVariants")}
             </p>
           )}
 
@@ -282,19 +304,20 @@ export function ProductDetails({ productId }: { productId: number }) {
               <svg width="15" height="15" viewBox="0 0 24 24" fill={wishlist.isSuccess ? "var(--primary)" : "none"} stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
                 <path d="M12 21S3 13.9 3 8.6C3 5.5 5.4 3 8.4 3c1.5 0 2.9.7 3.6 1.8C12.7 3.7 14.1 3 15.6 3 18.6 3 21 5.5 21 8.6c0 5.3-9 12.4-9 12.4Z" strokeLinejoin="round" />
               </svg>
-              {wishlist.isSuccess ? "Saved to wishlist" : "Add to wishlist"}
+              {wishlist.isSuccess ? t("product.saved") : t("product.wishlist")}
             </button>
           ) : null}
+          {wishlist.error ? <p className="errorText" role="alert">{errorMessage(wishlist.error)}</p> : null}
           {current.careInstructions ? (
             <p className="muted" style={{ margin: 0, fontSize: "0.88rem" }}>
-              Care: {current.careInstructions}
+              {t("product.care", { instructions: current.careInstructions })}
             </p>
           ) : null}
         </aside>
       </section>
 
       <RecommendationRail
-        title="You may also like."
+        title={t("product.similar")}
         productId={productId}
         fetch={() => aiApi.similar(productId, 4)}
         queryKey={["similar", productId]}
@@ -303,7 +326,7 @@ export function ProductDetails({ productId }: { productId: number }) {
       <ReviewPanel productId={productId} />
 
       <RecommendationRail
-        title="Often bought together."
+        title={t("product.together")}
         productId={productId}
         fetch={() => aiApi.boughtTogether(productId, 4)}
         queryKey={["bought-together", productId]}
@@ -341,6 +364,23 @@ function RecommendationRail({
       </div>
     </section>
   );
+}
+
+// swatch colours for the variant names the catalog uses; unknown names get no dot.
+// A static table (not CSS.supports) keeps server and client markup identical.
+const SWATCHES: Record<string, string> = {
+  black: "#1c1c1c", white: "#f5f3ee", grey: "#8a8a8a", gray: "#8a8a8a", charcoal: "#3b3b3b", silver: "#c4c4c4",
+  navy: "#1f2a44", blue: "#2f5fa8", denim: "#3b5a86", teal: "#2f7f7a", green: "#3f6b3a", olive: "#6b6b2f", khaki: "#b9a77a", mint: "#9fd3c0",
+  beige: "#d8c7a6", cream: "#f1e7cf", ivory: "#f4efe1", sand: "#d2b48c", tan: "#c9a173", camel: "#b6864b", brown: "#6b4a2b",
+  red: "#b3261e", burgundy: "#6d1f2c", maroon: "#6d1f2c", pink: "#e8a4b8", coral: "#f08070", orange: "#e0521a",
+  yellow: "#f2c545", mustard: "#c99a2e", gold: "#d4af37", purple: "#6b4a8a", lavender: "#b8a9d9"
+};
+
+function swatchColor(name: string) {
+  const value = name.trim().toLowerCase();
+  if (!value) return null;
+  const key = SWATCHES[value] ? value : Object.keys(SWATCHES).find((known) => value.split(/[\s/-]+/).includes(known));
+  return key ? SWATCHES[key] : null;
 }
 
 function hasStock(variants: Variant[], size: string) {
