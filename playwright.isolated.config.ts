@@ -10,8 +10,8 @@ if (!process.env.E2E_FIXTURE_FILE || !process.env.E2E_PASSWORD || !process.env.E
 export default defineConfig({
   testDir: "e2e",
   testMatch: process.env.E2E_REQUIRE_DE === "1"
-    ? ["remediation.acceptance.ts", "locale.acceptance.ts"]
-    : ["remediation.acceptance.ts"],
+    ? ["remediation.acceptance.ts", "accessibility.acceptance.ts", "locale.acceptance.ts"]
+    : ["remediation.acceptance.ts", "accessibility.acceptance.ts"],
   fullyParallel: false,
   workers: 1,
   retries: 0,

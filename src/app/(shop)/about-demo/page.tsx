@@ -12,6 +12,7 @@ export default function Page() {
       <h2 className="subtitle">{t("about.productsTitle")}</h2>
       <p>{t("about.products")}</p>
       <p>{t("about.reviews")}</p>
+      <p>{t("about.images")}</p>
     </section>
     <section className="stack">
       <h2 className="subtitle">{t("about.paymentTitle")}</h2>

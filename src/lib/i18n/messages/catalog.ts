@@ -255,6 +255,10 @@ export const catalogMessages = {
     "en": "Your account and everything linked to it stay until you erase the account from Security & data. Accounts that have not signed in for 12 months are removed by the operator. Fictional order and test-payment records of erased accounts are kept in pseudonymised form for up to 24 months so stock and payment history stay consistent. Security logs are kept for 12 months. Backups are rotated after 14 days; an erased account can therefore remain in a backup copy for up to 14 more days.",
     "de": "Dein Konto und alles, was damit verknüpft ist, bleibt gespeichert, bis du das Konto unter „Sicherheit & Daten“ löschst. Konten ohne Anmeldung seit 12 Monaten entfernt der Betreiber. Fiktive Bestell- und Testzahlungsdaten gelöschter Konten bleiben bis zu 24 Monate pseudonymisiert erhalten, damit Bestand und Zahlungsverlauf konsistent bleiben. Sicherheitsprotokolle werden 12 Monate aufbewahrt. Sicherungskopien werden nach 14 Tagen überschrieben; ein gelöschtes Konto kann daher bis zu 14 weitere Tage in einer Sicherung enthalten sein."
   },
+  "about.images": {
+    "en": "Product images were generated for this demonstration and show no real garments; no third-party photographs are used. Interface fonts are Bricolage Grotesque, Inter and JetBrains Mono under the SIL Open Font License. The source code is public on GitHub.",
+    "de": "Die Produktbilder wurden für diese Demo generiert und zeigen keine echten Kleidungsstücke; Fotos Dritter werden nicht verwendet. Die Schriften Bricolage Grotesque, Inter und JetBrains Mono stehen unter der SIL Open Font License. Der Quellcode ist öffentlich auf GitHub."
+  },
   "about.operator": {
     "en": "shopupu is a portfolio project by Dmytro Bolibok. It is not a store and sells nothing. Contact:",
     "de": "shopupu ist ein Portfolio-Projekt von Dmytro Bolibok. Es ist kein Shop und verkauft nichts. Kontakt:"

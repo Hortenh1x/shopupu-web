@@ -144,6 +144,18 @@ select {
   align-items: start;
 }
 
+/* Grid tracks default to min-content sizing: one unbreakable token in user text
+   (a pasted URL in a review) would otherwise widen the whole page on phones. */
+.split > *,
+.stack > * {
+  min-width: 0;
+}
+
+.card p,
+.card strong {
+  overflow-wrap: anywhere;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
